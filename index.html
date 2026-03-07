@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Minecraft 3D</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -28,7 +32,7 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
 #cmp{position:absolute;top:32px;right:10px;color:#fff;font-size:10px;background:rgba(0,0,0,.4);padding:2px 7px;border:1px solid #555}
 #inv{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;pointer-events:all;z-index:50}
 #inv.open{display:flex}
-#invp{background:#c6c6c6;border:3px solid #fff;box-shadow:5px 5px 0 #555;padding:14px;max-width:98vw}
+#invp{background:#c6c6c6;border:3px solid #fff;box-shadow:5px 5px 0 #555;padding:14px;max-width:98vw;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #invp h2{font-size:11px;color:#333;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
 .igr{display:grid;grid-template-columns:repeat(9,44px);gap:3px;margin-bottom:6px}
 .ilb{font-size:9px;color:#555;margin:4px 0 3px}
@@ -51,7 +55,7 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
 .hsub{color:#ccc;font-size:10px;letter-spacing:3px;margin-bottom:28px;text-shadow:1px 1px 0 #000}
 
 /* world list panel */
-#homePanel{background:rgba(0,0,0,.72);border:2px solid #444;padding:18px 22px;min-width:480px;max-width:96vw;max-height:80vh;overflow-y:auto;backdrop-filter:blur(4px)}
+#homePanel{background:rgba(0,0,0,.72);border:2px solid #444;padding:18px 22px;min-width:480px;max-width:96vw;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;backdrop-filter:blur(4px)}
 #homePanel h2{font-size:11px;letter-spacing:3px;color:#aaa;text-transform:uppercase;margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:6px}
 .wslot{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:4px;background:rgba(255,255,255,.06);border:1px solid #333;cursor:pointer;transition:background .15s}
 .wslot:hover,.wslot.sel{background:rgba(255,255,255,.14);border-color:#5d9e3f}
@@ -96,6 +100,123 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
 #loadBar{width:280px;height:10px;background:#222;border:1px solid #444;margin-bottom:8px}
 #loadBarFill{height:100%;background:#5d9e3f;width:0%;transition:width .12s}
 #loadMsg{font-size:10px;color:#666;letter-spacing:1px}
+
+/* ════════════════════════════
+   MOBILE TOUCH CONTROLS
+════════════════════════════ */
+/* Touch-action prevent scroll on canvas */
+canvas{touch-action:none}
+
+/* The whole overlay is pointer-events:none by default; individual zones enable it */
+#mobileCtrl{
+  display:none; /* shown only on touch devices via JS */
+  position:fixed;inset:0;z-index:15;
+  pointer-events:none;user-select:none;-webkit-user-select:none;
+}
+
+/* ── Joystick zone (left half) ── */
+#joyZone{
+  position:absolute;left:0;top:0;bottom:0;width:48%;
+  pointer-events:all;touch-action:none;
+}
+#joyBase{
+  position:absolute;width:120px;height:120px;border-radius:50%;
+  background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.22);
+  display:none;transform:translate(-50%,-50%);pointer-events:none;
+}
+#joyKnob{
+  position:absolute;width:52px;height:52px;border-radius:50%;
+  background:rgba(255,255,255,.32);border:2px solid rgba(255,255,255,.6);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+
+/* ── Look / camera swipe zone (right half) ── */
+#lookZone{
+  position:absolute;right:0;top:0;bottom:120px;left:48%;
+  pointer-events:all;touch-action:none;
+}
+
+/* ── Action button cluster (bottom-right) ── */
+#mobileActions{
+  position:absolute;right:10px;bottom:10px;
+  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+  pointer-events:all;
+}
+/* Row: jump left, break+place right */
+#mobileRow1{display:flex;gap:8px;align-items:flex-end;}
+#mobileRow2{display:flex;gap:8px;align-items:center;}
+
+.mab{
+  width:64px;height:64px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  background:rgba(0,0,0,.55);
+  color:#fff;font-size:26px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  touch-action:none;-webkit-tap-highlight-color:transparent;
+  user-select:none;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.5);
+  transition:background .08s;
+}
+.mab:active,.mab.pressed{background:rgba(255,255,255,.28);border-color:#fff;}
+.mab.sm{width:52px;height:52px;font-size:20px;}
+.mab.brk{border-color:rgba(255,80,80,.6);background:rgba(80,0,0,.55);}
+.mab.brk:active,.mab.brk.pressed{background:rgba(200,50,50,.6);}
+.mab.plc{border-color:rgba(80,200,80,.6);background:rgba(0,60,0,.55);}
+.mab.plc:active,.mab.plc.pressed{background:rgba(50,160,50,.6);}
+.mab.jmp{border-color:rgba(255,220,0,.6);background:rgba(60,50,0,.55);width:72px;height:72px;font-size:28px;}
+.mab.jmp:active,.mab.jmp.pressed{background:rgba(180,160,0,.55);}
+
+/* ── Top controls row ── */
+#mobileTop{
+  position:absolute;top:8px;right:8px;
+  display:flex;gap:6px;align-items:center;pointer-events:all;
+}
+
+/* ── Sprint & Fly left-side extras ── */
+#mobileSide{
+  position:absolute;left:8px;bottom:130px;
+  display:flex;flex-direction:column;gap:6px;pointer-events:all;
+}
+
+/* ── Hotbar prev/next arrows ── */
+#mobileHotL,#mobileHotR{
+  position:absolute;bottom:8px;
+  width:40px;height:52px;
+  background:rgba(0,0,0,.55);border:1px solid #555;
+  color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;
+  pointer-events:all;touch-action:none;-webkit-tap-highlight-color:transparent;
+}
+#mobileHotL{left:4px;}
+#mobileHotR{right:4px;}
+
+/* ── Responsive inventory panel for small screens ── */
+@media(pointer:coarse){
+  #c{cursor:crosshair;}
+  #invp,#furnaceUI>div,#enchUI>div,#chest>div{
+    max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+  #homePanel{width:94vw;min-width:unset;max-height:86vh;overflow-y:auto;}
+  .pauseBtn{min-width:180px;}
+  /* Compact grid on touch */
+  .igr{grid-template-columns:repeat(6,42px)!important;gap:3px!important;}
+  .isl{width:42px!important;height:42px!important;}
+  .isl canvas{width:26px!important;height:26px!important;}
+  .hs{width:46px!important;height:46px!important;}
+  .hs canvas{width:30px!important;height:30px!important;}
+  #hotbar{gap:2px!important;bottom:68px!important;}
+  /* bars shift up a bit */
+  #bars{bottom:130px!important;}
+  #xprow{bottom:116px!important;}
+  /* Crosshair always visible (no cursor:none on mobile) */
+  #xh{display:block!important;}
+}
+@media(max-width:500px){
+  .igr{grid-template-columns:repeat(5,40px)!important;}
+  .isl{width:40px!important;height:40px!important;}
+  #homeTitle{font-size:32px!important;letter-spacing:4px!important;}
+  .hsub{font-size:8px!important;}
+}
+
 </style>
 </head>
 <body>
@@ -104,6 +225,14 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
   <div id="xh"></div>
   <div id="dbg"></div>
   <div id="bars"><div id="hbar"></div><div id="abar"></div><div id="fbar"></div></div>
+  <div id="xprow" style="position:absolute;bottom:62px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1px;pointer-events:none">
+    <div id="xplvl" style="color:#80ff20;font-size:10px;text-shadow:1px 1px 0 #000;font-weight:bold"></div>
+    <div style="width:182px;height:5px;background:rgba(0,0,0,.5);border:1px solid #333">
+      <div id="xpbar" style="height:100%;background:#80ff20;width:0%;transition:width .2s"></div>
+    </div>
+  </div>
+  <div id="weatherIcon" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);color:#fff;font-size:12px;text-shadow:1px 1px 0 #000;display:none"></div>
+  <div id="enchMsg" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-120px);color:#dd88ff;font-size:13px;text-shadow:1px 1px 0 #000;font-weight:bold;display:none;text-align:center;pointer-events:none"></div>
   <div id="hotbar"></div>
   <div id="bb"><div id="bf"></div></div>
   <div id="badge">SURVIVAL</div>
@@ -280,13 +409,35 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
     <div style="font-size:8px;color:#888;margin-top:5px">Press E or Esc to close</div>
   </div>
 </div>
+
+<!-- Enchanting Table UI -->
+<div id="enchUI" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;pointer-events:all;z-index:50">
+  <div style="background:#1a0a2e;border:3px solid #7b3fbe;box-shadow:0 0 20px #7b3fbebb,5px 5px 0 #0a0016;padding:18px 22px;min-width:360px;max-width:98vw">
+    <h2 style="font-size:11px;color:#cc88ff;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px;text-shadow:0 0 8px #cc88ff">✦ Enchanting Table ✦</h2>
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">
+      <div>
+        <div class="ilb" style="color:#aa66ee">Item to Enchant</div>
+        <div id="enchItemSlot" class="isl" style="background:#2a1040;border-color:#7b3fbe;width:50px;height:50px"><canvas width="16" height="16"></canvas><span class="ct"></span></div>
+      </div>
+      <div style="flex:1">
+        <div class="ilb" style="color:#aa66ee">Available Enchants (costs XP levels)</div>
+        <div id="enchOptions" style="display:flex;flex-direction:column;gap:5px;margin-top:4px"></div>
+      </div>
+    </div>
+    <div style="font-size:9px;color:#9955cc;margin-bottom:10px">Your XP Level: <span id="enchXPDisplay">0</span></div>
+    <div class="ilb" style="color:#aa66ee">Inventory</div>
+    <div id="enchInvBag" style="display:grid;grid-template-columns:repeat(9,44px);gap:3px;margin-bottom:3px"></div>
+    <div id="enchInvHot" style="display:grid;grid-template-columns:repeat(9,44px);gap:3px"></div>
+    <div style="font-size:8px;color:#664488;margin-top:6px">Press E or Esc to close</div>
+  </div>
+</div>
 <div id="portalBar" style="position:fixed;bottom:120px;left:50%;transform:translateX(-50%);display:none;background:rgba(80,0,120,.7);border:2px solid #cc88ff;padding:6px 18px;font-size:10px;color:#ee88ff;letter-spacing:2px;text-align:center;font-family:monospace">ENTERING PORTAL...</div>
 <div id="death"><h2>You Died!</h2><button id="rBtn">Respawn</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
 // ═══════ CONFIG ═══════
-const CS=16,WH=64,SEA=12,RC=3,TILE=16,AC=36;
+const CS=16,WH=128,SEA=20,RC=3,TILE=16,AC=60;
 const G=-22, JV=6.8,
       WK=4.4,SP=6.8,SW=2.5,RCH=6;  // SP = sprint, WK = walk
 const EYE=1.62,PW=0.28,PCAP=0.18,PI2=Math.PI/2;
@@ -337,6 +488,13 @@ const BLK={
   38:{n:'Torch',         top:T(41),side:T(41),bot:T(41), solid:1,bt:0.1,emit:1,xray:1},
   39:{n:'Furnace',       top:T(43),side:T(42),bot:T(43), solid:1,bt:7.5,req:{tool:'pickaxe',tier:0},furnace:1},
   40:{n:'Cobbled Deepslate',top:T(44),side:T(44),bot:T(44),solid:1,bt:9.0,req:{tool:'pickaxe',tier:0}},
+  41:{n:'Snow Block',      top:T(45),side:T(45),bot:T(45),solid:1,bt:0.5,falls:1},
+  42:{n:'Ice',             top:T(46),side:T(46),bot:T(46),solid:1,bt:0.5,xray:1},
+  43:{n:'Wool',            top:T(47),side:T(47),bot:T(47),solid:1,bt:1.2},
+  44:{n:'Bookshelf',       top:T(8), side:T(48),bot:T(8), solid:1,bt:3.0},
+  45:{n:'Crafting Table',  top:T(49),side:T(50),bot:T(8), solid:1,bt:3.0,craftTable:1},
+  46:{n:'Bed',             top:T(51),side:T(51),bot:T(51),solid:1,bt:0.5,bed:1},
+  47:{n:'Enchanting Table',top:T(52),side:T(53),bot:T(3), solid:1,bt:5.0,req:{tool:'pickaxe',tier:0},enchTable:1},
 };
 
 // Non-block items
@@ -379,6 +537,10 @@ const NONBLK={
   85:{n:'Cooked Mutton',food:6,maxStack:64},
   86:{n:'Bone',         maxStack:64},
   87:{n:'Gunpowder',    maxStack:64},
+  88:{n:'Arrow',    maxStack:64},
+  89:{n:'Bow',      maxStack:1, bow:1},
+  98:{n:'Feather',  maxStack:64},
+  99:{n:'Bread',    food:5,maxStack:64},
 };
 const itemName=id=>BLK[id]?.n||NONBLK[id]?.n||'?';
 const itemMaxStack=id=>BLK[id]?64:(NONBLK[id]?.maxStack||64);
@@ -434,10 +596,11 @@ function getMineTime(bid,toolId){
   if(gameMode==='creative')return .05;
   const ti=NONBLK[toolId]?.tool;
   const req=BLK[bid]?.req;
-  if(!req)return ti?base/ti.spd:base;
+  const effMul=getItemEnchants(toolId).includes('efficiency')?0.5:1;
+  if(!req){const t=ti?base/(ti.spd):base;return t*effMul;}
   if(!ti||ti.type!==req.tool)return base*5;
   if(ti.tier<req.tier)return base*2;
-  return base/ti.spd;
+  return (base/ti.spd)*effMul;
 }
 // Diamond ore now requires tier 2 (iron pickaxe); diamond tools are tier 3
 // Update diamond ore req to tier 2 so iron pickaxe can mine it
@@ -446,7 +609,13 @@ function getBlockDrop(bid){
   if(BLK[bid]?.drop!==undefined)return BLK[bid].drop;
   return bid;
 }
-function getToolDamage(toolId){const t=NONBLK[toolId]?.tool;if(!t)return 1;return[1,3,5,8,12][t.tier]||2;}
+function getItemEnchants(toolId){for(let i=0;i<36;i++)if(INV[i]?.type===toolId)return INV[i].enchants||[];return[];}
+function getToolDamage(toolId){
+  const t=NONBLK[toolId]?.tool;const base=t?([1,3,5,8,12][t.tier]||2):1;
+  const enchs=getItemEnchants(toolId);let bonus=0;
+  if(enchs.includes('sharpness'))bonus+=3;
+  return base+bonus;
+}
 
 // ═══════ ATLAS ═══════
 function buildAtlas(){
@@ -1032,7 +1201,79 @@ function buildAtlas(){
     return[C(60+v),C(60+v),C(74+v)];
   });
 
-    const tex=new THREE.CanvasTexture(A);tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;
+
+  // ── 45: Snow Block ──
+  tile(45,(x,y)=>{const v=j(x,y,70,10);return[C(230+v),C(240+v),C(255+v)];});
+  // ── 46: Ice ──
+  tile(46,(x,y)=>{
+    const v=j(x,y,71,5);
+    const crack=hash(x*17+y*31+71)<0.08;
+    if(crack)return[C(140+v),C(180+v),C(220+v)];
+    return[C(170+v),C(210+v),C(245+v),210];
+  });
+  // ── 47: Wool ──
+  tile(47,(x,y)=>{
+    const v=j(x,y,72,14);
+    const edge=x===0||y===0||x===15||y===15;
+    return edge?[C(195+v),C(195+v),C(195+v)]:[C(215+v),C(215+v),C(215+v)];
+  });
+  // ── 48: Bookshelf (side with book spines) ──
+  tile(48,(x,y)=>{
+    const v=j(x,y,73,4);
+    if(y<=1||y>=14){const seam=x===0||x===7||x===15||y===0||y===15;return seam?[C(130+v),C(90+v),C(45+v)]:[C(162+v),C(115+v),C(55+v)];}
+    const bookX=x%4,bookIdx=Math.floor(x/4);
+    const cols=[[180,50,50],[50,80,165],[60,140,60],[155,100,20]];
+    const bc=cols[bookIdx%cols.length];
+    if(bookX===0||y===2||y===13)return[C(bc[0]-30+v),C(bc[1]-30+v),C(bc[2]-30+v)];
+    return[C(bc[0]+v),C(bc[1]+v),C(bc[2]+v)];
+  });
+  // ── 49: Crafting Table top ──
+  tile(49,(x,y)=>{
+    const v=j(x,y,74,4);
+    const cross=x===7||x===8||y===7||y===8;
+    if(cross)return[C(88+v),C(58+v),C(28+v)];
+    const seam=x<8&&y<8?hash(x*11+y*7+74)<0.2:false;
+    if(seam)return[C(135+v),C(92+v),C(46+v)];
+    return[C(162+v),C(115+v),C(55+v)];
+  });
+  // ── 50: Crafting Table side ──
+  tile(50,(x,y)=>{
+    const v=j(x,y,75,4);
+    if(y===3||y===4)return[C(100+v),C(65+v),C(25+v)];
+    const seam=x%8===0||y===0||y===15;
+    return seam?[C(128+v),C(88+v),C(44+v)]:[C(162+v),C(115+v),C(55+v)];
+  });
+  // ── 51: Bed (simplified top) ──
+  tile(51,(x,y)=>{
+    const v=j(x,y,76,5);
+    if(y<6&&x>2&&x<13)return[C(225+v),C(225+v),C(225+v)]; // pillow
+    if(y<6)return[C(170+v),C(50+v),C(50+v)];               // pillow edge
+    return[C(185+v),C(45+v),C(45+v)];                       // red blanket
+  });
+  // ── 52: Enchanting Table top (open book) ──
+  tile(52,(x,y)=>{
+    const v=j(x,y,77,5);
+    if(x>=4&&x<=11&&y>=3&&y<=12){
+      if(x===7||x===8)return[C(140+v),C(90+v),C(40+v)];
+      if(x<7&&hash(x*9+y*7+77)<0.15)return[C(80+v),C(50+v),C(160+v)];
+      if(x>8&&hash(x*9+y*7+78)<0.15)return[C(80+v),C(50+v),C(160+v)];
+      return[C(215+v),C(205+v),C(175+v)];
+    }
+    const rune=hash(x*13+y*23+52)<0.05;
+    if(rune)return[C(130+v),C(50+v),C(190+v)];
+    return[C(28+v),C(18+v),C(48+v)];
+  });
+  // ── 53: Enchanting Table side ──
+  tile(53,(x,y)=>{
+    const v=j(x,y,78,5);
+    const trim=x===0||x===15||y===0||y===15;
+    if(trim)return[C(160+v),C(120+v),C(20+v)];
+    const rune=hash(x*11+y*19+53)<0.07;
+    if(rune)return[C(130+v),C(55+v),C(195+v)];
+    return[C(38+v),C(28+v),C(58+v)];
+  });
+
+      const tex=new THREE.CanvasTexture(A);tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;
   return{tex,canvas:A};
 }
 const{tex:ATLAS,canvas:ATLAS_C}=buildAtlas();
@@ -1397,7 +1638,7 @@ function genChunk(cx,cz){
         if(y===h){
           switch(biome){
             case 2: t=6; break;
-            case 4: t=h<=SEA+2?11:1; break;
+            case 4: t=h<=SEA+2?11:41; break; // tundra snow
             case 5: t=h<=SEA+1?11:2; break;
             case 3: t=h>SEA+18?3:1; break;
             default: t=h<=SEA+1?6:1;
@@ -1448,6 +1689,12 @@ function genChunk(cx,cz){
         }
       }
 
+      // Tundra ice and snow
+      if(biome===4){
+        const ts=data[ci(lx,h,lz)];
+        if(ts===11)data[ci(lx,h,lz)]=42;
+        if(ts===41&&hash(wx*61+wz*37)<0.04&&h+1<WH)data[ci(lx,h+1,lz)]=41;
+      }
       // Desert cacti (sand column)
       if(biome===2&&hash(wx*73.1+wz*41.9)<0.012){
         const cH=2+Math.floor(hash(wx*17+wz*31)*3);
@@ -2655,8 +2902,22 @@ const RECIPES=[
   {p:[52,50],w:1,h:2,out:{type:38,n:4}},
   // Furnace: 8 cobblestone ring
   {p:[8,8,8, 8,0,8, 8,8,8],w:3,h:3,out:{type:39,n:1}},
-  // Cobbled Deepslate: deepslate in 2x2 -> 4 cobbled
+  // Cobbled Deepslate
   {sh:1,need:[[34,4]],out:{type:40,n:4}},
+  // Bow: sticks + planks
+  {p:[0,50,7, 50,0,7, 0,50,7],w:3,h:3,out:{type:89,n:1}},
+  // Arrow: flint + stick + feather
+  {p:[55,50,98],w:1,h:3,out:{type:88,n:4}},
+  // Bed: 3 wool + 3 planks
+  {p:[43,43,43, 7,7,7],w:3,h:2,out:{type:46,n:1}},
+  // Crafting Table: 2x2 planks
+  {p:[7,7, 7,7],w:2,h:2,out:{type:45,n:1}},
+  // Bookshelf: planks + wool + planks
+  {p:[7,7,7, 43,43,43, 7,7,7],w:3,h:3,out:{type:44,n:1}},
+  // Enchanting Table: diamonds + obsidian + cobble
+  {p:[0,53,0, 23,53,23, 8,8,8],w:3,h:3,out:{type:47,n:1}},
+  // Bread: 3 wool (placeholder, real MC uses wheat)
+  {p:[43,43,43],w:3,h:1,out:{type:99,n:2}},
 ];
 const CW=3;
 const csl=Array(CW*CW).fill(null);
@@ -2988,7 +3249,11 @@ function rfArmorBar(){
 function dmg(n){
   if(gameMode==='creative')return;
   const red=getArmorReduction();
-  hp=Math.max(0,hp-Math.ceil(n*(1-red)));
+  const actualDmg=Math.ceil(n*(1-red));
+  if(actualDmg>0)sfx('hurt');
+  hp=Math.max(0,hp-actualDmg);
+  // Flash screen red
+  const flash=document.body;flash.style.background='rgba(255,0,0,.25)';setTimeout(()=>flash.style.background='',180);
   rfHP();if(!hp&&!dead)die();
 }
 rfArmorBar();
@@ -3004,7 +3269,7 @@ function tickHunger(dt,moving){
 
 // ═══════ ANIMALS ═══════
 const MOB_DEFS={
-  sheep:  {hp:10,drop:82,dropN:2,
+  sheep:  {hp:10,drop:43,dropN:1,dropBonus:{id:82,n:1},
            body:{w:0.9,h:0.65,d:0.65}, head:{w:0.5,h:0.5,d:0.5},
            leg:{w:0.2,h:0.5,d:0.2}, totalH:1.3, speed:1.4,
            bodyCol:0xe8e8e8, headCol:0xdcdcdc, legCol:0xe0c0a0, woolly:true},
@@ -3012,7 +3277,7 @@ const MOB_DEFS={
            body:{w:1.1,h:0.75,d:0.6}, head:{w:0.7,h:0.65,d:0.55},
            leg:{w:0.22,h:0.6,d:0.22}, totalH:1.45, speed:1.2,
            bodyCol:0x584134, headCol:0x584134, legCol:0x3a2820, woolly:false},
-  chicken:{hp:4,drop:81,dropN:1,
+  chicken:{hp:4,drop:81,dropN:1,dropBonus:{id:98,n:1},
            body:{w:0.45,h:0.45,d:0.45}, head:{w:0.3,h:0.3,d:0.3},
            leg:{w:0.1,h:0.38,d:0.1}, totalH:0.9, speed:1.8,
            bodyCol:0xf5f5f0, headCol:0xf5f5f0, legCol:0xe8a030, woolly:false},
@@ -3445,6 +3710,15 @@ function tickBrk(dt,hit){
   brk.e+=dt;const p=Math.min(1,brk.e/brk.tot);setBB(p);
   if(p>=1){
     const drop=hasProper||gameMode==='creative'?getBlockDrop(bid):null;
+    // Fortune enchant — double ore drops
+    const toolId2=INV[sel]?.type;
+    if(drop&&hasProper&&getItemEnchants(toolId2).includes('fortune')){
+      const oreIds=[13,14,16,17,31,35,36,37];
+      if(oreIds.includes(bid))give(drop,1); // extra drop
+    }
+    // XP from ore mining
+    const oreXP={13:2,14:1,16:2,17:5,31:2,35:1,36:2,37:5,35:1};
+    if(hasProper&&oreXP[bid])giveXP(oreXP[bid]);
     // If it's a chest, drop its contents too
     if(bid===20){
       const key=chestK(brk.bx,brk.by,brk.bz);
@@ -3458,6 +3732,8 @@ function tickBrk(dt,hit){
       const fd=furnaceData.get(fk);
       if(fd){if(fd.ingr)give(fd.ingr.type,fd.ingr.count);if(fd.fuel)give(fd.fuel.type,fd.fuel.count);if(fd.out)give(fd.out.type,fd.out.count);furnaceData.delete(fk);}
     }
+    spawnParticles(brk.bx,brk.by,brk.bz,bid);
+    sfx('break');
     setB(brk.bx,brk.by,brk.bz,0);
     // Check block above for falling
     checkFallAbove(brk.bx,brk.by-1,brk.bz);
@@ -3474,8 +3750,8 @@ function tryLock(){if(document.pointerLockElement===canvas)return;try{const r=ca
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;if(locked){lastPX=null;lastPY=null;}});
 document.addEventListener('keydown',e=>{
   keys[e.code]=true;
-  if(e.code==='Escape'){if(furnaceOpen){closeFurnace();return;}if(chestOpen){closeChest();return;}if(creativeOpen){closeCreative();return;}if(tradeOpen){closeTrade();return;}if(invOpen){closeInv();return;}if(pauseEl.style.display==='flex'){hidePause();focused=true;paused=false;tryLock();return;}focused=false;paused=true;showPause();return;}
-  if(e.code==='KeyE'&&(focused||invOpen||creativeOpen||tradeOpen||furnaceOpen)){if(furnaceOpen){closeFurnace();return;}
+  if(e.code==='Escape'){if(enchOpen){closeEnchanting();return;}if(furnaceOpen){closeFurnace();return;}if(chestOpen){closeChest();return;}if(creativeOpen){closeCreative();return;}if(tradeOpen){closeTrade();return;}if(invOpen){closeInv();return;}if(pauseEl.style.display==='flex'){hidePause();focused=true;paused=false;tryLock();return;}focused=false;paused=true;showPause();return;}
+  if(e.code==='KeyE'&&(focused||invOpen||creativeOpen||tradeOpen||furnaceOpen||enchOpen)){if(enchOpen){closeEnchanting();return;}if(furnaceOpen){closeFurnace();return;}
     if(tradeOpen){closeTrade();return;}
     if(gameMode==='creative'){if(creativeOpen)closeCreative();else openCreative();}
     else{if(invOpen)closeInv();else openInv();}
@@ -3494,22 +3770,24 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('keyup',e=>{keys[e.code]=false;});
 document.addEventListener('pointermove',e=>{
-  if(!focused||invOpen||chestOpen||creativeOpen||tradeOpen||furnaceOpen)return;
+  if(!focused||invOpen||chestOpen||creativeOpen||tradeOpen||furnaceOpen||enchOpen)return;
   let dx,dy;
   if(locked){dx=e.movementX;dy=e.movementY;}
   else{if(lastPX===null){lastPX=e.clientX;lastPY=e.clientY;return;}dx=e.clientX-lastPX;dy=e.clientY-lastPY;lastPX=e.clientX;lastPY=e.clientY;}
   player.yaw-=dx*.0022;player.pitch=Math.max(-PI2+.01,Math.min(PI2-.01,player.pitch-dy*.0022));
 });
 function handleMouseDown(e){
-  if(invOpen||chestOpen||creativeOpen||tradeOpen||furnaceOpen||dead)return;
+  if(invOpen||chestOpen||creativeOpen||tradeOpen||furnaceOpen||enchOpen||dead)return;
   if(!focused){focused=true;paused=false;hidePause();hideHome();}
   if(e.button===0)brkBtn=true;
   if(e.button===2){
     e.preventDefault();
+    // Bow charging start
+    if(NONBLK[INV[sel]?.type]?.bow){bowCharging=true;bowChargeT=0;return;}
     // Check for villager first
     const vill=raycastVillager();
     if(vill){openTrade(vill);return;}
-    const s=INV[sel];if(s&&NONBLK[s.type]?.food){eatFood(NONBLK[s.type].food);s.count--;if(!s.count)INV[sel]=null;rfH();return;}
+    const s=INV[sel];if(s&&NONBLK[s.type]?.food){eatFood(NONBLK[s.type].food);sfx('eat');s.count--;if(!s.count)INV[sel]=null;rfH();return;}
     // Light portal with flint & steel — scan around player, works even clicking air
     if(NONBLK[INV[sel]?.type]?.flintSteel){
       const hit0=raycast();
@@ -3531,6 +3809,12 @@ function handleMouseDown(e){
     const hit=raycast();if(!hit)return;
     // Open furnace on right-click
     if(hit.t===39){openFurnace(hit.bx,hit.by,hit.bz);return;}
+    // Open enchanting table
+    if(hit.t===47){openEnchanting(hit.bx,hit.by,hit.bz);return;}
+    // Crafting table opens inventory
+    if(hit.t===45){if(!invOpen)openInv();return;}
+    // Bed: sleep or set spawn
+    if(hit.t===46){tryUseBed(hit.bx,hit.by,hit.bz);return;}
     // Open chest on right-click
     if(hit.t===20){openChest(hit.bx,hit.by,hit.bz);return;}
     // Toggle door on right-click
@@ -3546,6 +3830,7 @@ function handleMouseDown(e){
     if(px2+1>bb.x0&&px2<bb.x1&&py2+1>bb.y0&&py2<bb.y1&&pz2+1>bb.z0&&pz2<bb.z1)return;
     if(getB(px2,py2,pz2))return;if(!take(id))return;
     setB(px2,py2,pz2,id);
+    sfx('place');
     // Check if block placed under a falling block triggers it
     if(getB(px2,py2+1,pz2) && BLK[getB(px2,py2+1,pz2)]?.falls) startFall(px2,py2+1,pz2);
   }
@@ -3554,6 +3839,7 @@ function handleMouseDown(e){
 }
 function handleMouseUp(e){
   if(e.button===0){brkBtn=false;brk=null;setBB(0);}
+  if(e.button===2&&bowCharging){fireBow();}
   if(!locked){try{canvas.releasePointerCapture(e.pointerId);}catch(ex){}}
 }
 canvas.addEventListener('pointerdown',handleMouseDown);
@@ -3713,6 +3999,333 @@ function updateHostiles(dt){
   }
 }
 
+
+// ═══════ XP SYSTEM ═══════
+let xp=0,xpLevel=0;
+const XP_PER_LEVEL=50;
+function rfXP(){
+  const lvlXP=xp-(xpLevel*XP_PER_LEVEL);
+  const pct=Math.min(100,(lvlXP/XP_PER_LEVEL)*100);
+  document.getElementById('xpbar').style.width=pct+'%';
+  document.getElementById('xplvl').textContent=xpLevel>0?'Level '+xpLevel:'';
+}
+function giveXP(n){
+  xp+=n;const newLvl=Math.floor(xp/XP_PER_LEVEL);
+  if(newLvl>xpLevel){
+    xpLevel=newLvl;
+    showMsg('✦ Level '+xpLevel+'!','#80ff20');
+    sfx('levelup');
+  }
+  rfXP();
+}
+function spendLevels(n){if(xpLevel<n)return false;xpLevel-=n;xp=xpLevel*XP_PER_LEVEL;rfXP();return true;}
+
+// ═══════ SOUND SYSTEM ═══════
+let audioCtx=null;
+function getAC(){if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return audioCtx;}
+function sfx(type){
+  const ac=getAC();if(!ac)return;
+  const g=ac.createGain();g.connect(ac.destination);
+  const now=ac.currentTime;
+  const note=(freq,dur,vol=0.2,wave='sine')=>{
+    const o=ac.createOscillator();o.type=wave;o.frequency.value=freq;
+    o.connect(g);o.start(now);o.stop(now+dur);
+    g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(0.001,now+dur);
+    return o;
+  };
+  const noise=(dur,vol=0.15,hipass=800)=>{
+    const buf=ac.createBuffer(1,ac.sampleRate*dur,ac.sampleRate);
+    const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    const src=ac.createBufferSource();src.buffer=buf;
+    const f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=hipass;
+    src.connect(f);f.connect(g);src.start(now);
+    g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(0.001,now+dur);
+  };
+  switch(type){
+    case 'step':    noise(0.08,0.06,400); break;
+    case 'break':   noise(0.18,0.22,200); note(180,0.15,0.1,'sawtooth'); break;
+    case 'place':   note(280,0.06,0.12,'square'); note(220,0.04,0.08,'square'); break;
+    case 'hurt':    note(440,0.06,0.28); note(330,0.1,0.2); break;
+    case 'eat':     for(let i=0;i<3;i++){setTimeout(()=>{const ac2=getAC();if(!ac2)return;const g2=ac2.createGain();g2.connect(ac2.destination);const o=ac2.createOscillator();o.type='square';o.frequency.value=600+Math.random()*200;o.connect(g2);o.start();o.stop(ac2.currentTime+0.04);g2.gain.setValueAtTime(0.12,ac2.currentTime);g2.gain.exponentialRampToValueAtTime(0.001,ac2.currentTime+0.04);},i*80);}break;
+    case 'shoot':   note(600,0.05,0.18,'sawtooth'); note(200,0.12,0.1,'sawtooth'); break;
+    case 'levelup': [523,659,784,1047].forEach((f,i)=>{setTimeout(()=>{const a2=getAC();if(!a2)return;const g2=a2.createGain();g2.connect(a2.destination);const o=a2.createOscillator();o.frequency.value=f;o.connect(g2);o.start();o.stop(a2.currentTime+0.12);g2.gain.setValueAtTime(0.2,a2.currentTime);g2.gain.exponentialRampToValueAtTime(0.001,a2.currentTime+0.12);},i*100);}); break;
+    case 'thunder': {const b=ac.createBuffer(1,ac.sampleRate*1.2,ac.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/d.length*4);const src=ac.createBufferSource();src.buffer=b;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=300;src.connect(lp);lp.connect(g);src.start(now);g.gain.setValueAtTime(0.8,now);g.gain.exponentialRampToValueAtTime(0.001,now+1.2);break;}
+    case 'cave':    note(80+Math.random()*40,1.5,0.06,'sine'); note(60,2,0.04,'sine'); break;
+  }
+}
+// Footstep timer
+let stepT=0;
+function tickSteps(dt,moving,onGround){
+  if(!moving||!onGround)return;
+  stepT+=dt;if(stepT>0.42){stepT=0;sfx('step');}
+}
+// Random cave ambient
+let caveAmbT=Math.random()*20+10;
+function tickCaveAmbient(dt){
+  caveAmbT-=dt;
+  if(caveAmbT<0){
+    caveAmbT=Math.random()*30+15;
+    const y=Math.floor(player.pos.y);
+    if(y<30&&dimension==='overworld')sfx('cave');
+  }
+}
+
+// ═══════ BREAK PARTICLES ═══════
+const particles=[];
+const PMAT=new THREE.MeshBasicMaterial({vertexColors:true});
+function spawnParticles(bx,by,bz,blockId){
+  const base=BLK[blockId];if(!base)return;
+  const col=getBlockColor(blockId);
+  for(let i=0;i<8;i++){
+    const geo=new THREE.BoxGeometry(0.14,0.14,0.14);
+    const r=col.r/255,g=col.g/255,b=col.b/255;
+    const colors=new Float32Array(geo.attributes.position.count*3);
+    for(let v=0;v<colors.length;v+=3){colors[v]=r;colors[v+1]=g;colors[v+2]=b;}
+    geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+    const mesh=new THREE.Mesh(geo,PMAT.clone());
+    mesh.position.set(bx+0.5+(Math.random()-.5)*0.6,by+0.5+(Math.random()-.5)*0.6,bz+0.5+(Math.random()-.5)*0.6);
+    const ang=Math.random()*Math.PI*2,spd=2+Math.random()*4;
+    const vy=2+Math.random()*4;
+    scene.add(mesh);
+    particles.push({mesh,vx:Math.cos(ang)*spd,vy,vz:Math.sin(ang)*spd,life:0.6+Math.random()*0.4});
+  }
+}
+function getBlockColor(id){
+  const cols={1:{r:94,g:157,b:52},2:{r:134,g:96,b:67},3:{r:125,g:125,b:125},4:{r:102,g:73,b:38},5:{r:56,g:104,b:36},6:{r:210,g:198,b:126},7:{r:162,g:115,b:55},8:{r:120,g:120,b:120},9:{r:180,g:210,b:230},10:{r:132,g:120,b:108},11:{r:50,g:100,b:200},12:{r:160,g:100,b:80},14:{r:60,g:60,b:60},15:{r:70,g:70,b:70},16:{r:170,g:140,b:120},17:{r:90,g:210,b:240},22:{r:148,g:60,b:60},23:{r:24,g:18,b:38},26:{r:255,g:235,b:100},33:{r:240,g:100,b:20},34:{r:55,g:55,b:70},38:{r:255,g:180,b:20},41:{r:235,g:245,b:255},42:{r:170,g:210,b:245},43:{r:215,g:215,b:215}};
+  return cols[id]||{r:150,g:150,b:150};
+}
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.life-=dt;
+    if(p.life<=0){scene.remove(p.mesh);p.mesh.geometry.dispose();particles.splice(i,1);continue;}
+    p.vy-=18*dt;
+    p.mesh.position.x+=p.vx*dt;p.mesh.position.y+=p.vy*dt;p.mesh.position.z+=p.vz*dt;
+    p.mesh.rotation.x+=3*dt;p.mesh.rotation.y+=3*dt;
+    p.mesh.material.opacity=p.life>0.2?1:p.life/0.2;
+    p.mesh.material.transparent=true;
+  }
+}
+
+// ═══════ WEATHER ═══════
+let weatherState='clear',weatherT=120+Math.random()*180,rainIntensity=0;
+let thunderT=0,lightningFlash=0;
+const rainGeo=new THREE.BufferGeometry();
+const RAIN_COUNT=2000;
+const rainPos=new Float32Array(RAIN_COUNT*3);
+for(let i=0;i<RAIN_COUNT;i++){rainPos[i*3]=( Math.random()-.5)*60;rainPos[i*3+1]=Math.random()*30;rainPos[i*3+2]=(Math.random()-.5)*60;}
+rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
+const rainMat=new THREE.PointsMaterial({color:0x88aaff,size:0.08,transparent:true,opacity:0.6});
+const rainSystem=new THREE.Points(rainGeo,rainMat);
+rainSystem.visible=false;scene.add(rainSystem);
+const lightningMesh=new THREE.Mesh(new THREE.BoxGeometry(0.1,40,0.1),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0}));
+scene.add(lightningMesh);
+
+function updateWeather(dt){
+  if(dimension!=='overworld'){rainSystem.visible=false;return;}
+  weatherT-=dt;
+  if(weatherT<0){
+    if(weatherState==='clear'){weatherState=Math.random()<0.3?'thunder':'rain';weatherT=60+Math.random()*120;}
+    else{weatherState='clear';weatherT=120+Math.random()*240;}
+  }
+  const targetRain=(weatherState==='rain'||weatherState==='thunder')?1:0;
+  rainIntensity+=(targetRain-rainIntensity)*dt*0.5;
+  rainSystem.visible=rainIntensity>0.05;
+  rainSystem.material.opacity=0.5*rainIntensity;
+  // Move rain with player
+  rainSystem.position.set(player.pos.x,player.pos.y+5,player.pos.z);
+  // Animate rain falling
+  const pd=rainGeo.attributes.position;
+  for(let i=0;i<RAIN_COUNT;i++){
+    pd.array[i*3+1]-=30*dt;
+    if(pd.array[i*3+1]<-5)pd.array[i*3+1]=30;
+  }
+  pd.needsUpdate=true;
+  // Weather icon
+  const wi=document.getElementById('weatherIcon');
+  if(rainIntensity>0.1){wi.style.display='block';wi.textContent=weatherState==='thunder'?'⛈️ Thunderstorm':'🌧️ Rain';}
+  else wi.style.display='none';
+  // Thunder + lightning
+  if(weatherState==='thunder'&&rainIntensity>0.5){
+    thunderT-=dt;
+    if(thunderT<0){
+      thunderT=5+Math.random()*25;
+      sfx('thunder');
+      // Lightning flash + strike
+      lightningFlash=0.3;
+      const lx=player.pos.x+(Math.random()-.5)*40,lz=player.pos.z+(Math.random()-.5)*40;
+      let ly=WH;for(let y=WH-1;y>=0;y--)if(isSolid(getB(Math.round(lx),y,Math.round(lz)))){ly=y+1;break;}
+      lightningMesh.position.set(lx,ly+20,lz);
+      lightningMesh.material.opacity=0.9;
+      // Deal 3 damage if nearby
+      if(player.pos.distanceTo(lightningMesh.position)<8)dmg(3);
+    }
+  }
+  if(lightningFlash>0){lightningFlash-=dt*2;lightningMesh.material.opacity=Math.max(0,lightningFlash*3);if(lightningFlash<=0)lightningMesh.material.opacity=0;}
+  // Darken sky slightly during rain
+  if(rainIntensity>0.05&&dimension==='overworld'){
+    scene.fog.color.lerp(new THREE.Color(0x667799),rainIntensity*0.3*dt);
+    ambL.intensity*=(1-rainIntensity*0.2);
+  }
+}
+
+// ═══════ BOW & ARROWS ═══════
+let bowCharging=false,bowChargeT=0;
+const projectiles=[];
+const ARROW_DMG=4;
+function fireBow(){
+  if(!bowCharging)return;
+  const power=Math.min(1,bowChargeT/1.5);
+  bowCharging=false;bowChargeT=0;
+  if(power<0.1)return;
+  // Consume 1 arrow
+  let hasArrow=false;
+  for(let i=0;i<36;i++)if(INV[i]?.type===88){INV[i].count--;if(!INV[i].count)INV[i]=null;hasArrow=true;rfH();break;}
+  if(!hasArrow)return;
+  sfx('shoot');
+  const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion).normalize();
+  const spd=20*power+8;
+  const geo=new THREE.BoxGeometry(0.06,0.06,0.5);
+  const mat=new THREE.MeshLambertMaterial({color:0x8B6914});
+  const mesh=new THREE.Mesh(geo,mat);
+  mesh.position.copy(player.pos);
+  scene.add(mesh);
+  projectiles.push({mesh,pos:player.pos.clone(),vel:dir.clone().multiplyScalar(spd),life:4,fromPlayer:true,dmg:ARROW_DMG*power});
+}
+function updateProjectiles(dt){
+  for(let i=projectiles.length-1;i>=0;i--){
+    const p=projectiles[i];
+    p.life-=dt;
+    if(p.life<=0){scene.remove(p.mesh);projectiles.splice(i,1);continue;}
+    p.vel.y-=20*dt; // gravity
+    const newPos=p.pos.clone().addScaledVector(p.vel,dt);
+    const bx=Math.floor(newPos.x),by=Math.floor(newPos.y),bz=Math.floor(newPos.z);
+    if(isSolid(getB(bx,by,bz))){
+      // Stick in block
+      p.mesh.position.copy(newPos);
+      p.life=Math.min(p.life,2);
+      p.vel.set(0,0,0);
+    } else {
+      // Check mob hits
+      let hit=false;
+      for(const mob of [...mobs,...hostiles]){
+        const d=newPos.distanceTo(mob.pos);
+        if(d<0.9){attackMob(mob,p.dmg);hit=true;break;}
+      }
+      if(hit){scene.remove(p.mesh);projectiles.splice(i,1);continue;}
+      p.pos.copy(newPos);
+      p.mesh.position.copy(newPos);
+      // Orient arrow along velocity
+      if(p.vel.length()>1){const q=new THREE.Quaternion();q.setFromUnitVectors(new THREE.Vector3(0,0,-1),p.vel.clone().normalize());p.mesh.quaternion.copy(q);}
+    }
+  }
+}
+
+// ═══════ ENCHANTING ═══════
+const ENCHANTS={
+  sharpness:  {n:'Sharpness',  desc:'+3 damage',     cost:1,applies:['sword','axe']},
+  efficiency: {n:'Efficiency', desc:'2× mine speed', cost:1,applies:['pickaxe','axe','shovel']},
+  fortune:    {n:'Fortune',    desc:'2× ore drops',  cost:2,applies:['pickaxe','shovel']},
+  protection: {n:'Protection', desc:'+8% armor',     cost:1,applies:['armor']},
+  unbreaking: {n:'Unbreaking', desc:'Lasts longer',  cost:1,applies:['any']},
+  infinity:   {n:'Infinity',   desc:'Infinite arrows',cost:3,applies:['bow']},
+  power:      {n:'Power',      desc:'+50% bow dmg',  cost:2,applies:['bow']},
+  knockback:  {n:'Knockback',  desc:'Knocks enemies', cost:1,applies:['sword']},
+};
+let enchOpen=false,openEnchKey=null;
+function openEnchanting(wx,wy,wz){
+  enchOpen=true;openEnchKey=`${wx},${wy},${wz}`;
+  document.getElementById('enchUI').style.display='flex';
+  rfEnch();if(locked)document.exitPointerLock();
+}
+function closeEnchanting(){
+  enchOpen=false;openEnchKey=null;
+  document.getElementById('enchUI').style.display='none';
+  tryLock();
+}
+function getApplicableEnchants(item){
+  if(!item)return[];
+  const tool=NONBLK[item.type]?.tool;
+  const armor=NONBLK[item.type]?.armor;
+  const bow=NONBLK[item.type]?.bow;
+  return Object.entries(ENCHANTS).filter(([k,e])=>{
+    if(item.enchants?.includes(k))return false; // already enchanted
+    if(e.applies.includes('any'))return true;
+    if(bow&&e.applies.includes('bow'))return true;
+    if(tool&&e.applies.includes(tool.type))return true;
+    if(armor&&e.applies.includes('armor'))return true;
+    return false;
+  }).slice(0,3);
+}
+function rfEnch(){
+  const itemSlot=document.getElementById('enchItemSlot');
+  const item=INV[sel];
+  const cv=itemSlot.querySelector('canvas'),ct=itemSlot.querySelector('.ct');
+  if(item&&(BLK[item.type]||NONBLK[item.type])){
+    cv.getContext('2d').clearRect(0,0,16,16);cv.getContext('2d').drawImage(getItemIcon(item.type),0,0,16,16);
+    ct.textContent='';
+    // Show enchant glow
+    const eName=item.enchants?.length?item.enchants.map(e=>ENCHANTS[e]?.n||e).join(', '):'';
+    itemSlot.title=eName?'Enchants: '+eName:'No enchants';
+  } else {cv.getContext('2d').clearRect(0,0,16,16);ct.textContent='';}
+  document.getElementById('enchXPDisplay').textContent=xpLevel;
+  const opts=document.getElementById('enchOptions');opts.innerHTML='';
+  const applicable=getApplicableEnchants(item);
+  if(!item||!applicable.length){
+    opts.innerHTML='<div style="color:#664488;font-size:10px">Hold an enchantable item to see options.</div>';
+    return;
+  }
+  applicable.forEach(([key,e])=>{
+    const d=document.createElement('div');
+    const canAfford=xpLevel>=e.cost;
+    d.style.cssText=`padding:7px 10px;background:${canAfford?'rgba(100,40,180,.4)':'rgba(40,20,60,.4)'};border:1px solid ${canAfford?'#9955cc':'#442266'};cursor:${canAfford?'pointer':'not-allowed'};transition:background .15s`;
+    d.innerHTML=`<span style="color:${canAfford?'#dd88ff':'#776688'};font-size:10px;font-weight:bold">${e.n}</span> <span style="color:#664488;font-size:9px">— ${e.desc}</span> <span style="float:right;color:#80ff20;font-size:9px">${e.cost} level${e.cost>1?'s':''}</span>`;
+    if(canAfford)d.addEventListener('click',()=>{
+      if(!item||!spendLevels(e.cost))return;
+      if(!item.enchants)item.enchants=[];
+      item.enchants.push(key);
+      INV[sel]={...item};
+      sfx('levelup');
+      showMsg('✦ '+e.n+'!','#cc88ff');
+      rfEnch();rfH();
+    });
+    opts.appendChild(d);
+  });
+  // Inv rows
+  const bag=document.getElementById('enchInvBag'),hot=document.getElementById('enchInvHot');
+  bag.innerHTML='';hot.innerHTML='';
+  const mkS=(i,el)=>{const d=document.createElement('div');d.className='isl';const cv2=document.createElement('canvas');cv2.width=16;cv2.height=16;const ct2=document.createElement('span');ct2.className='ct';d.appendChild(cv2);d.appendChild(ct2);const s=INV[i];if(s&&(BLK[s.type]||NONBLK[s.type])){cv2.getContext('2d').drawImage(getItemIcon(s.type),0,0,16,16);ct2.textContent=s.count>1?s.count:'';}d.addEventListener('click',()=>{sel=i%9;rfH();rfEnch();});el.appendChild(d);};
+  for(let i=9;i<36;i++)mkS(i,bag);
+  for(let i=0;i<9;i++)mkS(i,hot);
+}
+
+// ═══════ BED SLEEP ═══════
+let bedSpawnPt=null;
+function tryUseBed(wx,wy,wz){
+  const isNight=dayT<0.2||dayT>0.78;
+  if(isNight){
+    // Sleep: skip to morning
+    dayT=0.27;
+    // Clear all hostiles
+    for(const h of hostiles)scene.remove(h.mesh);
+    hostiles.length=0;
+    showMsg('Good morning! ☀️','#ffdd66');
+    sfx('levelup');
+  }
+  // Always set spawn
+  bedSpawnPt={x:wx+0.5,y:wy+1.62,z:wz+0.5};
+  if(!isNight)showMsg('Spawn point set!','#88ff88');
+}
+
+// ═══════ HUD MESSAGES ═══════
+let hudMsgT=0,hudMsgEl=null;
+function showMsg(text,color='#fff'){
+  let el=document.getElementById('hudMsg');
+  if(!el){el=document.createElement('div');el.id='hudMsg';el.style.cssText='position:fixed;top:38%;left:50%;transform:translateX(-50%);font-size:14px;font-weight:bold;text-shadow:1px 1px 0 #000;pointer-events:none;z-index:10;transition:opacity .3s;text-align:center';document.getElementById('hud').appendChild(el);}
+  el.style.color=color;el.textContent=text;el.style.opacity='1';
+  clearTimeout(hudMsgT);hudMsgT=setTimeout(()=>{el.style.opacity='0';},2200);
+}
+
 // ═══════ DAY/NIGHT ═══════
 let dayT=.3;const TSPD=[4e-4,2e-3,0];let tI=0;
 function advT(){tI=(tI+1)%TSPD.length;}
@@ -3745,7 +4358,7 @@ function serializeWorld(){
   const furnaces={};for(const[k,v] of furnaceData)furnaces[k]=v;
   return{
     over,nether,chests,furnaces,
-    player:{x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw,pitch:player.pitch},
+    player:{x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw,pitch:player.pitch},xp,xpLevel,bedSpawnPt,weatherState,
     inv:JSON.parse(JSON.stringify(INV)),
     armorSlots:JSON.parse(JSON.stringify(armorSlots)),
     hp,hunger,gameMode,dimension,dayT,
@@ -3774,7 +4387,7 @@ function deserializeWorld(data){
   // Restore game state
   for(let i=0;i<INV.length;i++)INV[i]=data.inv[i]||null;
   for(const s of ['head','chest','legs','feet'])armorSlots[s]=data.armorSlots?.[s]||null;
-  hp=data.hp??20;hunger=data.hunger??20;
+  hp=data.hp??20;hunger=data.hunger??20;xp=data.xp??0;xpLevel=data.xpLevel??0;bedSpawnPt=data.bedSpawnPt||null;weatherState=data.weatherState||'clear';
   gameMode=data.gameMode||'survival';
   dimension=data.dimension||'overworld';
   chunks=dimension==='nether'?netherChunks:overChunks;
@@ -3784,7 +4397,7 @@ function deserializeWorld(data){
   player.yaw=data.player.yaw??Math.PI;
   player.pitch=data.player.pitch??0;
   player.vel.set(0,0,0);player.onGround=false;
-  rfHP();rfHunger();rfArmorBar();rfH();
+  rfHP();rfHunger();rfArmorBar();rfH();rfXP();
   setDimensionEnv();
   // Rebuild all chunk meshes
   for(const m of chunkMeshes.values())scene.add(m);
@@ -3933,7 +4546,7 @@ function startNewWorld(name, mode){
     for(const m of mobs){scene.remove(m.mesh);}mobs.length=0;
     for(const h of hostiles){scene.remove(h.mesh);}hostiles.length=0;
     dimension='overworld';chunks=overChunks;chunkMeshes=overMeshes;
-    hp=20;hunger=20;fallFrom=null;dead=false;dayT=0.3;
+    hp=20;hunger=20;fallFrom=null;dead=false;dayT=0.3;xp=0;xpLevel=0;bedSpawnPt=null;weatherState='clear';bowCharging=false;
     for(let i=0;i<INV.length;i++)INV[i]=null;
     for(const s of ['head','chest','legs','feet'])armorSlots[s]=null;
     loadProgress(20,'Building chunks...');
@@ -3948,11 +4561,11 @@ function startNewWorld(name, mode){
     player.pos.set(SPAWN_WX+.5,sy,SPAWN_WZ+.5);
     player.vel.set(0,0,0);player.yaw=Math.PI;player.pitch=0;player.onGround=false;player.fly=mode==='creative';
     // Give starter items
-    give(1,32);give(2,20);give(3,20);give(7,20);give(4,16);give(8,20);give(6,16);give(9,10);give(12,8);give(38,8);
+    give(1,32);give(2,20);give(3,20);give(7,20);give(4,16);give(8,20);give(6,16);give(9,10);give(12,8);give(38,8);give(88,16);give(89,1);
     if(mode==='creative'){give(13,16);give(14,16);give(15,4);give(16,16);give(17,8);give(23,16);give(54,1);}
     // Spawn animals near origin
     // (animals spawned in startNewWorld)
-    rfHP();rfHunger();rfArmorBar();rfH();scheduleChunks(SPAWN_WX,SPAWN_WZ);
+    rfHP();rfHunger();rfArmorBar();rfH();rfXP();scheduleChunks(SPAWN_WX,SPAWN_WZ);
     setDimensionEnv();
     loadProgress(100,'Done!');
     // Auto-save new world immediately
@@ -4022,8 +4635,9 @@ function updateBadge(){
 function die(){dead=true;focused=false;if(locked)document.exitPointerLock();document.getElementById('death').style.display='flex';}
 function respawn(){
   dead=false;hp=20;hunger=20;fallFrom=null;rfHP();rfHunger();rfArmorBar();
-  let ry=EYE+2;for(let y=WH-1;y>=0;y--)if(isSolid(getB(SPAWN_WX,y,SPAWN_WZ))){ry=y+1+EYE;break;}
-  player.pos.set(SPAWN_WX+.5,ry,SPAWN_WZ+.5);player.vel.set(0,0,0);player.onGround=false;
+  if(bedSpawnPt){player.pos.set(bedSpawnPt.x,bedSpawnPt.y,bedSpawnPt.z);}
+  else{let ry=EYE+2;for(let y=WH-1;y>=0;y--)if(isSolid(getB(SPAWN_WX,y,SPAWN_WZ))){ry=y+1+EYE;break;}player.pos.set(SPAWN_WX+.5,ry,SPAWN_WZ+.5);}
+  player.vel.set(0,0,0);player.onGround=false;
   document.getElementById('death').style.display='none';focused=true;paused=false;hidePause();lastPX=null;lastPY=null;tryLock();
 }
 document.getElementById('rBtn').onclick=respawn;
@@ -4038,7 +4652,7 @@ function updateDBG(){
   fc++;const now=performance.now();if(now-lastT>700){fps=Math.round(fc*1e3/(now-lastT));fc=0;lastT=now;}
   const p=player.pos,blk=INV[sel]?itemName(INV[sel].type):'empty';
   const pcx=Math.floor(p.x/CS),pcz=Math.floor(p.z/CS);
-  dbgEl.innerHTML=`FPS: ${fps}<br>XYZ: ${p.x.toFixed(1)} / ${p.y.toFixed(1)} / ${p.z.toFixed(1)}<br>Chunk: ${pcx},${pcz}<br>Hold: ${blk}<br>${gameMode.toUpperCase()}${player.fly?' [FLY]':''}${sprintActive?' [SPRINT]':''} ${locked?'🔒':''}<br>Time: ${(dayT*24).toFixed(1)}h ${dayT<0.25||dayT>0.75?'🌙 NIGHT':'☀️'}<br>Hostiles: ${hostiles.length} | Mobs: ${mobs.length}<br>Armor: ${Math.round(getArmorReduction()*100)}%`;
+  dbgEl.innerHTML=`FPS: ${fps}<br>XYZ: ${p.x.toFixed(1)} / ${p.y.toFixed(1)} / ${p.z.toFixed(1)}<br>Chunk: ${pcx},${pcz}<br>Hold: ${blk}<br>${gameMode.toUpperCase()}${player.fly?' [FLY]':''}${sprintActive?' [SPRINT]':''}${bowCharging?' [BOW '+(bowChargeT/1.5*100).toFixed(0)+'%]':''} ${locked?'🔒':''}<br>Time: ${(dayT*24).toFixed(1)}h ${dayT<0.25||dayT>0.75?'🌙 NIGHT':'☀️'}<br>Hostiles: ${hostiles.length} | Mobs: ${mobs.length}<br>Armor: ${Math.round(getArmorReduction()*100)}% | XP: Lv${xpLevel}`;
   cmpEl.textContent=DIRS[Math.round(((player.yaw/Math.PI+1)%2)*4)%8];
 }
 
@@ -4053,8 +4667,13 @@ function loop(){
   requestAnimationFrame(loop);
   const now=performance.now(),dt=Math.min((now-last)/1e3,.05);last=now;
   if(!paused&&!dead){
-    updatePlayer(dt);if(dimension==='overworld')updateDN(dt);updateMobs(dt);updateVillagers(dt);updateHostiles(dt);
-    tickFluids(dt);updateFallingBlocks(dt);tickFurnace(dt);
+    updatePlayer(dt);if(dimension==='overworld'){updateDN(dt);updateWeather(dt);}updateMobs(dt);updateVillagers(dt);updateHostiles(dt);
+    tickFluids(dt);updateFallingBlocks(dt);tickFurnace(dt);updateProjectiles(dt);updateParticles(dt);
+    tickSteps(dt,!!(keys['KeyW']||keys['KeyS']||keys['KeyA']||keys['KeyD']),player.onGround);
+    tickCaveAmbient(dt);
+    if(bowCharging)bowChargeT+=dt;
+    // Respawn at bed if set
+    if(bedSpawnPt&&false){} // placeholder — bed respawn handled in respawn()
 
     // ── Hostile mob spawning at night ──
     if(dimension==='overworld'&&gameMode==='survival'){
@@ -4131,7 +4750,447 @@ function loop(){
   }
   updateDBG();renderer.render(scene,camera);
 }
+
+// ══════════════════════════════════════════════════════
+//  MOBILE / TOUCH CONTROL SYSTEM
+// ══════════════════════════════════════════════════════
+const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+if (isMobile) {
+  // ── Show overlay ──
+  document.getElementById('mobileCtrl').style.display = 'block';
+  // Hide keyboard-hint lines in home/pause (declutter)
+  document.querySelectorAll('.ctls').forEach(el => el.style.display = 'none');
+
+  // On mobile: no pointer lock needed, always "focused" when game is running
+  // Override tryLock to be a no-op
+  const _tryLock = tryLock;
+  window.tryLock = function() {
+    // On mobile, just make sure we're focused; skip actual pointer lock
+    if (!paused && !dead) focused = true;
+  };
+
+  // ── State ──
+  const joy = {
+    active: false,
+    id: null,
+    ox: 0, oy: 0,   // origin (where finger first touched)
+    dx: 0, dy: 0,   // current offset from origin
+    r: 52,           // max radius
+  };
+  const look = {
+    active: false,
+    id: null,
+    lx: 0, ly: 0,   // last position
+  };
+  // Track which mobile buttons are held
+  const mheld = { brk: false, jump: false };
+
+  // ── DOM refs ──
+  const joyZone  = document.getElementById('joyZone');
+  const lookZone = document.getElementById('lookZone');
+  const joyBase  = document.getElementById('joyBase');
+  const joyKnob  = document.getElementById('joyKnob');
+  const mBrkBtn  = document.getElementById('mBrkBtn');
+  const mPlaceBtn = document.getElementById('mPlaceBtn');
+  const mJumpBtn = document.getElementById('mJumpBtn');
+  const mInvBtn  = document.getElementById('mInvBtn');
+  const mPauseBtn = document.getElementById('mPauseBtn');
+  const mSprintBtn = document.getElementById('mSprintBtn');
+  const mFlyBtn  = document.getElementById('mFlyBtn');
+  const mHotL    = document.getElementById('mobileHotL');
+  const mHotR    = document.getElementById('mobileHotR');
+
+  // ── Helper: set joystick visual ──
+  function setJoyVisual(show, cx, cy) {
+    if (!show) {
+      joyBase.style.display = 'none';
+      joy.active = false;
+      // Release all movement keys
+      keys['KeyW'] = keys['KeyS'] = keys['KeyA'] = keys['KeyD'] = false;
+      joy.dx = joy.dy = 0;
+      return;
+    }
+    joyBase.style.display = 'block';
+    joyBase.style.left = cx + 'px';
+    joyBase.style.top  = cy + 'px';
+  }
+
+  function updateJoyKeys() {
+    const dead = 8; // deadzone px
+    const nx = joy.dx, ny = joy.dy;
+    keys['KeyW'] = ny < -dead;
+    keys['KeyS'] = ny >  dead;
+    keys['KeyA'] = nx < -dead;
+    keys['KeyD'] = nx >  dead;
+    // Sprint if joystick fully forward (>70% of max radius)
+    if (ny < -joy.r * 0.70) sprintActive = true;
+    // Update knob position
+    joyKnob.style.left = (60 + joy.dx) + 'px';
+    joyKnob.style.top  = (60 + joy.dy) + 'px';
+  }
+
+  // ══ JOYSTICK ZONE touch events ══
+  joyZone.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (paused || dead || !focused) return;
+    for (const t of e.changedTouches) {
+      if (!joy.active) {
+        joy.active = true;
+        joy.id = t.identifier;
+        joy.ox = t.clientX;
+        joy.oy = t.clientY;
+        joy.dx = 0; joy.dy = 0;
+        setJoyVisual(true, t.clientX, t.clientY);
+        updateJoyKeys();
+      }
+    }
+  }, { passive: false });
+
+  joyZone.addEventListener('touchmove', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === joy.id) {
+        const dx = t.clientX - joy.ox;
+        const dy = t.clientY - joy.oy;
+        const len = Math.sqrt(dx*dx + dy*dy);
+        const clamped = Math.min(len, joy.r);
+        const angle = Math.atan2(dy, dx);
+        joy.dx = Math.cos(angle) * clamped;
+        joy.dy = Math.sin(angle) * clamped;
+        updateJoyKeys();
+      }
+    }
+  }, { passive: false });
+
+  function joyEnd(e) {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === joy.id) {
+        setJoyVisual(false, 0, 0);
+        sprintActive = false;
+      }
+    }
+  }
+  joyZone.addEventListener('touchend',    joyEnd, { passive: false });
+  joyZone.addEventListener('touchcancel', joyEnd, { passive: false });
+
+  // ══ LOOK ZONE touch events ══
+  // Sensitivity scalar — tuned for comfortable one-thumb looking
+  const LOOK_SENS = 0.0032;
+
+  lookZone.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (paused || dead) return;
+    // Entering the game on first touch
+    if (!focused) {
+      focused = true; paused = false;
+      hidePause(); hideHome();
+      // Show mobile fly button if creative
+      if (gameMode === 'creative') mFlyBtn.style.display = 'flex';
+    }
+    for (const t of e.changedTouches) {
+      if (!look.active) {
+        look.active = true;
+        look.id = t.identifier;
+        look.lx = t.clientX;
+        look.ly = t.clientY;
+      }
+    }
+  }, { passive: false });
+
+  lookZone.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!focused || paused) return;
+    for (const t of e.changedTouches) {
+      if (t.identifier === look.id) {
+        const dx = t.clientX - look.lx;
+        const dy = t.clientY - look.ly;
+        player.yaw   -= dx * LOOK_SENS;
+        player.pitch  = Math.max(-PI2+.01, Math.min(PI2-.01, player.pitch - dy * LOOK_SENS));
+        look.lx = t.clientX;
+        look.ly = t.clientY;
+      }
+    }
+  }, { passive: false });
+
+  function lookEnd(e) {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === look.id) { look.active = false; look.id = null; }
+    }
+  }
+  lookZone.addEventListener('touchend',    lookEnd, { passive: false });
+  lookZone.addEventListener('touchcancel', lookEnd, { passive: false });
+
+  // ══ BREAK button ══
+  mBrkBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!focused || paused || dead) return;
+    mheld.brk = true; brkBtn = true;
+    mBrkBtn.classList.add('pressed');
+  }, { passive: false });
+  function brkEnd(e) {
+    e.preventDefault();
+    mheld.brk = false; brkBtn = false; brk = null; setBB(0);
+    mBrkBtn.classList.remove('pressed');
+  }
+  mBrkBtn.addEventListener('touchend',    brkEnd, { passive: false });
+  mBrkBtn.addEventListener('touchcancel', brkEnd, { passive: false });
+
+  // ══ PLACE / USE button — mirrors right-click logic ══
+  mPlaceBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!focused || paused || dead) return;
+    mPlaceBtn.classList.add('pressed');
+
+    // Bow — start charging
+    if (NONBLK[INV[sel]?.type]?.bow) { bowCharging = true; bowChargeT = 0; return; }
+
+    // Food — eat
+    const s = INV[sel];
+    if (s && NONBLK[s.type]?.food) {
+      eatFood(NONBLK[s.type].food); sfx('eat');
+      s.count--; if (!s.count) INV[sel] = null; rfH(); return;
+    }
+
+    // Flint & steel
+    if (NONBLK[INV[sel]?.type]?.flintSteel) {
+      const hit0 = raycast();
+      const px = hit0 ? hit0.bx : Math.floor(player.pos.x);
+      const py = hit0 ? hit0.by : Math.floor(player.pos.y);
+      const pz = hit0 ? hit0.bz : Math.floor(player.pos.z);
+      if (tryLightPortal(px, py, pz)) return;
+    }
+
+    // Bucket
+    if (NONBLK[INV[sel]?.type]?.bucket !== undefined) {
+      const hit0 = raycast(); if (!hit0) return;
+      const ftype = NONBLK[INV[sel].type].bucket;
+      const px2 = hit0.bx+hit0.nx, py2 = hit0.by+hit0.ny, pz2 = hit0.bz+hit0.nz;
+      placeFluidBlock(px2, py2, pz2, ftype);
+      INV[sel].count--; if (!INV[sel].count) INV[sel] = null; rfH(); return;
+    }
+
+    const hit = raycast(); if (!hit) return;
+    if (hit.t===39) { openFurnace(hit.bx, hit.by, hit.bz); return; }
+    if (hit.t===47) { openEnchanting(hit.bx, hit.by, hit.bz); return; }
+    if (hit.t===45) { if (!invOpen) openInv(); return; }
+    if (hit.t===46) { tryUseBed(hit.bx, hit.by, hit.bz); return; }
+    if (hit.t===20) { openChest(hit.bx, hit.by, hit.bz); return; }
+    if (hit.t===21) {
+      const dk = `${hit.bx},${hit.by},${hit.bz}`;
+      if (doorOpen.has(dk)) doorOpen.delete(dk); else doorOpen.add(dk);
+      markDirty(hit.bx, hit.bz); return;
+    }
+
+    // Villager trade
+    const vill = raycastVillager(); if (vill) { openTrade(vill); return; }
+
+    // Place block
+    const id = curB(); if (!id) return;
+    const px2 = hit.bx+hit.nx, py2 = hit.by+hit.ny, pz2 = hit.bz+hit.nz;
+    const bb = pAABB(player.pos);
+    if (px2+1>bb.x0&&px2<bb.x1&&py2+1>bb.y0&&py2<bb.y1&&pz2+1>bb.z0&&pz2<bb.z1) return;
+    if (getB(px2,py2,pz2)) return;
+    if (!take(id)) return;
+    setB(px2,py2,pz2,id); sfx('place');
+    if (getB(px2,py2+1,pz2) && BLK[getB(px2,py2+1,pz2)]?.falls) startFall(px2,py2+1,pz2);
+  }, { passive: false });
+
+  function placeEnd(e) {
+    e.preventDefault();
+    mPlaceBtn.classList.remove('pressed');
+    // Fire bow on release
+    if (bowCharging) fireBow();
+  }
+  mPlaceBtn.addEventListener('touchend',    placeEnd, { passive: false });
+  mPlaceBtn.addEventListener('touchcancel', placeEnd, { passive: false });
+
+  // ══ JUMP button ══
+  mJumpBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!focused || paused || dead) return;
+    keys['Space'] = true;
+    mJumpBtn.classList.add('pressed');
+    // Creative fly: double-tap jump to toggle
+  }, { passive: false });
+  function jumpEnd(e) {
+    e.preventDefault();
+    keys['Space'] = false;
+    mJumpBtn.classList.remove('pressed');
+  }
+  mJumpBtn.addEventListener('touchend',    jumpEnd, { passive: false });
+  mJumpBtn.addEventListener('touchcancel', jumpEnd, { passive: false });
+
+  // ══ INVENTORY button ══
+  mInvBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!focused || dead) return;
+    if (invOpen || creativeOpen) {
+      if (gameMode === 'creative') closeCreative(); else closeInv();
+    } else {
+      if (gameMode === 'creative') openCreative(); else openInv();
+    }
+  }, { passive: false });
+
+  // ══ PAUSE button ══
+  mPauseBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (pauseEl.style.display === 'flex') {
+      hidePause(); focused = true; paused = false;
+    } else {
+      focused = false; paused = true; showPause();
+    }
+  }, { passive: false });
+
+  // ══ SPRINT toggle ══
+  mSprintBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!focused || paused) return;
+    sprintActive = !sprintActive;
+    mSprintBtn.style.background = sprintActive ? 'rgba(255,200,0,.4)' : '';
+    mSprintBtn.style.borderColor = sprintActive ? '#ffcc00' : '';
+  }, { passive: false });
+
+  // ══ FLY toggle (creative) ══
+  mFlyBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!focused || paused || gameMode !== 'creative') return;
+    player.fly = !player.fly; player.vel.y = 0;
+    mFlyBtn.style.background = player.fly ? 'rgba(100,200,255,.4)' : '';
+    document.getElementById('badge').textContent = 'CREATIVE ' + (player.fly ? '[FLY]' : '');
+  }, { passive: false });
+
+  // Sneak: hold sprint button activates sneak (shift) — long press
+  let sprintLongPress = null;
+  mSprintBtn.addEventListener('touchstart', e => {
+    sprintLongPress = setTimeout(() => {
+      keys['ShiftLeft'] = true;
+      mSprintBtn.textContent = '🦵';
+    }, 400);
+  }, { passive: false });
+  mSprintBtn.addEventListener('touchend', e => {
+    clearTimeout(sprintLongPress);
+    keys['ShiftLeft'] = false;
+    mSprintBtn.textContent = '⚡';
+  }, { passive: false });
+
+  // ══ HOTBAR arrows ══
+  mHotL.addEventListener('touchstart', e => {
+    e.preventDefault();
+    sel = (sel + 8) % 9; rfH();
+  }, { passive: false });
+  mHotR.addEventListener('touchstart', e => {
+    e.preventDefault();
+    sel = (sel + 1) % 9; rfH();
+  }, { passive: false });
+
+  // ══ Tap on look zone = quick break (single tap) ══
+  // Track tap timing to distinguish taps vs drags
+  let lookTapT = 0, lookTapMoved = false;
+  lookZone.addEventListener('touchstart', e => { lookTapT = performance.now(); lookTapMoved = false; }, { passive: true });
+  lookZone.addEventListener('touchmove',  e => { lookTapMoved = true; }, { passive: true });
+  lookZone.addEventListener('touchend', e => {
+    if (!lookTapMoved && performance.now() - lookTapT < 200) {
+      // Quick tap = interact / break once
+      const hit = raycast();
+      if (hit) {
+        // One-shot break start
+        brkBtn = true;
+        setTimeout(() => { brkBtn = false; brk = null; setBB(0); }, 120);
+      }
+    }
+  }, { passive: true });
+
+  // ══ Adjust fly speed with jump/sneak while flying ══
+  // (already handled via keys['Space'] and keys['ShiftLeft'])
+
+  // ══ Update mobile UI when game mode changes ══
+  const _updateBadge = updateBadge;
+  window.updateBadge = function() {
+    _updateBadge();
+    if (gameMode === 'creative') mFlyBtn.style.display = 'flex';
+    else { mFlyBtn.style.display = 'none'; player.fly = false; }
+  };
+
+  // ══ Keep mobile controls hidden while in menus ══
+  function updateMobileCtrlVisibility() {
+    const anyMenuOpen = invOpen || chestOpen || creativeOpen || tradeOpen || furnaceOpen || enchOpen || paused || dead;
+    document.getElementById('mobileCtrl').style.opacity = anyMenuOpen ? '0' : '1';
+    document.getElementById('mobileCtrl').style.pointerEvents = anyMenuOpen ? 'none' : '';
+  }
+  // Patch open/close functions to call this
+  const _openInv = openInv, _closeInv = closeInv;
+  window.openInv  = function() { _openInv();  updateMobileCtrlVisibility(); };
+  window.closeInv = function() { _closeInv(); updateMobileCtrlVisibility(); };
+  const _openChest = openChest, _closeChest = closeChest;
+  window.openChest  = function(x,y,z) { _openChest(x,y,z);  updateMobileCtrlVisibility(); };
+  window.closeChest = function()       { _closeChest();       updateMobileCtrlVisibility(); };
+  const _openFurnace = openFurnace, _closeFurnace = closeFurnace;
+  window.openFurnace  = function(x,y,z) { _openFurnace(x,y,z);  updateMobileCtrlVisibility(); };
+  window.closeFurnace = function()       { _closeFurnace();       updateMobileCtrlVisibility(); };
+  const _openEnch = openEnchanting, _closeEnch = closeEnchanting;
+  window.openEnchanting  = function(x,y,z) { _openEnch(x,y,z);  updateMobileCtrlVisibility(); };
+  window.closeEnchanting = function()       { _closeEnch();       updateMobileCtrlVisibility(); };
+  const _showPause = showPause, _hidePause = hidePause;
+  window.showPause = function() { _showPause(); updateMobileCtrlVisibility(); };
+  window.hidePause = function() { _hidePause(); updateMobileCtrlVisibility(); };
+
+  // ══ Mobile-friendly start: set focused immediately when game starts ══
+  const _startNewWorld = startNewWorld;
+  window.startNewWorld = function(name, mode) {
+    _startNewWorld(name, mode);
+    setTimeout(() => { focused = true; paused = false; if (gameMode==='creative') mFlyBtn.style.display='flex'; }, 200);
+  };
+  const _playSelectedWorld = playSelectedWorld;
+  window.playSelectedWorld = function() {
+    _playSelectedWorld();
+    setTimeout(() => { focused = true; paused = false; if (gameMode==='creative') mFlyBtn.style.display='flex'; }, 800);
+  };
+}
+// ══════════════════════════════════════════════════════
+
 loop();
 </script>
+
+<!-- ═══════ MOBILE CONTROLS OVERLAY ═══════ -->
+<div id="mobileCtrl">
+
+  <!-- Left: joystick zone -->
+  <div id="joyZone">
+    <div id="joyBase"><div id="joyKnob"></div></div>
+  </div>
+
+  <!-- Right: camera look zone -->
+  <div id="lookZone"></div>
+
+  <!-- Top-right: inventory + pause -->
+  <div id="mobileTop">
+    <button class="mab sm" id="mPauseBtn" title="Pause">⏸</button>
+    <button class="mab sm" id="mInvBtn" title="Inventory">🎒</button>
+  </div>
+
+  <!-- Left-side: sprint, fly -->
+  <div id="mobileSide">
+    <button class="mab sm" id="mSprintBtn" title="Sprint">⚡</button>
+    <button class="mab sm" id="mFlyBtn" title="Fly" style="display:none">🦅</button>
+  </div>
+
+  <!-- Bottom-right action cluster -->
+  <div id="mobileActions">
+    <div id="mobileRow2">
+      <button class="mab sm plc" id="mPlaceBtn" title="Place / Use">🖐</button>
+      <button class="mab jmp" id="mJumpBtn" title="Jump">⬆</button>
+      <button class="mab sm brk" id="mBrkBtn" title="Break">⛏</button>
+    </div>
+  </div>
+
+  <!-- Hotbar nav -->
+  <div id="mobileHotL">◀</div>
+  <div id="mobileHotR">▶</div>
+
+</div>
+
 </body>
 </html>
