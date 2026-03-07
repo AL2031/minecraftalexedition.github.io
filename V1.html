@@ -42,18 +42,60 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
 #dg{position:fixed;pointer-events:none;display:none;z-index:100;transform:translate(-50%,-50%)}
 #dg canvas{width:34px;height:34px;image-rendering:pixelated}
 #tip{position:fixed;pointer-events:none;display:none;z-index:999;background:#100c0cee;color:#fff;font-size:12px;padding:5px 10px;border:1px solid #7a5c2e;font-family:'Courier New',monospace;white-space:nowrap;box-shadow:2px 2px 6px #0009}
-#ov{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:200}
-#ov h1{font-size:48px;font-weight:900;letter-spacing:6px;color:#5d9e3f;text-shadow:4px 4px 0 #2a4a1a;margin-bottom:4px}
-.sub{color:#888;font-size:11px;margin-bottom:12px}
-.ctls{display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:10px;color:#777;margin-bottom:14px;text-align:left}
-.ctls .k{color:#ccc;font-weight:bold}
-.modebts{display:flex;gap:10px;margin-bottom:14px}
-.mbtn{background:#444;color:#ddd;border:2px solid #666;padding:8px 22px;font-size:13px;font-family:inherit;cursor:pointer;letter-spacing:1px}
+/* ── Home screen / pause overlay ── */
+#home{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;overflow:hidden}
+#homeBg{position:absolute;inset:0;background:linear-gradient(180deg,#1a3a6b 0%,#3a7abf 40%,#7cc8f8 70%,#8ed468 100%);z-index:-1}
+#homeDirt{position:absolute;bottom:0;left:0;right:0;height:64px;background:repeating-linear-gradient(90deg,#5a3a1a 0px,#5a3a1a 16px,#6a4a22 16px,#6a4a22 32px);opacity:.85;z-index:-1}
+#homeTitle{font-size:54px;font-weight:900;letter-spacing:8px;color:#fff;text-shadow:3px 3px 0 #222,-3px -3px 0 #000,3px -3px 0 #222,-3px 3px 0 #222;margin-bottom:2px;image-rendering:pixelated}
+#homeTitle span{color:#88ff44;text-shadow:3px 3px 0 #2a5a00,-3px -3px 0 #000}
+.hsub{color:#ccc;font-size:10px;letter-spacing:3px;margin-bottom:28px;text-shadow:1px 1px 0 #000}
+
+/* world list panel */
+#homePanel{background:rgba(0,0,0,.72);border:2px solid #444;padding:18px 22px;min-width:480px;max-width:96vw;max-height:80vh;overflow-y:auto;backdrop-filter:blur(4px)}
+#homePanel h2{font-size:11px;letter-spacing:3px;color:#aaa;text-transform:uppercase;margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:6px}
+.wslot{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:4px;background:rgba(255,255,255,.06);border:1px solid #333;cursor:pointer;transition:background .15s}
+.wslot:hover,.wslot.sel{background:rgba(255,255,255,.14);border-color:#5d9e3f}
+.wslot .wico{width:40px;height:40px;flex-shrink:0;background:linear-gradient(135deg,#5d9e3f,#3a6828);border:2px solid #2a4a18;display:flex;align-items:center;justify-content:center;font-size:18px}
+.wslot .wmeta{flex:1;min-width:0}
+.wslot .wname{font-size:13px;font-weight:bold;color:#eee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wslot .winfo{font-size:9px;color:#888;margin-top:2px}
+.wslot .wdel{background:#622;border:none;color:#f88;font-size:10px;padding:3px 7px;font-family:inherit;cursor:pointer;opacity:.7;flex-shrink:0}
+.wslot .wdel:hover{opacity:1;background:#933}
+.wnew{display:flex;gap:6px;margin-bottom:10px}
+#wNameIn{flex:1;background:#1a1a1a;border:1px solid #444;color:#fff;padding:6px 10px;font-size:11px;font-family:inherit;outline:none}
+#wNameIn:focus{border-color:#5d9e3f}
+.hbtn{background:#3a3a3a;color:#ddd;border:2px solid #555;padding:7px 16px;font-size:11px;font-family:inherit;cursor:pointer;letter-spacing:1px;white-space:nowrap}
+.hbtn:hover{background:#4a4a4a;border-color:#888}
+.hbtn.green{background:#3a6828;border-color:#5d9e3f;color:#adf57c}
+.hbtn.green:hover{background:#4a8838;border-color:#8ed45f}
+.hbtn.red{background:#622;border-color:#944;color:#f88}
+.hbtn.red:hover{background:#833}
+.modebts{display:flex;gap:8px;margin:8px 0 12px}
+.mbtn{background:#444;color:#ddd;border:2px solid #666;padding:6px 16px;font-size:11px;font-family:inherit;cursor:pointer;letter-spacing:1px}
 .mbtn:hover{background:#555;border-color:#aaa}.mbtn.active{background:#5d9e3f;border-color:#8ed45f;color:#fff}
-#death{position:fixed;inset:0;background:rgba(100,0,0,.72);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:200}
+#homeActions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+/* pause overlay (shown in-game when Esc) */
+#pause{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:250;backdrop-filter:blur(2px)}
+#pause h2{font-size:28px;letter-spacing:4px;color:#eee;text-shadow:2px 2px 0 #000;margin-bottom:20px}
+.pauseBtn{background:#2a2a2a;color:#ddd;border:2px solid #555;padding:9px 36px;font-size:12px;font-family:inherit;cursor:pointer;letter-spacing:2px;margin-bottom:8px;min-width:220px;text-align:center}
+.pauseBtn:hover{background:#3a3a3a;border-color:#888}
+.pauseBtn.green{background:#2a4a18;border-color:#5d9e3f;color:#adf57c}
+.pauseBtn.green:hover{background:#3a6828}
+.ctls{display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:10px;color:#777;margin-top:16px;text-align:left}
+.ctls .k{color:#ccc;font-weight:bold}
+
+#death{position:fixed;inset:0;background:rgba(100,0,0,.72);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:260}
 #death h2{font-size:44px;color:#f55;text-shadow:2px 2px 0 #800;margin-bottom:18px}
 #rBtn{background:#922;color:#fff;border:none;padding:10px 28px;font-size:13px;font-family:inherit;cursor:pointer;letter-spacing:2px}
 #rBtn:hover{background:#c33}
+
+/* loading screen */
+#loading{position:fixed;inset:0;background:#111;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:400}
+#loading h2{font-size:18px;letter-spacing:4px;color:#5d9e3f;margin-bottom:16px}
+#loadBar{width:280px;height:10px;background:#222;border:1px solid #444;margin-bottom:8px}
+#loadBarFill{height:100%;background:#5d9e3f;width:0%;transition:width .12s}
+#loadMsg{font-size:10px;color:#666;letter-spacing:1px}
 </style>
 </head>
 <body>
@@ -61,7 +103,7 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
 <div id="hud">
   <div id="xh"></div>
   <div id="dbg"></div>
-  <div id="bars"><div id="hbar"></div><div id="fbar"></div></div>
+  <div id="bars"><div id="hbar"></div><div id="abar"></div><div id="fbar"></div></div>
   <div id="hotbar"></div>
   <div id="bb"><div id="bf"></div></div>
   <div id="badge">SURVIVAL</div>
@@ -70,8 +112,16 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
 <div id="inv">
   <div id="invp">
     <h2>Inventory <span style="font-size:8px;color:#888">(E) &nbsp; L-click=pick &nbsp; R-click=half/place-1</span></h2>
-    <div class="ilb">Storage</div><div id="ibag" class="igr"></div>
-    <div class="ilb">Hotbar</div><div id="ihot" class="igr"></div>
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:6px">
+      <div>
+        <div class="ilb">Armor</div>
+        <div id="armorSlots" style="display:flex;flex-direction:column;gap:3px"></div>
+      </div>
+      <div style="flex:1">
+        <div class="ilb">Storage</div><div id="ibag" class="igr"></div>
+        <div class="ilb">Hotbar</div><div id="ihot" class="igr"></div>
+      </div>
+    </div>
     <div class="ilb">Crafting 3×3</div>
     <div class="irow">
       <div id="icg" style="display:grid;grid-template-columns:repeat(3,44px);gap:3px"></div>
@@ -83,57 +133,210 @@ body{background:#000;overflow:hidden;font-family:'Courier New',monospace}
 </div>
 <div id="tip"></div>
 <div id="dg"><canvas id="dgc" width="16" height="16"></canvas></div>
-<div id="ov">
-  <h1>&#9935; Minecraft Alex Edition</h1>
-  <p class="sub">I HAVE A 4 GPA, NOT A 1.5 GPA</p>
-  <div class="ctls">
-    <span class="k">WASD / Ctrl</span><span>Move / Sprint</span>
-    <span class="k">Space / Shift</span><span>Jump / Sink</span>
-    <span class="k">Left hold</span><span>Break block / Attack</span>
-    <span class="k">Right click</span><span>Place / Eat food</span>
-    <span class="k">E</span><span>Inventory / Craft</span>
-    <span class="k">F</span><span>Fly (Creative)</span>
-    <span class="k">G</span><span>Cycle time of day</span>
+<!-- Chest UI -->
+<div id="chest" style="position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;pointer-events:all;z-index:50">
+  <div style="background:#c6c6c6;border:3px solid #fff;box-shadow:5px 5px 0 #555;padding:14px;max-width:98vw">
+    <h2 style="font-size:11px;color:#333;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px" id="chestTitle">Chest</h2>
+    <div class="ilb">Chest Contents</div>
+    <div id="chestSlots" style="display:grid;grid-template-columns:repeat(9,44px);gap:3px;margin-bottom:6px"></div>
+    <div class="ilb">Inventory</div>
+    <div id="chestInvBag" style="display:grid;grid-template-columns:repeat(9,44px);gap:3px;margin-bottom:3px"></div>
+    <div id="chestInvHot" style="display:grid;grid-template-columns:repeat(9,44px);gap:3px"></div>
   </div>
-  <div class="modebts">
-    <button class="mbtn active" id="btnSurv">SURVIVAL</button>
-    <button class="mbtn" id="btnCrea">CREATIVE</button>
-  </div>
-  <button id="pBtn" style="background:#5d9e3f;color:#fff;border:none;padding:11px 34px;font-size:14px;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:0 4px 0 #3a6828;letter-spacing:2px">PLAY</button>
 </div>
+<!-- Creative Item Picker -->
+<style>
+.ctab{background:#555;color:#ccc;border:1px solid #777;padding:5px 8px;font-size:9px;font-family:inherit;cursor:pointer;text-align:left;letter-spacing:.5px}
+.ctab:hover{background:#666}.ctab.active{background:#5d9e3f;border-color:#8ed45f;color:#fff}
+</style>
+<!-- Trade UI -->
+<div id="tradeUI" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;pointer-events:all;z-index:50">
+  <div style="background:#c6c6c6;border:3px solid #fff;box-shadow:5px 5px 0 #555;padding:14px;min-width:340px;max-width:98vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="font-size:11px;color:#333;text-transform:uppercase;letter-spacing:2px" id="tradeTitle">Villager</h2>
+      <button id="tradeClose" style="background:#888;color:#fff;border:none;padding:2px 8px;font-family:inherit;font-size:10px;cursor:pointer">✕</button>
+    </div>
+    <div style="display:flex;gap:12px">
+      <div style="flex:1">
+        <div class="ilb">Trades</div>
+        <div id="tradeList" style="display:flex;flex-direction:column;gap:4px;max-height:260px;overflow-y:auto"></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;border-top:2px solid #888;padding-top:8px">
+      <div class="ilb">Your Inventory</div>
+      <div id="tradeInvBag" style="display:grid;grid-template-columns:repeat(9,40px);gap:2px;margin-bottom:2px"></div>
+      <div id="tradeInvHot" style="display:grid;grid-template-columns:repeat(9,40px);gap:2px"></div>
+    </div>
+  </div>
+</div>
+<div id="creativeInv" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;pointer-events:all;z-index:50">
+  <div style="background:#3a3a3a;border:3px solid #666;box-shadow:5px 5px 0 #111;padding:14px;display:flex;flex-direction:column;max-width:98vw">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <h2 style="font-size:11px;color:#ddd;text-transform:uppercase;letter-spacing:2px;white-space:nowrap">Creative <span style="font-size:8px;color:#888">(E) · Click=stack · Right=1</span></h2>
+      <input id="creativeSearch" type="text" placeholder="search..." style="margin-left:auto;background:#222;border:1px solid #555;color:#fff;padding:3px 7px;font-size:10px;font-family:inherit;outline:none;width:110px">
+    </div>
+    <div style="display:flex;gap:10px">
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <button class="ctab active" data-tab="blocks">Blocks</button>
+        <button class="ctab" data-tab="tools">Tools</button>
+        <button class="ctab" data-tab="armor">Armor</button>
+        <button class="ctab" data-tab="materials">Materials</button>
+        <button class="ctab" data-tab="food">Food</button>
+        <button class="ctab" data-tab="all">All</button>
+      </div>
+      <div id="creativeGrid" style="display:grid;grid-template-columns:repeat(9,44px);gap:3px;overflow-y:auto;align-content:start;height:308px;width:408px"></div>
+    </div>
+    <div style="margin-top:8px;border-top:1px solid #555;padding-top:6px">
+      <div style="font-size:8px;color:#888;margin-bottom:3px">HOTBAR</div>
+      <div id="creativeHotbar" style="display:flex;gap:3px"></div>
+    </div>
+  </div>
+</div>
+<!-- ═══ HOME SCREEN ═══ -->
+<div id="home">
+  <div id="homeBg"></div>
+  <div id="homeDirt"></div>
+  <div id="homeTitle">&#9935; MINE<span>CRAFT</span></div>
+  <p class="hsub">ALEX EDITION</p>
+  <div id="homePanel">
+    <h2>&#127758; Select World</h2>
+    <div class="wnew">
+      <input id="wNameIn" type="text" placeholder="World name..." maxlength="24" value="My World">
+      <button class="hbtn green" id="wNewBtn">+ New World</button>
+    </div>
+    <div class="modebts">
+      <button class="mbtn active" id="btnSurv">Survival</button>
+      <button class="mbtn" id="btnCrea">Creative</button>
+    </div>
+    <div id="wList"></div>
+    <div id="homeActions">
+      <button class="hbtn" id="wPlayBtn" disabled>&#9654; Play Selected</button>
+    </div>
+    <div style="margin-top:14px;border-top:1px solid #333;padding-top:10px">
+      <div style="font-size:9px;color:#555;letter-spacing:1px;margin-bottom:6px">CONTROLS</div>
+      <div class="ctls">
+        <span class="k">WASD</span><span>Move</span>
+        <span class="k">Double-W</span><span>Sprint</span>
+        <span class="k">Space / Shift</span><span>Jump / Sink</span>
+        <span class="k">Left-click hold</span><span>Break / Attack</span>
+        <span class="k">Right-click</span><span>Place / Use / Eat</span>
+        <span class="k">E</span><span>Inventory &amp; Craft</span>
+        <span class="k">F</span><span>Fly (Creative)</span>
+        <span class="k">G</span><span>Cycle time of day</span>
+        <span class="k">Esc</span><span>Pause &amp; Save</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAUSE SCREEN ═══ -->
+<div id="pause">
+  <h2>PAUSED</h2>
+  <button class="pauseBtn green" id="pauseResume">&#9654; Resume</button>
+  <button class="pauseBtn" id="pauseSave">&#128190; Save World</button>
+  <button class="pauseBtn" id="pauseQuit">&#8962; Save &amp; Quit to Title</button>
+  <div class="ctls">
+    <span class="k">WASD</span><span>Move</span>
+    <span class="k">Double-W</span><span>Sprint</span>
+    <span class="k">Space / Shift</span><span>Jump / Sink</span>
+    <span class="k">Left-click hold</span><span>Break / Attack</span>
+    <span class="k">Right-click</span><span>Place / Use / Eat</span>
+    <span class="k">E</span><span>Inventory</span>
+    <span class="k">F</span><span>Fly (Creative)</span>
+  </div>
+</div>
+
+<!-- ═══ LOADING SCREEN ═══ -->
+<div id="loading">
+  <h2>LOADING WORLD...</h2>
+  <div id="loadBar"><div id="loadBarFill"></div></div>
+  <div id="loadMsg">Generating terrain...</div>
+</div>
+
+<!-- Furnace UI -->
+<div id="furnaceUI" style="position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;pointer-events:all;z-index:50">
+  <div style="background:#c6c6c6;border:3px solid #fff;box-shadow:5px 5px 0 #555;padding:14px;max-width:98vw">
+    <h2 style="font-size:11px;color:#333;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Furnace</h2>
+    <div style="display:flex;gap:20px;align-items:center;margin-bottom:10px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div class="ilb">Smelt</div>
+        <div id="furnIngr" class="isl" style="background:#8b8b8b"><canvas width="16" height="16"></canvas><span class="ct"></span></div>
+        <div class="ilb">Fuel</div>
+        <div id="furnFuel" class="isl" style="background:#8b8b8b"><canvas width="16" height="16"></canvas><span class="ct"></span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="font-size:18px;color:#555">&#9654;</div>
+        <div id="furnProg" style="width:58px;height:6px;background:#555;border:1px solid #333"><div id="furnProgBar" style="height:100%;background:#f80;width:0%"></div></div>
+        <div id="furnFuelBar" style="width:20px;height:10px;background:#444;border:1px solid #333;margin:0 auto"><div id="furnFuelBarInner" style="height:100%;background:#f50;width:0%;transition:width .3s"></div></div>
+      </div>
+      <div>
+        <div class="ilb">Output</div>
+        <div id="furnOut" class="isl" style="background:#777"><canvas width="16" height="16"></canvas><span class="ct"></span></div>
+      </div>
+    </div>
+    <div class="ilb">Inventory</div>
+    <div id="furnInvBag" style="display:grid;grid-template-columns:repeat(9,44px);gap:3px;margin-bottom:3px"></div>
+    <div id="furnInvHot" style="display:grid;grid-template-columns:repeat(9,44px);gap:3px"></div>
+    <div style="font-size:8px;color:#888;margin-top:5px">Press E or Esc to close</div>
+  </div>
+</div>
+<div id="portalBar" style="position:fixed;bottom:120px;left:50%;transform:translateX(-50%);display:none;background:rgba(80,0,120,.7);border:2px solid #cc88ff;padding:6px 18px;font-size:10px;color:#ee88ff;letter-spacing:2px;text-align:center;font-family:monospace">ENTERING PORTAL...</div>
 <div id="death"><h2>You Died!</h2><button id="rBtn">Respawn</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
 // ═══════ CONFIG ═══════
-const CS=16,WH=64,SEA=12,RC=4,TILE=16,AC=20;
+const CS=16,WH=64,SEA=12,RC=3,TILE=16,AC=36;
 const G=-22, JV=6.8,
-      WK=5,SP=8.5,SW=2.5,RCH=6;
+      WK=4.4,SP=6.8,SW=2.5,RCH=6;  // SP = sprint, WK = walk
 const EYE=1.62,PW=0.28,PCAP=0.18,PI2=Math.PI/2;
 let gameMode='survival';
 
 // ═══════ BLOCK DEFS ═══════
 const T=i=>[i,0];
 const BLK={
-   1:{n:'Grass',   top:T(0), side:T(1), bot:T(2),  solid:1,bt:.5},
-   2:{n:'Dirt',    top:T(2), side:T(2), bot:T(2),  solid:1,bt:.5},
-   3:{n:'Stone',   top:T(3), side:T(3), bot:T(3),  solid:1,bt:1.5,req:{tool:'pickaxe',tier:0}},
-   4:{n:'Log',     top:T(4), side:T(5), bot:T(4),  solid:1,bt:.8},
-   5:{n:'Leaves',  top:T(6), side:T(6), bot:T(6),  solid:1,bt:.3,xray:1},
-   6:{n:'Sand',    top:T(7), side:T(7), bot:T(7),  solid:1,bt:.5},
-   7:{n:'Planks',  top:T(8), side:T(8), bot:T(8),  solid:1,bt:.7},
-   8:{n:'Cobble',  top:T(9), side:T(9), bot:T(9),  solid:1,bt:1.5,req:{tool:'pickaxe',tier:0}},
-   9:{n:'Glass',   top:T(10),side:T(10),bot:T(10), solid:1,bt:.4,xray:1},
-  10:{n:'Gravel',  top:T(11),side:T(11),bot:T(11), solid:1,bt:.5},
+   1:{n:'Grass',   top:T(0), side:T(1), bot:T(2),  solid:1,bt:1.5},
+   2:{n:'Dirt',    top:T(2), side:T(2), bot:T(2),  solid:1,bt:1.5},
+   3:{n:'Stone',   top:T(3), side:T(3), bot:T(3),  solid:1,bt:7.5,req:{tool:'pickaxe',tier:0}},
+   4:{n:'Log',     top:T(4), side:T(5), bot:T(4),  solid:1,bt:4.0},
+   5:{n:'Leaves',  top:T(6), side:T(6), bot:T(6),  solid:1,bt:0.5,xray:1},
+   6:{n:'Sand',    top:T(7), side:T(7), bot:T(7),  solid:1,bt:1.5,falls:1},
+   7:{n:'Planks',  top:T(8), side:T(8), bot:T(8),  solid:1,bt:3.0},
+   8:{n:'Cobble',  top:T(9), side:T(9), bot:T(9),  solid:1,bt:7.5,req:{tool:'pickaxe',tier:0}},
+   9:{n:'Glass',   top:T(10),side:T(10),bot:T(10), solid:1,bt:1.5,xray:1},
+  10:{n:'Gravel',  top:T(11),side:T(11),bot:T(11), solid:1,bt:1.5,drop:55,falls:1},
   11:{n:'Water',   top:T(12),side:T(12),bot:T(12), solid:0,liq:1,bt:99},
-  12:{n:'Bricks',  top:T(13),side:T(13),bot:T(13), solid:1,bt:2,req:{tool:'pickaxe',tier:0}},
+  12:{n:'Bricks',  top:T(13),side:T(13),bot:T(13), solid:1,bt:10,req:{tool:'pickaxe',tier:0}},
   // *** FIXED: ore indices were all +1 off — now correctly mapped ***
-  13:{n:'Gold Ore',top:T(13),side:T(13),bot:T(13), solid:1,bt:3,req:{tool:'pickaxe',tier:1}},
-  14:{n:'Coal Ore',top:T(14),side:T(14),bot:T(14), solid:1,bt:1.5,req:{tool:'pickaxe',tier:0},drop:52},
+  13:{n:'Gold Ore',top:T(13),side:T(13),bot:T(13), solid:1,bt:15,req:{tool:'pickaxe',tier:1}},
+  14:{n:'Coal Ore',top:T(14),side:T(14),bot:T(14), solid:1,bt:7.5,req:{tool:'pickaxe',tier:0},drop:52},
   15:{n:'Bedrock', top:T(15),side:T(15),bot:T(15), solid:1,bt:Infinity,unbreakable:1},
-  16:{n:'Iron Ore',top:T(16),side:T(16),bot:T(16), solid:1,bt:3,req:{tool:'pickaxe',tier:1},drop:51},
-  17:{n:'Diamond Ore',top:T(17),side:T(17),bot:T(17),solid:1,bt:5,req:{tool:'pickaxe',tier:2},drop:53},
-  18:{n:'Iron Block',top:T(19),side:T(19),bot:T(19),solid:1,bt:4,req:{tool:'pickaxe',tier:1}},
+  16:{n:'Iron Ore',top:T(16),side:T(16),bot:T(16), solid:1,bt:15,req:{tool:'pickaxe',tier:1},drop:51},
+  17:{n:'Diamond Ore',top:T(17),side:T(17),bot:T(17),solid:1,bt:25,req:{tool:'pickaxe',tier:2},drop:53},
+  18:{n:'Iron Block',top:T(19),side:T(19),bot:T(19),solid:1,bt:20,req:{tool:'pickaxe',tier:1}},
+  20:{n:'Chest',    top:T(21),side:T(20),bot:T(21), solid:1,bt:3.0,chest:1},
+  21:{n:'Door',      top:T(22),side:T(22),bot:T(22), solid:1,bt:2.0,door:1},
+  22:{n:'Netherrack',top:T(23),side:T(23),bot:T(23), solid:1,bt:0.5},
+  23:{n:'Obsidian',  top:T(24),side:T(24),bot:T(24), solid:1,bt:50, req:{tool:'pickaxe',tier:2}},
+  24:{n:'Nether Portal',top:T(25),side:T(25),bot:T(25),solid:0,bt:Infinity,portal:1,xray:1},
+  25:{n:'Soul Sand', top:T(26),side:T(26),bot:T(26), solid:1,bt:1.0},
+  26:{n:'Glowstone', top:T(27),side:T(27),bot:T(27), solid:1,bt:1.0,emit:1},
+  27:{n:'Nether Brick',top:T(28),side:T(28),bot:T(28),solid:1,bt:8.0,req:{tool:'pickaxe',tier:0}},
+  28:{n:'Magma',       top:T(29),side:T(29),bot:T(29),solid:1,bt:3.0,emit:1},
+  29:{n:'Basalt',      top:T(30),side:T(31),bot:T(30),solid:1,bt:6.0,req:{tool:'pickaxe',tier:0}},
+  30:{n:'Crimson Stem',top:T(32),side:T(33),bot:T(32),solid:1,bt:4.0},
+  31:{n:'Quartz Ore',  top:T(34),side:T(34),bot:T(34),solid:1,bt:7.5,req:{tool:'pickaxe',tier:0},drop:56},
+  32:{n:'Crimson Cap', top:T(35),side:T(35),bot:T(35),solid:1,bt:0.3,xray:1},
+  33:{n:'Lava',        top:T(36),side:T(36),bot:T(36),solid:0,liq:1,emit:1,bt:99},
+  // ── Deepslate layer ──
+  34:{n:'Deepslate',     top:T(37),side:T(37),bot:T(37), solid:1,bt:9.0,req:{tool:'pickaxe',tier:0},drop:40},
+  35:{n:'Deepslate Coal Ore',top:T(38),side:T(38),bot:T(38),solid:1,bt:9.0,req:{tool:'pickaxe',tier:0},drop:52},
+  36:{n:'Deepslate Iron Ore',top:T(39),side:T(39),bot:T(39),solid:1,bt:9.0,req:{tool:'pickaxe',tier:1},drop:51},
+  37:{n:'Deepslate Diamond Ore',top:T(40),side:T(40),bot:T(40),solid:1,bt:12.0,req:{tool:'pickaxe',tier:2},drop:53},
+  // ── Functional blocks ──
+  38:{n:'Torch',         top:T(41),side:T(41),bot:T(41), solid:1,bt:0.1,emit:1,xray:1},
+  39:{n:'Furnace',       top:T(43),side:T(42),bot:T(43), solid:1,bt:7.5,req:{tool:'pickaxe',tier:0},furnace:1},
+  40:{n:'Cobbled Deepslate',top:T(44),side:T(44),bot:T(44),solid:1,bt:9.0,req:{tool:'pickaxe',tier:0}},
 };
 
 // Non-block items
@@ -142,25 +345,89 @@ const NONBLK={
   51:{n:'Iron Ingot',maxStack:64},
   52:{n:'Coal',    maxStack:64},
   53:{n:'Diamond', maxStack:64},
+  54:{n:'Flint & Steel',maxStack:1,flintSteel:1},
+  57:{n:'Water Bucket',maxStack:1,bucket:11},
+  58:{n:'Lava Bucket', maxStack:1,bucket:33},
+  55:{n:'Flint',          maxStack:64},
+  56:{n:'Nether Quartz',  maxStack:64},
   60:{n:'Wood Pickaxe', tool:{type:'pickaxe',tier:0,spd:2},maxStack:1},
   61:{n:'Stone Pickaxe',tool:{type:'pickaxe',tier:1,spd:4},maxStack:1},
-  62:{n:'Iron Pickaxe', tool:{type:'pickaxe',tier:2,spd:8},maxStack:1},
+  62:{n:'Iron Pickaxe', tool:{type:'pickaxe',tier:2,spd:6},maxStack:1},
   63:{n:'Wood Axe',     tool:{type:'axe',tier:0,spd:2},maxStack:1},
   64:{n:'Stone Axe',    tool:{type:'axe',tier:1,spd:4},maxStack:1},
-  65:{n:'Iron Axe',     tool:{type:'axe',tier:2,spd:8},maxStack:1},
+  65:{n:'Iron Axe',     tool:{type:'axe',tier:2,spd:6},maxStack:1},
   66:{n:'Wood Shovel',  tool:{type:'shovel',tier:0,spd:2},maxStack:1},
-  67:{n:'Iron Shovel',  tool:{type:'shovel',tier:2,spd:8},maxStack:1},
+  67:{n:'Iron Shovel',  tool:{type:'shovel',tier:2,spd:6},maxStack:1},
   68:{n:'Wood Sword',   tool:{type:'sword',tier:0},maxStack:1},
   69:{n:'Iron Sword',   tool:{type:'sword',tier:2},maxStack:1},
+  70:{n:'Diamond Pickaxe',tool:{type:'pickaxe',tier:3,spd:8},maxStack:1},
+  71:{n:'Diamond Sword',  tool:{type:'sword',tier:3},maxStack:1},
+  // Armor (slot: head/chest/legs/feet, armor = points)
+  90:{n:'Iron Helmet',     armor:{slot:'head', pts:2, mat:'iron'},maxStack:1},
+  91:{n:'Iron Chestplate', armor:{slot:'chest',pts:6, mat:'iron'},maxStack:1},
+  92:{n:'Iron Leggings',   armor:{slot:'legs', pts:5, mat:'iron'},maxStack:1},
+  93:{n:'Iron Boots',      armor:{slot:'feet', pts:2, mat:'iron'},maxStack:1},
+  94:{n:'Diamond Helmet',  armor:{slot:'head', pts:3, mat:'diamond'},maxStack:1},
+  95:{n:'Diamond Chestplate',armor:{slot:'chest',pts:8,mat:'diamond'},maxStack:1},
+  96:{n:'Diamond Leggings',  armor:{slot:'legs', pts:6,mat:'diamond'},maxStack:1},
+  97:{n:'Diamond Boots',     armor:{slot:'feet', pts:3,mat:'diamond'},maxStack:1},
   80:{n:'Raw Beef',     food:3,maxStack:64},
   81:{n:'Raw Chicken',  food:2,maxStack:64},
   82:{n:'Mutton',       food:2,maxStack:64},
+  83:{n:'Cooked Beef',  food:8,maxStack:64},
+  84:{n:'Cooked Chicken',food:6,maxStack:64},
+  85:{n:'Cooked Mutton',food:6,maxStack:64},
+  86:{n:'Bone',         maxStack:64},
+  87:{n:'Gunpowder',    maxStack:64},
 };
 const itemName=id=>BLK[id]?.n||NONBLK[id]?.n||'?';
 const itemMaxStack=id=>BLK[id]?64:(NONBLK[id]?.maxStack||64);
 const isSolid=t=>!!BLK[t]?.solid;
+const isSolidAt=(x,y,z)=>{const t=getB(x,y,z);if(!BLK[t]?.solid)return false;if(BLK[t]?.door&&doorOpen.has(`${x},${y},${z}`))return false;return true;};
 const isLiquid=t=>!!BLK[t]?.liq;
-const isOpaque=t=>isSolid(t)&&!BLK[t]?.xray;
+const isOpaque=(t,x,y,z)=>{if(!isSolid(t)||BLK[t]?.xray)return false;if(BLK[t]?.door&&x!==undefined&&doorOpen.has(`${x},${y},${z}`))return false;return true;};
+
+// ═══════ ARMOR ═══════
+const armorSlots={head:null,chest:null,legs:null,feet:null};
+const ARMOR_ORDER=['head','chest','legs','feet'];
+const ARMOR_LABELS={head:'🪖',chest:'🛡️',legs:'👖',feet:'👟'};
+function getArmorReduction(){
+  let pts=0;
+  for(const slot of ARMOR_ORDER)if(armorSlots[slot])pts+=NONBLK[armorSlots[slot].type]?.armor?.pts||0;
+  return Math.min(0.8,pts*0.04); // cap at 80%
+}
+function rfArmorSlots(){
+  const el=document.getElementById('armorSlots');if(!el)return;
+  el.innerHTML='';
+  for(const slot of ARMOR_ORDER){
+    const d=document.createElement('div');d.className='isl';
+    d.style.position='relative';
+    const cv=document.createElement('canvas');cv.width=16;cv.height=16;d.appendChild(cv);
+    const ct=document.createElement('span');ct.className='ct';d.appendChild(ct);
+    const lbl=document.createElement('span');lbl.style.cssText='position:absolute;top:1px;left:2px;font-size:8px;color:#888';lbl.textContent=ARMOR_LABELS[slot];d.appendChild(lbl);
+    const s=armorSlots[slot];
+    if(s){cv.getContext('2d').drawImage(getItemIcon(s.type),0,0,16,16);ct.textContent='';}
+    else{cv.getContext('2d').clearRect(0,0,16,16);}
+    d.addEventListener('mouseenter',e=>{if(armorSlots[slot])showTip(itemName(armorSlots[slot].type),e);else showTip('Empty '+slot+' slot',e);});
+    d.addEventListener('mouseleave',hideTip);
+    d.addEventListener('mousedown',e=>{
+      e.preventDefault();hideTip();
+      if(!dragItem){
+        if(armorSlots[slot]){dragItem={...armorSlots[slot]};armorSlots[slot]=null;}
+      } else {
+        const arm=NONBLK[dragItem.type]?.armor;
+        if(arm&&arm.slot===slot){
+          const prev=armorSlots[slot];
+          armorSlots[slot]={...dragItem};
+          dragItem=prev;
+        }
+      }
+      rfDg();rfArmorSlots();rfH();
+    });
+    d.addEventListener('contextmenu',e=>e.preventDefault());
+    el.appendChild(d);
+  }
+}
 function getMineTime(bid,toolId){
   if(BLK[bid]?.unbreakable&&gameMode!=='creative')return Infinity;
   const base=BLK[bid]?.bt||1;
@@ -172,49 +439,600 @@ function getMineTime(bid,toolId){
   if(ti.tier<req.tier)return base*2;
   return base/ti.spd;
 }
+// Diamond ore now requires tier 2 (iron pickaxe); diamond tools are tier 3
+// Update diamond ore req to tier 2 so iron pickaxe can mine it
 function getBlockDrop(bid){
   if(BLK[bid]?.unbreakable)return null;
   if(BLK[bid]?.drop!==undefined)return BLK[bid].drop;
   return bid;
 }
-function getToolDamage(toolId){return NONBLK[toolId]?.tool?.tier?[1,3,5,8][NONBLK[toolId].tool.tier]||2:1;}
+function getToolDamage(toolId){const t=NONBLK[toolId]?.tool;if(!t)return 1;return[1,3,5,8,12][t.tier]||2;}
 
 // ═══════ ATLAS ═══════
 function buildAtlas(){
   const A=document.createElement('canvas');A.width=AC*TILE;A.height=TILE;
   const ctx=A.getContext('2d');
-  const rv=(x,y,s,a=20)=>{const v=Math.sin(x*127.1+y*311.7+s*74.3)*43758.5453;return((v-Math.floor(v))*2-1)*a;};
-  const cl=(v,lo,hi)=>Math.max(lo,Math.min(hi,Math.round(v)));
+  // j: deterministic jitter ±range around 0
+  const j=(x,y,seed,range=8)=>{const v=Math.sin(x*127.1+y*311.7+seed*74.3)*43758.5453;return Math.round(((v-Math.floor(v))*2-1)*range);};
+  const C=(v,lo=0,hi=255)=>Math.max(lo,Math.min(hi,Math.round(v)));
   const px=(tx,x,y,r,g,b,a=255)=>{ctx.fillStyle=`rgba(${r},${g},${b},${a/255})`;ctx.fillRect(tx*TILE+x,y,1,1);};
-  const tile=(tx,fn)=>{for(let y=0;y<TILE;y++)for(let x=0;x<TILE;x++){const[r,g,b,a=255]=fn(x,y);px(tx,x,y,r,g,b,a);}};
-  tile(0,(x,y)=>{const v=rv(x,y,1,11);return[cl(100+v,75,124),cl(162+v,130,186),cl(52+v,30,73)];});
-  tile(1,(x,y)=>{if(y<=2){const v=rv(x,y,2,9);return[cl(88+v,66,110),cl(150+v,122,176),cl(44+v,26,64)];}if(y===3)return[104,84,57];const v=rv(x,y,3,18);return[cl(133+v,99,167),cl(95+v,67,123),cl(66+v,41,91)];});
-  tile(2,(x,y)=>{const v=rv(x,y,4,20);return[cl(133+v,99,167),cl(95+v,67,123),cl(66+v,41,91)];});
-  tile(3,(x,y)=>{const v=rv(x,y,5,18);const b=cl(128+v,90,162);return((x%7===2&&y%9===4)||(x%13===8&&y%7===3))?[75,75,77]:[b,b,b];});
-  tile(4,(x,y)=>{const cx=x-7.5,cy=y-7.5,d=Math.sqrt(cx*cx+cy*cy),rg=Math.floor(d/2.8)%2;const v=rv(x,y,6,8);return rg?[cl(98+v,75,124),cl(63+v,42,87),cl(26+v,12,47)]:[cl(116+v,89,143),cl(78+v,56,103),cl(36+v,18,56)];});
-  tile(5,(x,y)=>{const s=Math.floor(x/2)%2,v=rv(x,y,7,10);return(x>=5&&x<=7&&y>=6&&y<=9)?[67,45,19]:s?[cl(108+v,82,134),cl(70+v,48,96),cl(30+v,14,50)]:[cl(94+v,70,120),cl(58+v,38,80),cl(23+v,8,44)];});
-  tile(6,(x,y)=>{const h=Math.sin(x*1.3+y*.9)*43758.5,r=h-Math.floor(h);if(r<.14)return[0,0,0,0];const v=rv(x,y,8,15);return[cl(34+v,15,54),cl(113+v,85,139),cl(26+v,10,46),210];});
-  tile(7,(x,y)=>{const v=rv(x,y,9,13);return[cl(214+v,184,237),cl(192+v,164,217),cl(109+v,81,134)];});
-  tile(8,(x,y)=>{const sm=(y%4===0)||(x%8===0&&y%4!==0),v=rv(x,y,10,10);return sm?[cl(131+v,100,160),cl(88+v,60,116),cl(44+v,24,68)]:[cl(166+v,136,194),cl(114+v,86,142),cl(60+v,36,86)];});
-  tile(9,(x,y)=>{const g=(x===0||y===0||(x<8&&(x===4||y===8))||(x>=8&&(x===12||y===4)));const v=rv(x,y,11,18);const b=cl(124+v,83,159);return g?[59,59,62]:[b,b,b];});
-  tile(10,(x,y)=>{const b=x===0||y===0||x===15||y===15||x===7||y===7;return b?[187,213,233,216]:[157,197,233,40];});
-  tile(11,(x,y)=>{const v=rv(x,y,12,11),w=Math.round(Math.sin(x*.6+y*.4)*2);return[cl(29+v+w,11,61),cl(75+v+w,49,109),cl(182+v,145,212),165];});
-  tile(12,(x,y)=>{const row=Math.floor(y/5),ox=row%2?4:0,bx=Math.floor((x+ox)%8),by=y%5,m=bx===0||by===0;const v=rv(x,y,13,14);return m?[159,149,141]:[cl(173+v,140,204),cl(80+v,52,110),cl(58+v,34,84)];});
-  // *** FIXED: tile 13 = Gold Ore (was being used for bricks before fix) ***
-  tile(13,(x,y)=>{const v=rv(x,y,14,18),b=cl(128+v,92,162);const isOre=((x*3+y*7)%9<2)&&((x*7+y*3)%11<3);return isOre?[225,185,20]:[b,b,b];});
-  // *** FIXED: tile 14 = Coal Ore ***
-  tile(14,(x,y)=>{const v=rv(x,y,15,18),b=cl(128+v,92,162),o=((x*3+y*7)%11<3);return o?[22,22,24]:[b,b,b];});
-  // 15: Bedrock
-  tile(15,(x,y)=>{const v=rv(x,y,16,22),p=((x+y*3)%5===0)||(x%4===1&&y%3===2);return p?[20,20,20]:[cl(60+v,35,88),cl(60+v,35,88),cl(60+v,35,88)];});
-  // *** FIXED: tile 16 = Iron Ore — stone with warm orange-brown flecks ***
-  tile(16,(x,y)=>{const v=rv(x,y,17,18),b=cl(128+v,92,162),o=((x*5+y*3)%9<3)&&((x+y*2)%5<2);return o?[200,120,55]:[b,b,b];});
-  // *** FIXED: tile 17 = Diamond Ore — stone with bright cyan sparkles ***
-  tile(17,(x,y)=>{const v=rv(x,y,18,18),b=cl(128+v,92,162),o=((x*7+y*11)%13<2)&&((x*3+y*5)%9<3);return o?[60,230,248]:[b,b,b];});
-  // 18: unused (emerald-ish, kept for atlas alignment)
-  tile(18,(x,y)=>{const v=rv(x,y,19,18),b=cl(126+v,86,160),o=((x*3+y*7)%11<2&&x%5!==0);return o?[40,180,70]:[b,b,b];});
-  // 19: Iron Block — polished grey metal panels
-  tile(19,(x,y)=>{const v=rv(x,y,20,8);const b=cl(180+v,155,200);const line=(x===0||y===0||x===7||y===7||x===15||y===15);return line?[140,140,143]:[b,b,b];});
-  const tex=new THREE.CanvasTexture(A);tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;
+  const tile=(tx,fn)=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++){const c=fn(x,y);px(tx,x,y,c[0],c[1],c[2],c[3]??255);}};
+
+  // ── 0: Grass Top — patchy lime green ──
+  tile(0,(x,y)=>{
+    const v=j(x,y,1,14);
+    // Minecraft grass top: bright lime green ~(94,157,52) with variation
+    const d=j(x,y,11,10);
+    return[C(94+v+d),C(157+v),C(52+v)];
+  });
+
+  // ── 1: Grass Side — green band on top, dirt below ──
+  tile(1,(x,y)=>{
+    if(y===0){const v=j(x,y,2,6);return[C(74+v),C(133+v),C(37+v)];}
+    if(y===1){const v=j(x,y,3,8);return[C(86+v),C(148+v),C(43+v)];}
+    if(y===2){const v=j(x,y,4,10);return[C(90+v),C(153+v),C(46+v)];}
+    if(y===3)return[100,80,52];
+    const v=j(x,y,5,12);
+    return[C(134+v),C(96+v),C(67+v)];
+  });
+
+  // ── 2: Dirt — warm brown ──
+  tile(2,(x,y)=>{
+    const v=j(x,y,6,14);
+    return[C(134+v),C(96+v),C(67+v)];
+  });
+
+  // ── 3: Stone — mid grey with scattered dark cracks ──
+  tile(3,(x,y)=>{
+    const v=j(x,y,7,8);
+    // Scattered dark specks like MC stone
+    const speck=((x===3&&y===1)||(x===10&&y===3)||(x===6&&y===8)||(x===14&&y===6)||(x===1&&y===11)||(x===9&&y===14)||(x===12&&y===10)||(x===4&&y===13)||(x===7&&y===5)||(x===2&&y===7));
+    if(speck)return[C(85+v),C(85+v),C(85+v)];
+    return[C(125+v),C(125+v),C(125+v)];
+  });
+
+  // ── 4: Log Top — concentric rings ──
+  tile(4,(x,y)=>{
+    const cx=x-7.5,cy=y-7.5,r=Math.sqrt(cx*cx+cy*cy);
+    const v=j(x,y,8,6);
+    if(r<2.5)return[C(162+v),C(130+v),C(78+v)];
+    if(r<4)  return[C(102+v),C(81+v), C(51+v)];
+    if(r<6)  return[C(150+v),C(118+v),C(70+v)];
+    return[C(96+v),C(77+v),C(48+v)];
+  });
+
+  // ── 5: Log Side — alternating vertical bark stripes ──
+  tile(5,(x,y)=>{
+    const v=j(x,y,9,7);
+    const stripe=x%4<2;
+    if(stripe)return[C(162+v),C(130+v),C(78+v)];
+    return[C(102+v),C(81+v),C(51+v)];
+  });
+
+  // ── 6: Leaves — transparent dappled green ──
+  tile(6,(x,y)=>{
+    const v=j(x,y,10,16);
+    const h=Math.abs(Math.sin(x*2.1+y*1.4+10)*43758.5)%1;
+    if(h<0.14)return[0,0,0,0];
+    if(h<0.28)return[C(38+v),C(80+v),C(20+v),200];
+    return[C(55+v),C(100+v),C(28+v),220];
+  });
+
+  // ── 7: Sand — warm tan ──
+  tile(7,(x,y)=>{
+    const v=j(x,y,11,10);
+    return[C(220+v),C(207+v),C(160+v)];
+  });
+
+  // ── 8: Oak Planks — horizontal boards with grain ──
+  tile(8,(x,y)=>{
+    const v=j(x,y,12,7);
+    // Board dividers every 4 rows
+    if(y%4===0)return[C(112+v),C(86+v),C(50+v)];
+    // Vertical knot lines
+    const grain=(x===2||x===10)&&y%4!==0;
+    if(grain)return[C(148+v),C(115+v),C(68+v)];
+    return[C(162+v),C(130+v),C(78+v)];
+  });
+
+  // ── 9: Cobblestone — classic mosaic pattern ──
+  // Hand-drawn 16x16 cobble mortar map (1=mortar, 0=stone)
+  tile(9,(x,y)=>{
+    const M=[
+      [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],
+      [0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],
+      [0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],
+      [1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,0,1,1,1,1,1,1,0,0,0,1,1,1,1],
+      [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+      [1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,1,0,0,1,1,0,0,1,1,1,0,1,1,1],
+    ];
+    const v=j(x,y,13,10);
+    if(M[y][x])return[C(73+v),C(73+v),C(73+v)];
+    return[C(118+v),C(118+v),C(118+v)];
+  });
+
+  // ── 10: Glass — white edge, faint tint interior ──
+  tile(10,(x,y)=>{
+    const edge=x===0||y===0||x===15||y===15;
+    const inner=(!edge)&&(x===1||y===1||x===14||y===14);
+    if(edge) return[255,255,255,240];
+    if(inner)return[255,255,255,180];
+    // Very faint blue-white tint
+    if(x<6&&y<6)return[198,226,255,55];
+    return[198,226,255,28];
+  });
+
+  // ── 11: Gravel — speckled grey-brown pebbles ──
+  tile(11,(x,y)=>{
+    const v=j(x,y,14,16);
+    const h=Math.abs(Math.sin(x*3.7+y*2.9+14)*43758.5)%1;
+    if(h<0.15)return[C(82+v),C(80+v),C(77+v)];
+    if(h<0.5) return[C(130+v),C(127+v),C(121+v)];
+    return[C(113+v),C(110+v),C(106+v)];
+  });
+
+  // ── 12: Water — semi-transparent blue with shimmer lines ──
+  tile(12,(x,y)=>{
+    const v=j(x,y,15,8);
+    const shimmer=(y%5<2)&&(x%3<2);
+    if(shimmer)return[C(95+v),C(150+v),C(255+v),200];
+    return[C(63+v),C(118+v),C(228+v),190];
+  });
+
+  // ── 13: Gold Ore — stone base + bright gold clusters ──
+  tile(13,(x,y)=>{
+    const G=[
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0],
+      [0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0],
+      [0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    const v=j(x,y,16,8);
+    if(G[y][x])return[C(252+v),C(197+v),C(18)];
+    return[C(126+v),C(126+v),C(126+v)];
+  });
+
+  // ── 14: Coal Ore ──
+  tile(14,(x,y)=>{
+    const C2=[
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,1,1,1,0,0,0,0,0,1,1,0,0,0,0],
+      [0,1,1,1,1,0,0,0,0,1,1,1,0,0,0,0],
+      [0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    const v=j(x,y,17,8);
+    if(C2[y][x])return[22,22,22];
+    return[C(126+v),C(126+v),C(126+v)];
+  });
+
+  // ── 15: Bedrock — black with irregular grey patches ──
+  tile(15,(x,y)=>{
+    const P=[
+      [0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0],
+      [0,1,1,2,2,1,0,0,0,1,2,1,0,0,0,0],
+      [1,2,2,2,2,1,0,0,1,2,2,2,1,0,0,0],
+      [1,2,2,2,1,0,0,0,1,2,2,1,0,0,0,0],
+      [0,1,1,1,0,0,0,0,0,1,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,1,2,1,0,0],
+      [0,0,0,0,1,2,2,1,0,0,1,2,2,2,1,0],
+      [0,0,0,1,2,2,2,2,1,0,1,2,2,2,1,0],
+      [0,0,1,2,2,2,2,2,1,0,0,1,2,1,0,0],
+      [0,1,2,2,2,2,2,1,0,0,0,0,1,0,0,0],
+      [1,2,2,2,2,1,1,0,0,0,0,0,0,0,0,0],
+      [1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,2,2,1,0,0,0,0],
+      [0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
+    ];
+    const v=j(x,y,18,8);
+    const val=P[y][x];
+    if(val===0)return[C(22+v),C(22+v),C(22+v)];
+    if(val===1)return[C(52+v),C(52+v),C(52+v)];
+    return[C(74+v),C(74+v),C(74+v)];
+  });
+
+  // ── 16: Iron Ore ──
+  tile(16,(x,y)=>{
+    const IR=[
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+      [0,0,0,1,1,0,0,0,0,1,1,1,1,0,0,0],
+      [0,0,1,1,1,1,0,0,0,1,1,1,1,0,0,0],
+      [0,0,1,1,1,0,0,0,0,0,1,1,0,0,0,0],
+      [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+      [0,0,0,0,1,1,1,1,0,0,0,0,0,1,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    const v=j(x,y,19,8);
+    if(IR[y][x])return[C(216+v),C(175+v),C(155+v)];
+    return[C(126+v),C(126+v),C(126+v)];
+  });
+
+  // ── 17: Diamond Ore ──
+  tile(17,(x,y)=>{
+    const D=[
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0],
+      [0,0,0,0,1,1,1,1,0,0,1,1,1,0,0,0],
+      [0,0,0,0,1,1,1,1,0,0,1,1,1,0,0,0],
+      [0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0],
+      [1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1],
+      [1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1],
+      [0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    const v=j(x,y,20,8);
+    if(D[y][x])return[C(78+v),C(230+v),C(245+v)];
+    return[C(126+v),C(126+v),C(126+v)];
+  });
+
+  // ── 18: Placeholder (kept for atlas alignment) ──
+  tile(18,(x,y)=>{const v=j(x,y,21,8);return[C(126+v),C(126+v),C(126+v)];});
+
+  // ── 19: Iron Block — polished silver with panel lines ──
+  tile(19,(x,y)=>{
+    const v=j(x,y,22,6);
+    const seam=(x===0||y===0||x===7||y===7||x===15||y===15);
+    if(seam)return[C(162+v),C(162+v),C(162+v)];
+    return[C(203+v),C(203+v),C(203+v)];
+  });
+
+  // ── 20: Chest front — oak wood with iron latch ──
+  tile(20,(x,y)=>{
+    const v=j(x,y,23,7);
+    if(x===0||y===0||x===15||y===15)return[C(82+v),C(66+v),C(38+v)];
+    // Latch hardware center
+    if(x>=6&&x<=9&&y>=5&&y<=10){
+      if(x===6||x===9||y===5||y===10)return[C(118+v),C(90+v),C(30+v)];
+      if(x>=7&&x<=8&&y<=7)return[C(240+v),C(192+v),C(48+v)];
+      if((x===7||x===8)&&y>=8)return[C(192+v),C(148+v),C(32+v)];
+      return[C(160+v),C(122+v),C(40+v)];
+    }
+    if(y===8)return[C(128+v),C(100+v),C(58+v)];
+    if(x===3||x===12)return[C(145+v),C(112+v),C(65+v)];
+    return[C(162+v),C(130+v),C(78+v)];
+  });
+
+  // ── 21: Chest top/side ──
+  tile(21,(x,y)=>{
+    const v=j(x,y,24,7);
+    if(x===0||y===0||x===15||y===15)return[C(82+v),C(66+v),C(38+v)];
+    if(y===8)return[C(128+v),C(100+v),C(58+v)];
+    if(x===3||x===12)return[C(145+v),C(112+v),C(65+v)];
+    return[C(162+v),C(130+v),C(78+v)];
+  });
+
+  // ── 22: Oak Door ──
+  tile(22,(x,y)=>{
+    const v=j(x,y,25,7);
+    if(x===0||x===15||y===0||y===15)return[C(90+v),C(68+v),C(38+v)];
+    if(x===7||x===8||y===7||y===8)return[C(108+v),C(82+v),C(46+v)];
+    const knob=(x===11||x===12)&&y>=6&&y<=9;
+    if(knob)return[C(200+v),C(160+v),C(40+v)];
+    if(x===2||x===13)return[C(148+v),C(114+v),C(66+v)];
+    return[C(162+v),C(130+v),C(78+v)];
+  });
+
+  // ── 23: Netherrack — dark red porous rock ──
+  tile(23,(x,y)=>{
+    const v=j(x,y,30,14);
+    const H=[
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],
+      [0,0,0,1,0,0,1,1,1,0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,0,1,0,0,0,0,1,0,0,0],
+      [0,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],
+      [0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],
+      [0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    if(H[y][x])return[C(60+v),C(10+v),C(10+v)];
+    return[C(168+v),C(52+v),C(52+v)];
+  });
+
+  // ── 24: Obsidian — near-black with purple shimmer ──
+  tile(24,(x,y)=>{
+    const v=j(x,y,31,7);
+    const sh=((x===3&&y===5)||(x===11&&y===2)||(x===7&&y===12)||(x===14&&y===9)||(x===1&&y===14)||(x===12&&y===6));
+    if(sh)return[C(78+v),C(42+v),C(98+v)];
+    return[C(20+v),C(12+v),C(28+v)];
+  });
+
+  // ── 25: Nether Portal — swirling purple transparent ──
+  tile(25,(x,y)=>{
+    const v=j(x,y,32,16);
+    const swirl=Math.sin(x*0.7+y*0.5)*Math.cos(x*0.3-y*0.8);
+    const a=C(140+Math.round(swirl*50)+v,80,210);
+    return[C(90+v),C(22+v),C(180+Math.round(swirl*28)+v),a];
+  });
+
+  // ── 26: Soul Sand — muddy brown with screaming face ──
+  tile(26,(x,y)=>{
+    const v=j(x,y,33,11);
+    const lEye=(x>=3&&x<=5&&y>=5&&y<=7);
+    const rEye=(x>=10&&x<=12&&y>=5&&y<=7);
+    const mouth=(y>=10&&y<=12&&x>=4&&x<=11&&x%2===0);
+    const nose=(x===7||x===8)&&y===8;
+    if(lEye||rEye)return[C(18+v),C(10+v),C(8+v)];
+    if(mouth)return[C(28+v),C(16+v),C(12+v)];
+    if(nose)return[C(50+v),C(36+v),C(28+v)];
+    return[C(84+v),C(64+v),C(51+v)];
+  });
+
+  // ── 27: Glowstone — amber crystal grid ──
+  tile(27,(x,y)=>{
+    const v=j(x,y,34,9);
+    // Cross-divider lines every 4 px
+    const seam=(x===4||x===5||x===10||x===11||y===4||y===5||y===10||y===11);
+    if(seam)return[C(172+v),C(132+v),C(38+v)];
+    return[C(254+v),C(223+v),C(98+v)];
+  });
+
+  // ── 28: Nether Brick — dark red bricks with mortar ──
+  tile(28,(x,y)=>{
+    const v=j(x,y,35,7);
+    const row=Math.floor(y/4),ox=row%2?4:0;
+    const bx=(x+ox)%8,by=y%4;
+    if(bx===0||by===0)return[C(20+v),C(8+v),C(8+v)];
+    return[C(96+v),C(32+v),C(26+v)];
+  });
+
+  // ── 29: Magma Block — dark rock glowing orange cracks ──
+  tile(29,(x,y)=>{
+    const v=j(x,y,36,7);
+    const CK=[
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0],
+      [0,0,2,0,0,0,0,0,0,0,2,2,0,2,2,0],
+      [0,2,2,2,0,0,0,0,0,2,2,0,0,0,2,0],
+      [2,2,0,2,2,0,0,0,2,2,0,0,0,0,2,2],
+      [2,0,0,0,2,2,2,2,2,0,0,0,0,0,0,2],
+      [0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0],
+      [0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,2,2,0,0,0,0,0,0,0,0,0,2,0],
+      [0,0,2,2,0,0,0,0,0,0,0,0,0,2,2,2],
+      [0,0,2,0,0,0,0,0,0,0,0,0,2,2,0,2],
+      [0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,2],
+      [0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    const val=CK[y][x];
+    if(val===2)return[C(255+v),C(130+v),C(0)];
+    return[C(60+v),C(18+v),C(18+v)];
+  });
+
+  // ── 30: Basalt top — dark polished rings ──
+  tile(30,(x,y)=>{
+    const v=j(x,y,37,6);
+    const cx=x-7.5,cy=y-7.5,r=Math.sqrt(cx*cx+cy*cy);
+    if(r>7)return[C(40+v),C(40+v),C(42+v)];
+    if(r>5)return[C(54+v),C(54+v),C(56+v)];
+    return[C(70+v),C(70+v),C(72+v)];
+  });
+
+  // ── 31: Basalt side — dark charcoal with thin column lines ──
+  tile(31,(x,y)=>{
+    const v=j(x,y,38,5);
+    if(x%4===0)return[C(36+v),C(36+v),C(38+v)];
+    return[C(58+v),C(58+v),C(60+v)];
+  });
+
+  // ── 32: Crimson Stem top — deep red concentric rings ──
+  tile(32,(x,y)=>{
+    const v=j(x,y,39,9);
+    const cx=x-7.5,cy=y-7.5,r=Math.sqrt(cx*cx+cy*cy);
+    if(r>6) return[C(120+v),C(16+v),C(14+v)];
+    if(r>3.5)return[C(180+v),C(34+v),C(30+v)];
+    return[C(210+v),C(48+v),C(44+v)];
+  });
+
+  // ── 33: Crimson Stem side — vivid red vertical stripes ──
+  tile(33,(x,y)=>{
+    const v=j(x,y,40,8);
+    const stripe=x%4<2;
+    if(stripe)return[C(198+v),C(40+v),C(38+v)];
+    return[C(120+v),C(18+v),C(16+v)];
+  });
+
+  // ── 34: Nether Quartz Ore — netherrack with white veins ──
+  tile(34,(x,y)=>{
+    const v=j(x,y,41,11);
+    const VN=[
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0],
+      [0,0,1,1,1,1,0,0,0,0,1,1,1,1,0,0],
+      [0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    if(VN[y][x])return[C(242+v),C(240+v),C(238+v)];
+    return[C(168+v),C(52+v),C(52+v)];
+  });
+
+  // ── 35: Crimson Cap — deep red mushroom top ──
+  tile(35,(x,y)=>{
+    const v=j(x,y,42,10);
+    const cx=x-7.5,cy=y-7.5,d=Math.sqrt(cx*cx+cy*cy);
+    const spot=(Math.abs(Math.sin(x*1.8+y*2.4+4)*43758.5)%1)<0.12&&d<6.5;
+    if(spot)return[C(50+v),C(8+v),C(8+v),220];
+    if(d>7) return[C(130+v),C(20+v),C(18+v),200];
+    return[C(216+v),C(36+v),C(32+v),220];
+  });
+
+  // ── 36: Lava — bright orange concentric glow ──
+  tile(36,(x,y)=>{
+    const v=j(x,y,50,9);
+    const FL=[
+      [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
+      [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
+      [3,3,3,3,3,2,2,2,2,3,3,3,3,3,3,3],
+      [3,3,3,3,2,2,1,1,2,2,3,3,3,3,3,3],
+      [3,3,3,2,2,1,1,1,1,2,2,3,3,3,3,3],
+      [3,3,2,2,1,1,0,0,1,1,2,2,3,3,3,3],
+      [3,3,2,1,1,0,0,0,0,1,1,2,3,3,3,3],
+      [3,2,2,1,0,0,0,0,0,0,1,2,2,3,3,3],
+      [3,2,1,1,0,0,0,0,0,0,1,1,2,3,3,3],
+      [3,2,1,0,0,0,0,0,0,0,0,1,2,3,3,3],
+      [3,2,1,0,0,0,0,0,0,0,0,1,2,3,3,3],
+      [3,2,1,1,0,0,0,0,0,0,1,1,2,3,3,3],
+      [3,3,2,1,1,0,0,0,0,1,1,2,3,3,3,3],
+      [3,3,2,2,1,1,0,0,1,1,2,2,3,3,3,3],
+      [3,3,3,2,2,1,1,1,1,2,2,3,3,3,3,3],
+      [3,3,3,3,2,2,2,2,2,3,3,3,3,3,3,3],
+    ];
+    const val=FL[y]?.[x]??3;
+    if(val===0)return[C(255+v),C(234+v),C(80+v)];
+    if(val===1)return[C(255+v),C(160+v),C(18+v)];
+    if(val===2)return[C(238+v),C(100+v),C(12+v)];
+    return[C(200+v),C(50+v),C(6+v)];
+  });
+
+
+  // ── 37: Deepslate — dark blue-grey with horizontal banding ──
+  tile(37,(x,y)=>{
+    const v=j(x,y,60,5);
+    const band=Math.floor(y/2)%3===0?-6:0;
+    return[C(50+v+band),C(50+v+band),C(64+v+band)];
+  });
+  // ── 38: Deepslate Coal Ore ──
+  tile(38,(x,y)=>{
+    const v=j(x,y,61,4);
+    const band=Math.floor(y/2)%3===0?-5:0;
+    const o=hash(x*31+y*17+38),o2=hash((x+1)*31+y*17+38)+hash(x*31+(y+1)*17+38);
+    if(o<0.15&&o2>0.35)return[22,22,22];
+    return[C(50+v+band),C(50+v+band),C(64+v+band)];
+  });
+  // ── 39: Deepslate Iron Ore ──
+  tile(39,(x,y)=>{
+    const v=j(x,y,62,4);
+    const band=Math.floor(y/2)%3===0?-5:0;
+    const o=hash(x*29+y*13+39),o2=hash((x+1)*29+y*13+39)+hash(x*29+(y+1)*13+39);
+    if(o<0.11&&o2>0.4)return[C(216),C(175),C(155)];
+    return[C(50+v+band),C(50+v+band),C(64+v+band)];
+  });
+  // ── 40: Deepslate Diamond Ore ──
+  tile(40,(x,y)=>{
+    const v=j(x,y,63,4);
+    const band=Math.floor(y/2)%3===0?-5:0;
+    const o=hash(x*37+y*23+40),o2=hash((x+1)*37+y*23+40)+hash(x*37+(y+1)*23+40);
+    if(o<0.08&&o2>0.45)return[78,230,245];
+    return[C(50+v+band),C(50+v+band),C(64+v+band)];
+  });
+  // ── 41: Torch — warm fire glow ──
+  tile(41,(x,y)=>{
+    const v=j(x,y,64,12);
+    // Center stick at x=7-8, fire on top, brown stick below
+    if(y<5){const f=1-y/5;return[C(255+v),C(180+f*60+v),C(f*50+v)];}
+    if(y<6)return[C(200+v),C(140+v),C(20+v)];
+    return[C(88+v),C(55+v),C(15+v)];
+  });
+  // ── 42: Furnace Front (lit) — stone with fire opening ──
+  tile(42,(x,y)=>{
+    const v=j(x,y,65,6);
+    if(x>=4&&x<=11&&y>=4&&y<=12){
+      const f=1-(y-4)/8;
+      return[C(240+v),C(100+f*100+v),C(f*25)];
+    }
+    const seam=(x%8===0||y%8===0);
+    return seam?[C(82+v),C(82+v),C(82+v)]:[C(112+v),C(112+v),C(112+v)];
+  });
+  // ── 43: Furnace Top/Side — stone with intake marks ──
+  tile(43,(x,y)=>{
+    const v=j(x,y,66,6);
+    const seam=(x%8===0||y%8===0);
+    if(seam)return[C(82+v),C(82+v),C(82+v)];
+    // Two small dark intake holes on face
+    if((x>=5&&x<=6||x>=9&&x<=10)&&y>=6&&y<=9)return[C(40+v),C(40+v),C(40+v)];
+    return[C(112+v),C(112+v),C(112+v)];
+  });
+  // ── 44: Cobbled Deepslate ──
+  tile(44,(x,y)=>{
+    const v=j(x,y,67,6);
+    const M=[
+      [1,1,1,0,1,1,1,1,0,1,1,1,1,0,1,1],[1,1,1,0,1,1,1,1,0,1,1,1,1,0,1,1],
+      [1,1,1,0,1,1,1,1,0,1,1,1,1,0,1,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,1,1,1,0,1,1,1,0,1,1,1,1,0,1],[1,1,1,1,1,0,1,1,1,0,1,1,1,1,0,1],
+      [1,1,1,1,1,0,1,1,1,0,1,1,1,1,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,0,1,1,1,1,0,1,1,1,1,0,1,1,1],[1,1,0,1,1,1,1,0,1,1,1,1,0,1,1,1],
+      [1,1,0,1,1,1,1,0,1,1,1,1,0,1,1,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,1,1,0,1,1,1,1,0,1,1,1,0,1,1],[1,1,1,1,0,1,1,1,1,0,1,1,1,0,1,1],
+      [1,1,1,1,0,1,1,1,1,0,1,1,1,0,1,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ];
+    if(!M[y]?.[x])return[C(36+v),C(36+v),C(46+v)];
+    return[C(60+v),C(60+v),C(74+v)];
+  });
+
+    const tex=new THREE.CanvasTexture(A);tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.generateMipmaps=false;
   return{tex,canvas:A};
 }
 const{tex:ATLAS,canvas:ATLAS_C}=buildAtlas();
@@ -242,14 +1060,48 @@ function drawNonBlockIcon(ctx,id){
     else if(tool.type==='axe'){ctx.fillRect(1,1,6,6);ctx.fillRect(5,7,2,3);}
     else if(tool.type==='shovel'){ctx.fillRect(5,1,4,6);ctx.fillRect(6,7,2,3);}
     else if(tool.type==='sword'){ctx.fillStyle='#888';ctx.fillRect(7,12,2,2);ctx.fillStyle=hc;ctx.fillRect(6,3,4,10);}
+  }else if(d.armor){
+    const mc=d.armor.mat==='diamond'?'#60d0f0':'#b4c8d2';
+    const dc=d.armor.mat==='diamond'?'#2090a0':'#607080';
+    ctx.fillStyle=mc;
+    if(d.armor.slot==='head'){
+      ctx.fillRect(3,2,10,4);ctx.fillRect(2,6,12,4);ctx.fillStyle=dc;ctx.fillRect(5,3,6,2);
+    }else if(d.armor.slot==='chest'){
+      ctx.fillRect(5,1,6,4);ctx.fillRect(1,5,14,8);ctx.fillStyle=dc;ctx.fillRect(6,2,4,2);
+    }else if(d.armor.slot==='legs'){
+      ctx.fillRect(1,1,14,5);ctx.fillRect(1,7,6,7);ctx.fillRect(9,7,6,7);ctx.fillStyle=dc;ctx.fillRect(1,6,14,2);
+    }else{
+      ctx.fillRect(2,4,5,9);ctx.fillRect(9,4,5,9);ctx.fillStyle=dc;ctx.fillRect(2,12,5,2);ctx.fillRect(9,12,5,2);
+    }
   }else if(d.food){
     const fc={80:[180,50,50],81:[200,150,100],82:[190,100,80]}[id]||[200,150,100];
     ctx.fillStyle=`rgb(${fc})`;ctx.beginPath();ctx.arc(8,8,6,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(5,5,6,6);
+  }else if(d.flintSteel){
+    ctx.fillStyle='#999';ctx.fillRect(2,2,5,10);ctx.fillRect(2,9,10,3);
+    ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(2,2,5,2);
+    ctx.fillStyle='#444';ctx.fillRect(8,2,6,3);ctx.fillRect(9,5,5,3);ctx.fillRect(10,8,4,2);
+    ctx.fillStyle='#666';ctx.fillRect(8,2,2,2);ctx.fillRect(9,4,2,2);
+  }else if(d.bucket!==undefined){
+    // Bucket shape
+    ctx.fillStyle='#aaa';ctx.fillRect(4,8,8,6);ctx.fillRect(3,7,1,2);ctx.fillRect(12,7,1,2);
+    ctx.fillRect(5,5,6,1); // handle top
+    ctx.fillStyle=d.bucket===11?'#3af':'#f72';
+    ctx.fillRect(5,8,6,5); // fluid inside
   }else{
-    const cols={50:'#c8a05a',51:'#b4c8d2',52:'#222',53:'#60d0f0'}[id]||'#aaa';
-    ctx.fillStyle=cols;ctx.fillRect(3,3,10,10);
-    ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(3,3,5,2);
+    const cols={50:'#c8a05a',51:'#b4c8d2',52:'#222',53:'#60d0f0',55:'#555'}[id]||'#aaa';
+    if(id===55){
+      // Flint: jagged dark shard
+      ctx.fillStyle='#444';ctx.fillRect(4,2,8,3);ctx.fillRect(3,5,9,3);ctx.fillRect(4,8,7,4);ctx.fillRect(5,12,5,2);
+      ctx.fillStyle='#666';ctx.fillRect(4,2,3,2);ctx.fillRect(3,5,3,2);
+    } else if(id===56){
+      // Nether Quartz: bright white/cream crystal
+      ctx.fillStyle='#eeeeff';ctx.fillRect(5,1,6,4);ctx.fillRect(4,5,8,6);ctx.fillRect(6,11,4,4);
+      ctx.fillStyle='rgba(255,255,255,.6)';ctx.fillRect(5,1,2,3);ctx.fillRect(4,5,2,4);
+    } else {
+      ctx.fillStyle=cols;ctx.fillRect(3,3,10,10);
+      ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(3,3,5,2);
+    }
   }
 }
 function iconBlock(dst,id){
@@ -280,11 +1132,178 @@ const ambL=new THREE.AmbientLight(0xffffff,.45);scene.add(ambL);
 const sunL=new THREE.DirectionalLight(0xfff5d0,1.1);sunL.castShadow=true;sunL.shadow.mapSize.set(1024,1024);
 Object.assign(sunL.shadow.camera,{left:-40,right:40,top:40,bottom:-40,near:1,far:100});scene.add(sunL);
 const moonL=new THREE.DirectionalLight(0x8899ff,.08);scene.add(moonL);
+// Nether lava glow — warm orange light that follows player
+const lavaGlowL=new THREE.PointLight(0xff4400,0,40);scene.add(lavaGlowL);
+const lavaGlowL2=new THREE.PointLight(0xff6600,0,25);scene.add(lavaGlowL2);
 const cloudGrp=new THREE.Group();scene.add(cloudGrp);
-(()=>{const cm=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.76});for(let i=0;i<24;i++){const m=new THREE.Mesh(new THREE.BoxGeometry(4+Math.random()*10,.5,3+Math.random()*5),cm);m.position.set((Math.random()-.5)*400,WH+3+Math.random()*5,(Math.random()-.5)*400);m.userData.v=.2+Math.random()*.3;cloudGrp.add(m);}})();
+(()=>{const cm=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.76});for(let i=0;i<24;i++){const m=new THREE.Mesh(new THREE.BoxGeometry(4+Math.random()*10,.5,3+Math.random()*5),cm);m.position.set((Math.random()-.5)*400,WH*0.72+Math.random()*6,(Math.random()-.5)*400);m.userData.v=.2+Math.random()*.3;cloudGrp.add(m);}})();
 
-// ═══════ CHUNK DATA ═══════
-const chunks=new Map();
+// ═══════ CHEST DATA ═══════
+const chestData=new Map(); // key="wx,wy,wz" → Array(27) of {type,count}|null
+const doorOpen=new Set();  // key="wx,wy,wz" for open doors (non-solid)
+const CHEST_SLOTS=27;
+const chestK=(x,y,z)=>`${x},${y},${z}`;
+
+// Loot table: returns a filled 27-slot array based on structure type
+const LOOT={
+  tower:()=>rollLoot([
+    {id:8, wt:8, min:4,max:12},   // cobble
+    {id:7, wt:6, min:2,max:8},    // planks
+    {id:52,wt:7, min:1,max:4},    // coal
+    {id:51,wt:4, min:1,max:3},    // iron ingot
+    {id:80,wt:5, min:1,max:3},    // raw beef
+    {id:61,wt:2, min:1,max:1},    // stone pickaxe
+    {id:68,wt:3, min:1,max:1},    // wood sword
+  ],4,7),
+  ruin:()=>rollLoot([
+    {id:8, wt:9, min:6,max:16},   // cobble
+    {id:10,wt:5, min:2,max:6},    // gravel
+    {id:52,wt:6, min:1,max:3},    // coal
+    {id:51,wt:3, min:1,max:2},    // iron ingot
+    {id:80,wt:4, min:1,max:2},    // food
+  ],3,5),
+  dungeon:()=>rollLoot([
+    {id:52,wt:7, min:2,max:6},    // coal
+    {id:51,wt:6, min:1,max:4},    // iron ingot
+    {id:53,wt:2, min:1,max:2},    // diamond
+    {id:13,wt:3, min:1,max:2},    // gold ore
+    {id:62,wt:2, min:1,max:1},    // iron pickaxe
+    {id:69,wt:2, min:1,max:1},    // iron sword
+    {id:18,wt:1, min:1,max:1},    // iron block
+    {id:80,wt:4, min:1,max:4},    // food
+    {id:81,wt:3, min:1,max:3},
+  ],5,9),
+  shrine:()=>rollLoot([
+    {id:7, wt:5, min:4,max:10},   // planks
+    {id:12,wt:4, min:2,max:6},    // bricks
+    {id:52,wt:5, min:1,max:3},    // coal
+    {id:80,wt:6, min:1,max:3},    // food
+    {id:82,wt:5, min:1,max:3},
+    {id:60,wt:3, min:1,max:1},    // wood pickaxe
+  ],3,6),
+  well:()=>rollLoot([
+    {id:6, wt:6, min:4,max:10},   // sand
+    {id:8, wt:5, min:3,max:8},    // cobble
+    {id:80,wt:5, min:1,max:3},    // food
+    {id:52,wt:4, min:1,max:3},    // coal
+  ],2,4),
+  village:()=>rollLoot([
+    {id:80,wt:8, min:2,max:6},    // raw beef
+    {id:81,wt:6, min:2,max:5},    // raw chicken
+    {id:82,wt:6, min:2,max:5},    // mutton
+    {id:52,wt:6, min:2,max:5},    // coal
+    {id:50,wt:5, min:2,max:6},    // sticks
+    {id:51,wt:4, min:1,max:3},    // iron ingot
+    {id:7, wt:5, min:4,max:12},   // planks
+    {id:60,wt:3, min:1,max:1},    // wood pickaxe
+    {id:68,wt:3, min:1,max:1},    // wood sword
+    {id:61,wt:1, min:1,max:1},    // stone pickaxe
+  ],4,8),
+  fortress:()=>rollLoot([
+    {id:56,wt:8, min:2,max:8},    // nether quartz
+    {id:51,wt:5, min:1,max:4},    // iron ingot
+    {id:53,wt:2, min:1,max:2},    // diamond
+    {id:23,wt:4, min:2,max:6},    // obsidian
+    {id:26,wt:3, min:1,max:3},    // glowstone
+    {id:62,wt:2, min:1,max:1},    // iron pickaxe
+    {id:69,wt:2, min:1,max:1},    // iron sword
+    {id:54,wt:1, min:1,max:1},    // flint & steel
+  ],5,9),
+};
+function rollLoot(table,minItems,maxItems){
+  const slots=new Array(CHEST_SLOTS).fill(null);
+  const total=table.reduce((s,e)=>s+e.wt,0);
+  const nItems=minItems+Math.floor(Math.random()*(maxItems-minItems+1));
+  const usedSlots=new Set();
+  for(let i=0;i<nItems;i++){
+    let r=Math.random()*total,pick=table[table.length-1];
+    for(const e of table){r-=e.wt;if(r<=0){pick=e;break;}}
+    let slot;let tries=0;
+    do{slot=Math.floor(Math.random()*CHEST_SLOTS);tries++;}while(usedSlots.has(slot)&&tries<50);
+    if(usedSlots.has(slot))continue;
+    usedSlots.add(slot);
+    const count=pick.min+Math.floor(Math.random()*(pick.max-pick.min+1));
+    slots[slot]={type:pick.id,count};
+  }
+  return slots;
+}
+
+function initChest(wx,wy,wz,stype){
+  const key=chestK(wx,wy,wz);
+  if(!chestData.has(key)){
+    const fn=LOOT[stype]||LOOT.ruin;
+    chestData.set(key,fn());
+  }
+}
+
+// Chest UI state
+let chestOpen=false,chestKey=null;
+
+function openChest(wx,wy,wz){
+  const key=chestK(wx,wy,wz);
+  if(!chestData.has(key))chestData.set(key,new Array(CHEST_SLOTS).fill(null));
+  chestKey=key;chestOpen=true;
+  document.getElementById('chestTitle').textContent=`Chest (${wx},${wy},${wz})`;
+  document.getElementById('chest').style.display='flex';
+  rfChest();
+  if(locked)document.exitPointerLock();
+}
+function closeChest(){
+  chestOpen=false;chestKey=null;
+  document.getElementById('chest').style.display='none';
+  rfDg();
+  tryLock();
+}
+document.getElementById('chest').addEventListener('mousedown',e=>{
+  if(e.target===document.getElementById('chest'))closeChest();
+});
+
+function rfChest(){
+  if(!chestKey)return;
+  const cInv=chestData.get(chestKey);
+  // Rebuild chest slot elements
+  const cGrid=document.getElementById('chestSlots');
+  const bagGrid=document.getElementById('chestInvBag');
+  const hotGrid=document.getElementById('chestInvHot');
+  [cGrid,bagGrid,hotGrid].forEach(g=>g.innerHTML='');
+
+  // Helper to make an interactive slot element
+  const mkCS=(getS,setS,parent)=>{
+    const el=document.createElement('div');el.className='isl';
+    const cv=document.createElement('canvas');cv.width=16;cv.height=16;el.appendChild(cv);
+    const ct=document.createElement('span');ct.className='ct';el.appendChild(ct);
+    const rf=()=>{const s=getS();if(s&&BLK[s.type]||NONBLK[s?.type]){cv.getContext('2d').clearRect(0,0,16,16);cv.getContext('2d').drawImage(getItemIcon(s.type),0,0,16,16);ct.textContent=s.count>1?s.count:'';}else{cv.getContext('2d').clearRect(0,0,16,16);ct.textContent='';}};
+    el.rf=rf;rf();
+    el.addEventListener('mouseenter',e=>{const s=getS();if(s)showTip(itemName(s.type),e);});
+    el.addEventListener('mousemove',e=>{const s=getS();if(s)showTip(itemName(s.type),e);else hideTip();});
+    el.addEventListener('mouseleave',hideTip);
+    el.addEventListener('mousedown',e=>{
+      e.preventDefault();hideTip();
+      slotClick(e.button,getS,v=>{setS(v);});
+      // Refresh all chest slots after interaction
+      rfChest();rfH();
+    });
+    el.addEventListener('contextmenu',e=>e.preventDefault());
+    parent.appendChild(el);return el;
+  };
+  // Chest slots
+  for(let i=0;i<CHEST_SLOTS;i++){
+    mkCS(()=>cInv[i],v=>{cInv[i]=v;},cGrid);
+  }
+  // Player bag (slots 9-35)
+  for(let i=9;i<36;i++)mkCS(()=>INV[i],v=>{INV[i]=v;},bagGrid);
+  // Player hotbar (slots 0-8)
+  for(let i=0;i<9;i++)mkCS(()=>INV[i],v=>{INV[i]=v;},hotGrid);
+}
+
+// Patch Escape key to also close chest
+
+// ═══════ DIMENSION CHUNKS ═══════
+const overChunks=new Map(),netherChunks=new Map();
+const overMeshes=new Map(),netherMeshes=new Map();
+let chunks=overChunks,chunkMeshes=overMeshes;
+let dimension='overworld';
+let portalTimer=0;
 const ck=(cx,cz)=>`${cx},${cz}`;
 const ci=(lx,y,lz)=>lx+CS*(y+WH*lz);
 function hash(n){const s=Math.sin(n)*43758.5453;return s-Math.floor(s);}
@@ -303,14 +1322,354 @@ function n3d(x,y,z){
   return a+(b-a)*ux+(c-a)*uy+(e-a)*uz+(d+a-b-c)*ux*uy+(f+a-b-e)*ux*uz+(g+a-c-e)*uy*uz+(h2-a+b+c+e-d-f-g)*ux*uy*uz;
 }
 
+// ═══════ BIOME SYSTEM ═══════
+// Returns biome id at world coords. Biomes blend via noise.
+// 0=plains, 1=forest, 2=desert, 3=mountains, 4=tundra, 5=swamp, 6=savanna
+function getBiome(wx,wz){
+  const t=fbm(wx*.0015+300,wz*.0015+300,3); // temperature 0-1
+  const h=fbm(wx*.0015+600,wz*.0015+600,3); // humidity 0-1
+  if(t<0.25)return 4;          // tundra (cold)
+  if(t>0.75&&h<0.25)return 2;  // desert (hot+dry)
+  if(t>0.65&&h>0.55)return 5;  // swamp (hot+wet)
+  if(t>0.55&&h<0.45)return 6;  // savanna (warm+dry)
+  const rough=fbm(wx*.004+900,wz*.004+900,4);
+  if(rough>0.65)return 3;      // mountains (high roughness)
+  if(h>0.55)return 1;          // forest (wet)
+  return 0;                    // plains
+}
+
+// Smooth biome blend - sample 4 neighbors and blend
+function getBiomeBlend(wx,wz){
+  const BSCALE=40; // blend over ~40 blocks
+  const bx=wx/BSCALE,bz=wz/BSCALE;
+  const ix=Math.floor(bx),iz=Math.floor(bz);
+  const fx=bx-ix,fz=bz-iz;
+  const ux=fx*fx*(3-2*fx),uz=fz*fz*(3-2*fz);
+  const b00=getBiome(ix*BSCALE,iz*BSCALE);
+  const b10=getBiome((ix+1)*BSCALE,iz*BSCALE);
+  const b01=getBiome(ix*BSCALE,(iz+1)*BSCALE);
+  const b11=getBiome((ix+1)*BSCALE,(iz+1)*BSCALE);
+  // For height, blend actual heights
+  const h00=biomeBaseH(b00,wx,wz);
+  const h10=biomeBaseH(b10,wx,wz);
+  const h01=biomeBaseH(b01,wx,wz);
+  const h11=biomeBaseH(b11,wx,wz);
+  return{
+    biome:getBiome(wx,wz), // dominant biome
+    height:Math.round(h00+(h10-h00)*ux+(h01-h00)*uz+(h11+h00-h10-h01)*ux*uz)
+  };
+}
+
+function biomeBaseH(biome,wx,wz){
+  const c=fbm(wx*.0038+100,wz*.0038+100,4);
+  const d=fbm(wx*.02,wz*.02,5);
+  const m=fbm(wx*.009+50,wz*.009+50,3);
+  const base=c*.42+d*.36+m*.22;
+  switch(biome){
+    case 0: return Math.max(SEA+2,Math.floor(SEA+6+base*12));  // plains
+    case 1: return Math.max(SEA+2,Math.floor(SEA+6+base*14));  // forest
+    case 2: return Math.max(SEA+2,Math.floor(SEA+4+base*9));   // desert
+    case 3: return Math.max(SEA+2,Math.floor(SEA+10+base*34)); // mountains: tall
+    case 4: return Math.max(SEA+2,Math.floor(SEA+5+base*12));  // tundra
+    case 5: return Math.max(SEA,  Math.floor(SEA+2+base*6));   // swamp
+    case 6: return Math.max(SEA+2,Math.floor(SEA+5+base*11));  // savanna
+    default:return Math.max(SEA+2,Math.floor(SEA+7+base*20));
+  }
+}
+
 function surfH(wx,wz){
-  const c=fbm(wx*.0038+100,wz*.0038+100,4),d=fbm(wx*.02,wz*.02,5),m=fbm(wx*.009+50,wz*.009+50,3);
-  // Deeper world: surface at ~SEA+6 to SEA+24, with WH=64 that's y=18..36
-  return Math.max(SEA+2,Math.min(WH-14,Math.floor(SEA+6+(c*.42+d*.36+m*.22)*20)));
+  return getBiomeBlend(wx,wz).height;
+}
+
+function genChunk(cx,cz){
+  const data=new Uint8Array(CS*WH*CS);
+
+  // ── Terrain pass ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    const {biome,height:h}=getBiomeBlend(wx,wz);
+    for(let y=0;y<WH;y++){
+      let t=0;
+      // Bedrock: solid floor + random layers above
+      if(y===0) t=15;
+      else if(y<=3 && hash(wx*19+y*37+wz*73)<0.7) t=15;
+      else if(y<=h){
+        if(y===h){
+          switch(biome){
+            case 2: t=6; break;
+            case 4: t=h<=SEA+2?11:1; break;
+            case 5: t=h<=SEA+1?11:2; break;
+            case 3: t=h>SEA+18?3:1; break;
+            default: t=h<=SEA+1?6:1;
+          }
+        } else if(y>h-1&&biome===2){ t=6;
+        } else if(y>h-4){ t=biome===2?6:2;
+        } else if(y<16){
+          // Deepslate layer (y 4-15)
+          const od=hash(wx*13+y*7+wz*31);
+          if(od<0.016) t=35;          // deepslate coal ore
+          else if(od<0.028&&y<14) t=36; // deepslate iron ore
+          else if(od<0.034&&y<10) t=37; // deepslate diamond ore
+          else t=34;                   // deepslate
+        } else {
+          // Stone layer with ores (y 16+)
+          const o=hash(wx*13+y*7+wz*31);
+          if(o<.016) t=14;                     // coal (common, all depths)
+          else if(o<.030&&y<70) t=16;          // iron (mid depths)
+          else if(o<.036&&y<40) t=13;          // gold (deeper)
+          else if(o<.043&&y<26) t=17;          // diamond (deep only)
+          else t=3;
+        }
+      } else if(y<=SEA) t=11;
+      data[ci(lx,y,lz)]=t;
+    }
+
+    // ── Biome features ──
+    if(h>SEA+1){
+      const treeChance=biome===1?0.07:biome===0?0.025:biome===6?0.015:biome===5?0.04:0;
+
+      // ALWAYS scan nearby potential tree trunks so every column gets correct leaves
+      for(let tx=wx-2;tx<=wx+2;tx++)for(let tz=wz-2;tz<=wz+2;tz++){
+        if(hash(tx*94.7+tz*57.3)>=treeChance)continue;
+        const {height:th2}=getBiomeBlend(tx,tz);if(th2<=SEA+1)continue;
+        const trH=biome===1?5+Math.floor(hash(tx+tz*100)*4):4+Math.floor(hash(tx+tz*100)*3);
+        const top=th2+trH,dx2=wx-tx,dz2=wz-tz;
+        // Place trunk if this is the trunk column
+        if(dx2===0&&dz2===0){
+          for(let i=1;i<=trH&&th2+i<WH;i++)if(!data[ci(lx,th2+i,lz)])data[ci(lx,th2+i,lz)]=4;
+        }
+        // Place leaves at this column if it's within leaf radius of this tree
+        for(let ly=-1;ly<=2;ly++){
+          const ly2=top+ly;if(ly2<0||ly2>=WH)continue;
+          if(Math.abs(dx2)+Math.abs(dz2)+Math.abs(ly)<=3){
+            const cur=data[ci(lx,ly2,lz)];
+            if(!cur||cur===11)data[ci(lx,ly2,lz)]=5;
+          }
+        }
+      }
+
+      // Desert cacti (sand column)
+      if(biome===2&&hash(wx*73.1+wz*41.9)<0.012){
+        const cH=2+Math.floor(hash(wx*17+wz*31)*3);
+        for(let i=1;i<=cH&&h+i<WH;i++)if(!data[ci(lx,h+i,lz)])data[ci(lx,h+i,lz)]=6;
+      }
+    }
+  }
+
+  // ── Cave pass ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    const sh=surfH(wx,wz);
+    for(let y=4;y<sh-2;y++){
+      if(data[ci(lx,y,lz)]===15)continue;
+      const warpX=n3d(wx*.03+77,y*.05+200,wz*.03)*6;
+      const warpY=n3d(wx*.04+300,y*.06,wz*.04+400)*4;
+      const warpZ=n3d(wx*.03+500,y*.05+600,wz*.03+100)*6;
+      const n1=n3d((wx+warpX)*.06,(y+warpY)*.10+1000,(wz+warpZ)*.06);
+      const n2=n3d((wx-warpZ)*.05+500,(y+warpX*.3)*.08,(wz+warpY)*.05+500);
+      const density=n3d(wx*.008+900,0,wz*.008+900);
+      const threshold=0.82-density*0.06+(y<8?-0.03:0);
+      if(n1*n1+n2*n2>threshold)data[ci(lx,y,lz)]=0;
+    }
+  }
+
+  // ── Structure pass ──
+  genStructures(data,cx,cz);
+
+  // ── Village pass ──
+  genVillages(data,cx,cz);
+
+  chunks.set(ck(cx,cz),data);
+  return data;
 }
 
 function getB(wx,wy,wz){if(wy<0||wy>=WH)return 0;const cx=Math.floor(wx/CS),cz=Math.floor(wz/CS);const ch=chunks.get(ck(cx,cz));return ch?ch[ci(wx-cx*CS,wy,wz-cz*CS)]:0;}
-function setB(wx,wy,wz,t){if(wy<0||wy>=WH)return;const cx=Math.floor(wx/CS),cz=Math.floor(wz/CS);let ch=chunks.get(ck(cx,cz));if(!ch){ch=genChunk(cx,cz);}ch[ci(wx-cx*CS,wy,wz-cz*CS)]=t;markDirty(wx,wz);}
+function setB(wx,wy,wz,t){if(wy<0||wy>=WH)return;const cx=Math.floor(wx/CS),cz=Math.floor(wz/CS);let ch=chunks.get(ck(cx,cz));if(!ch){ch=dimension==='nether'?genNetherChunk(cx,cz):genChunk(cx,cz);}ch[ci(wx-cx*CS,wy,wz-cz*CS)]=t;markDirty(wx,wz);}
+
+
+// ═══════ FLUID SIMULATION ═══════
+// fluidSrc: player-placed source blocks → set of "x,y,z" keys
+// World-gen fluids are static; only player-placed sources simulate
+const fluidSrc = new Map(); // "x,y,z" -> type (11=water, 33=lava)
+const fluidDirty = new Set(); // positions to re-evaluate next tick
+let wFluidT = 0, lFluidT = 0;
+const WATER_TICK = 0.25, LAVA_TICK = 0.5; // lava is 2× as viscous
+
+function markFluidDirty(wx,wy,wz){
+  const offsets = [[0,0,0],[0,-1,0],[0,1,0],[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]];
+  for(const[dx,dy,dz] of offsets)
+    fluidDirty.add((wx+dx)+','+(wy+dy)+','+(wz+dz));
+}
+
+// Can fluid of type t flow into block b?
+function fluidCanEnter(b,t){
+  if(b===0) return true;
+  if(b===t) return false; // same fluid, already there
+  // Water into lava → cobblestone/obsidian; lava into water → cobblestone
+  return false;
+}
+
+// Check if a flowing fluid block is still being fed by a source or fall
+function isFluidFed(wx,wy,wz,t){
+  // Fed from above (falling)
+  if(getB(wx,wy+1,wz)===t) return true;
+  // Fed by adjacent source
+  for(const[dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
+    const k=(wx+dx)+','+wy+','+(wz+dz);
+    if(getB(wx+dx,wy,wz+dz)===t&&fluidSrc.has(k)) return true;
+    // Also fed by a block that is itself falling
+    if(getB(wx+dx,wy,wz+dz)===t&&getB(wx+dx,wy+1,wz+dz)===t) return true;
+  }
+  return false;
+}
+
+function interactFluids(wx,wy,wz,placing,existing){
+  // water + lava = cobblestone (flowing) or obsidian (source)
+  if((placing===11&&existing===33)||(placing===33&&existing===11)){
+    const isObsidian = fluidSrc.has(wx+','+wy+','+wz) && placing===11 && existing===33;
+    setB(wx,wy,wz, isObsidian?23:8);
+    fluidSrc.delete(wx+','+wy+','+wz);
+    markFluidDirty(wx,wy,wz);
+    return true;
+  }
+  return false;
+}
+
+function tickFluids(dt){
+  wFluidT+=dt; lFluidT+=dt;
+  const doW = wFluidT>=WATER_TICK;
+  const doL = lFluidT>=LAVA_TICK;
+  if(!doW&&!doL) return;
+  if(doW) wFluidT=0;
+  if(doL) lFluidT=0;
+  if(fluidDirty.size===0) return;
+
+  const keys=[...fluidDirty].slice(0,80);
+  keys.forEach(k=>fluidDirty.delete(k));
+
+  for(const k of keys){
+    const[wx,wy,wz]=k.split(',').map(Number);
+    if(wy<0||wy>=WH) continue;
+    const t=getB(wx,wy,wz);
+    const isWater=t===11,isLava=t===33,isFluid=isWater||isLava;
+
+    // Empty air cell: fill from above if fluid is falling into it
+    if(!isFluid){
+      if(t!==0) continue;
+      const above=getB(wx,wy+1,wz);
+      if((above===11&&doW)||(above===33&&doL)){
+        if(!interactFluids(wx,wy,wz,above,t)){
+          setB(wx,wy,wz,above);
+          markFluidDirty(wx,wy,wz);
+        }
+      }
+      continue;
+    }
+
+    // Run each fluid only on its own tick interval
+    if(isWater&&!doW) continue;
+    if(isLava&&!doL) continue;
+
+    const isSrc=fluidSrc.has(k);
+
+    // Non-source blocks drain away when no longer fed from above or adjacent source
+    if(!isSrc&&!isFluidFed(wx,wy,wz,t)){
+      setB(wx,wy,wz,0);
+      markFluidDirty(wx,wy,wz);
+      continue;
+    }
+
+    // Flow downward first (always preferred)
+    if(wy>0){
+      const below=getB(wx,wy-1,wz);
+      if(below===0){
+        setB(wx,wy-1,wz,t);
+        fluidDirty.add(wx+','+(wy-1)+','+wz);
+      } else if((below===11||below===33)&&below!==t){
+        interactFluids(wx,wy-1,wz,t,below);
+      }
+    }
+
+    // Spread sideways — any fed block spreads, not just sources
+    // Lava spreads 4 blocks max from source, water 7 — enforced by drain-when-unfed
+    for(const[sdx,sdz] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const nx=wx+sdx,nz=wz+sdz;
+      const nb=getB(nx,wy,nz);
+      if(nb===0){
+        setB(nx,wy,nz,t);
+        fluidDirty.add(nx+','+wy+','+nz);
+      } else if((nb===11||nb===33)&&nb!==t){
+        interactFluids(nx,wy,nz,t,nb);
+      }
+    }
+  }
+}
+
+
+// ═══════ FALLING BLOCKS ═══════
+const fallingBlocks=[]; // {mesh,x,y,z,type,vy}
+function startFall(wx,wy,wz){
+  const t=getB(wx,wy,wz);
+  if(!t||!BLK[t]?.falls)return;
+  setB(wx,wy,wz,0);markDirty(wx,wz);
+  // Create a small mesh for the falling block
+  const geo=new THREE.BoxGeometry(0.98,0.98,0.98);
+  const tileIdx=BLK[t].top[0];
+  const mat=new THREE.MeshLambertMaterial({map:ATLAS});
+  mat.map=ATLAS; // Will use full atlas texture (simplified — block color only)
+  const col=t===6?0xd4c98c:t===10?0x888070:0x888888;
+  const mesh=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:col}));
+  mesh.position.set(wx+0.5,wy+0.5,wz+0.5);
+  scene.add(mesh);
+  fallingBlocks.push({mesh,x:wx,y:wy+0.5,z:wz,type:t,vy:0});
+}
+function checkFallAbove(wx,wy,wz){
+  // Check if block above should start falling
+  for(let dy=1;dy<=4;dy++){
+    const above=getB(wx,wy+dy,wz);
+    if(above&&BLK[above]?.falls)startFall(wx,wy+dy,wz);
+    else if(above)break;
+  }
+}
+function updateFallingBlocks(dt){
+  for(let i=fallingBlocks.length-1;i>=0;i--){
+    const fb=fallingBlocks[i];
+    fb.vy-=20*dt;
+    fb.y+=fb.vy*dt;
+    const bx=Math.floor(fb.x),by=Math.floor(fb.y),bz=Math.floor(fb.z);
+    const below=getB(bx,by-1,bz);
+    if(by<=0||isSolid(below)||(by<Math.floor(fb.mesh.position.y)&&isSolid(getB(bx,by,bz)))){
+      // Land
+      const landY=by;
+      if(!isSolid(getB(bx,landY,bz))&&getB(bx,landY,bz)===0){
+        setB(bx,landY,bz,fb.type);markDirty(bx,bz);
+        checkFallAbove(bx,landY,bz);
+      }
+      scene.remove(fb.mesh);fb.mesh.geometry.dispose();
+      fallingBlocks.splice(i,1);
+    } else {
+      fb.mesh.position.set(fb.x+0.5,fb.y+0.5,fb.z+0.5);
+    }
+  }
+}
+
+// Place fluid (called when player right-clicks with bucket)
+function placeFluidBlock(wx,wy,wz,type){
+  const k=wx+','+wy+','+wz;
+  const existing=getB(wx,wy,wz);
+  if(interactFluids(wx,wy,wz,type,existing)) return;
+  setB(wx,wy,wz,type);
+  fluidSrc.set(k,type);
+  markFluidDirty(wx,wy,wz);
+}
+
+// Remove fluid (called when player breaks a fluid block)
+function removeFluidBlock(wx,wy,wz){
+  const k=wx+','+wy+','+wz;
+  fluidSrc.delete(k);
+  setB(wx,wy,wz,0);
+  markFluidDirty(wx,wy,wz);
+}
 
 // ═══════ STRUCTURE GENERATION ═══════
 function placeStructure(data,cx,cz,type,awx,awz,gndY){
@@ -328,7 +1687,6 @@ function placeStructure(data,cx,cz,type,awx,awz,gndY){
         const isWall=dx===-2||dx===2||dz===-2||dz===2;
         const isDoor=(dy<3&&dx===0&&dz===-2); // doorway
         if(isWall&&!isDoor){
-          // Corner pillars extend a bit higher
           const isCorner=(Math.abs(dx)===2&&Math.abs(dz)===2);
           const mat=dy<height/2?3:8;
           if(!isCorner||dy<=height)place(awx+dx,gndY+dy,awz+dz,mat);
@@ -345,6 +1703,9 @@ function placeStructure(data,cx,cz,type,awx,awz,gndY){
     }
     // Roof floor
     for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++)place(awx+dx,gndY+height,awz+dz,8);
+    // Chest inside on ground floor
+    place(awx+1,gndY+1,awz+1,20);
+    initChest(awx+1,gndY+1,awz+1,'tower');
 
   } else if(type==='ruin'){
     // Ancient stone ruins: partial cobble walls, crumbled corners
@@ -355,7 +1716,6 @@ function placeStructure(data,cx,cz,type,awx,awz,gndY){
       const wallSeed=hash(awx+dx*7.3+awz+dz*4.1+200);
       const wallH=Math.floor(wallSeed*4)+1;
       for(let dy=0;dy<wallH;dy++){
-        // Crumble: skip some blocks for ruined look
         if(hash(awx*3.1+dx*6.7+dy*11.3+awz+dz*8.9)>0.38)
           place(awx+dx,gndY+dy,awz+dz,8);
       }
@@ -365,6 +1725,9 @@ function placeStructure(data,cx,cz,type,awx,awz,gndY){
       if(hash(awx*1.7+dx*5.3+awz*2.1+dz*7.9)>0.85)
         place(awx+dx,gndY,awz+dz,10); // gravel rubble
     }
+    // Half-buried chest inside the ruin
+    place(awx,gndY+1,awz,20);
+    initChest(awx,gndY+1,awz,'ruin');
 
   } else if(type==='well'){
     // Desert well: cobble rim, log corner posts, water inside
@@ -389,6 +1752,9 @@ function placeStructure(data,cx,cz,type,awx,awz,gndY){
     // Crossbeam
     place(awx,gndY+3,awz-1,4);place(awx+1,gndY+3,awz-1,4);
     place(awx,gndY+3,awz+2,4);place(awx+1,gndY+3,awz+2,4);
+    // Small chest beside the well
+    place(awx-2,gndY+1,awz,20);
+    initChest(awx-2,gndY+1,awz,'well');
 
   } else if(type==='dungeon'){
     // Underground cobble dungeon room: 7x7x4 carved room
@@ -411,6 +1777,9 @@ function placeStructure(data,cx,cz,type,awx,awz,gndY){
       if(hash(awx+dx*3.7+awz+dz*5.3)>0.6)
         place(awx+dx,ry,awz+dz,10); // gravel patches on floor
     }
+    // Two chests: one against each side wall
+    place(awx-2,ry+1,awz,20);   initChest(awx-2,ry+1,awz,'dungeon');
+    place(awx+2,ry+1,awz,20);   initChest(awx+2,ry+1,awz,'dungeon');
 
   } else if(type==='shrine'){
     // Small 3x3 shrine with planks roof, on grass
@@ -427,6 +1796,217 @@ function placeStructure(data,cx,cz,type,awx,awz,gndY){
     for(let dx=-1;dx<=1;dx++)for(let dz=-1;dz<=1;dz++)place(awx+dx,gndY+3,awz+dz,7);
     // Cobble base/altar
     place(awx,gndY,awz,12);  // brick altar block
+    // Offering chest beside altar
+    place(awx+1,gndY+1,awz,20);
+    initChest(awx+1,gndY+1,awz,'shrine');
+  }
+}
+
+// ═══════ VILLAGER DATA (must be before village gen uses PROF_KEYS) ═══════
+const VILLAGER_TRADES={
+  farmer:[
+    {cost:{id:80,n:4}, reward:{id:52,n:2}},
+    {cost:{id:52,n:3}, reward:{id:80,n:8}},
+    {cost:{id:51,n:2}, reward:{id:60,n:1}},
+    {cost:{id:50,n:8}, reward:{id:6,n:16}},
+  ],
+  blacksmith:[
+    {cost:{id:52,n:6}, reward:{id:51,n:2}},
+    {cost:{id:51,n:5}, reward:{id:18,n:1}},
+    {cost:{id:53,n:2}, reward:{id:69,n:1}},
+    {cost:{id:53,n:3}, reward:{id:91,n:1}},
+    {cost:{id:53,n:2}, reward:{id:70,n:1}},
+  ],
+  librarian:[
+    {cost:{id:7,n:12}, reward:{id:51,n:2}},
+    {cost:{id:52,n:3}, reward:{id:9,n:8}},
+    {cost:{id:51,n:2}, reward:{id:53,n:1}},
+    {cost:{id:53,n:3}, reward:{id:95,n:1}},
+  ],
+  shepherd:[
+    {cost:{id:82,n:3}, reward:{id:7,n:12}},
+    {cost:{id:50,n:4}, reward:{id:81,n:4}},
+    {cost:{id:51,n:1}, reward:{id:66,n:1}},
+  ],
+  miner:[
+    {cost:{id:7,n:8},  reward:{id:52,n:4}},
+    {cost:{id:52,n:4}, reward:{id:3,n:16}},
+    {cost:{id:51,n:3}, reward:{id:62,n:1}},
+    {cost:{id:53,n:2}, reward:{id:70,n:1}},
+  ],
+};
+const PROF_KEYS=Object.keys(VILLAGER_TRADES);
+const villagers=[];
+const pendingVillagers=[];
+const spawnedVillageKeys=new Set(); // prevents queuing villagers multiple times per village
+let tradeOpen=false,tradeVillager=null;
+
+// ═══════ VILLAGE GENERATION ═══════
+const VC=3; // village cell = 3 chunks = 48 blocks — very dense
+
+function getVillageForCell(vcx,vcz){
+  // Guarantee a village at cell (0,0) so one always exists near spawn
+  const forced=(vcx===0&&vcz===0);
+  const s=hash(vcx*4721.3+vcz*8317.9+2847);
+  if(!forced&&s>0.55)return null; // ~45% spawn rate
+  const margin=6;
+  const span=VC*CS-margin*2;
+  const wx=vcx*VC*CS+margin+Math.floor(hash(vcx*13.7+vcz*29.3)*span);
+  const wz=vcz*VC*CS+margin+Math.floor(hash(vcx*41.3+vcz*17.7+500)*span);
+  const gndY=surfH(wx,wz);
+  if(gndY<=SEA+2)return null;
+  return{wx,wz,gndY,vseed:forced?0.3:s};
+}
+
+function getVillageLayout(vwx,vwz,vseed){
+  const rng=(n)=>hash(vwx*n*0.31+vwz*n*0.19+vseed*317+n*71);
+  const nBuildings=4+Math.floor(rng(1)*3); // 4-6 buildings
+  const buildings=[];
+  // Central well
+  buildings.push({type:'vwell',dx:0,dz:0});
+  // Houses placed radially
+  for(let i=0;i<nBuildings;i++){
+    const angle=(i/nBuildings)*Math.PI*2+rng(i+10)*0.9;
+    const dist=11+Math.floor(rng(i+20)*9);
+    const dx=Math.round(Math.cos(angle)*dist);
+    const dz=Math.round(Math.sin(angle)*dist);
+    const big=rng(i+30)>0.65;
+    const doorFace=Math.floor(rng(i+40)*4); // 0=N 1=E 2=S 3=W
+    buildings.push({type:big?'vhouseLarge':'vhouseSmall',dx,dz,doorFace});
+  }
+  // Blacksmith (bigger, stone + iron)
+  const bsAngle=rng(60)*Math.PI*2;
+  const bsDist=14+Math.floor(rng(61)*6);
+  buildings.push({type:'vblacksmith',dx:Math.round(Math.cos(bsAngle)*bsDist),dz:Math.round(Math.sin(bsAngle)*bsDist),doorFace:Math.floor(rng(62)*4)});
+  return buildings;
+}
+
+function placeVillage(data,cx,cz,vwx,vwz,vseed){
+  const place=(x,y,z,t)=>{
+    const lx=x-cx*CS,lz=z-cz*CS;
+    if(lx<0||lx>=CS||lz<0||lz>=CS||y<1||y>=WH)return;
+    data[ci(lx,y,lz)]=t;
+  };
+  // Gravel path from a to b at ground level (within this chunk only)
+  const path=(ax,az,bx,bz)=>{
+    const steps=Math.max(Math.abs(bx-ax),Math.abs(bz-az));
+    for(let i=0;i<=steps;i++){
+      const px=Math.round(ax+(bx-ax)*i/steps);
+      const pz=Math.round(az+(bz-az)*i/steps);
+      const py=surfH(px,pz);
+      place(px,py,pz,10); // gravel path
+      place(px,py-1,pz,10);
+    }
+  };
+
+  // Small house: 5×5, 5 tall (planks walls, log corners, glass windows, door gap)
+  const buildHouse=(bx,bz,wide,deep,tall,doorFace)=>{
+    const gy=surfH(bx+Math.floor(wide/2),bz+Math.floor(deep/2));
+    // Foundation: cobble
+    for(let dx=0;dx<wide;dx++)for(let dz=0;dz<deep;dz++)place(bx+dx,gy-1,bz+dz,8);
+    // Walls
+    for(let dy=0;dy<tall;dy++){
+      for(let dx=0;dx<wide;dx++)for(let dz=0;dz<deep;dz++){
+        const isWall=dx===0||dx===wide-1||dz===0||dz===deep-1;
+        if(!isWall)continue;
+        const isCorner=(dx===0||dx===wide-1)&&(dz===0||dz===deep-1);
+        // Door opening (2 tall, 1 wide, centered on specified face)
+        let isDoor=false;
+        if(dy<2){
+          if(doorFace===0&&dz===0&&dx===Math.floor(wide/2))isDoor=true; // N
+          if(doorFace===1&&dx===wide-1&&dz===Math.floor(deep/2))isDoor=true; // E
+          if(doorFace===2&&dz===deep-1&&dx===Math.floor(wide/2))isDoor=true; // S
+          if(doorFace===3&&dx===0&&dz===Math.floor(deep/2))isDoor=true; // W
+        }
+        if(isDoor){place(bx+dx,gy+dy,bz+dz,0);continue;}
+        // Windows on upper wall (not corners, not door row)
+        const isWindow=!isCorner&&dy===2&&(
+          (dz===0||dz===deep-1)&&(dx===1||dx===wide-2)||
+          (dx===0||dx===wide-1)&&(dz===1||dz===deep-2)
+        );
+        place(bx+dx,gy+dy,bz+dz,isCorner?4:isWindow?9:7); // log/glass/planks
+      }
+    }
+    // Roof: planks slab layer + logs along ridge
+    for(let dx=0;dx<wide;dx++)for(let dz=0;dz<deep;dz++)place(bx+dx,gy+tall,bz+dz,7);
+    for(let dx=0;dx<wide;dx++)place(bx+dx,gy+tall,bz+Math.floor(deep/2),4);
+    // Chest inside
+    const cx2=bx+Math.floor(wide/2),cz2=bz+1,cy2=gy+1;
+    place(cx2,cy2,cz2,20);
+    initChest(cx2,cy2,cz2,'village');
+    // Clear interior air
+    for(let dx=1;dx<wide-1;dx++)for(let dz=1;dz<deep-1;dz++)for(let dy=0;dy<tall-1;dy++)place(bx+dx,gy+dy,bz+dz,0);
+  };
+
+  const layout=getVillageLayout(vwx,vwz,vseed);
+  for(const b of layout){
+    const bwx=vwx+b.dx,bwz=vwz+b.dz;
+    const bgy=surfH(bwx,bwz);
+    const df=b.doorFace||0;
+    if(b.type==='vwell'){
+      // 3×3 cobble rim + water basin + log posts
+      for(let dx=-1;dx<=2;dx++)for(let dz=-1;dz<=2;dz++){
+        const isRim=(dx===-1||dx===2||dz===-1||dz===2)&&!(dx===0||dx===1)&&!(dz===0||dz===1)||(dx===0||dx===1)&&(dz===-1||dz===2)||(dz===0||dz===1)&&(dx===-1||dx===2);
+        if(isRim){place(bwx+dx,bgy,bwz+dz,8);place(bwx+dx,bgy+1,bwz+dz,8);}
+        else if(dx>=0&&dx<=1&&dz>=0&&dz<=1)place(bwx+dx,bgy,bwz+dz,11); // water
+      }
+      for(const[lx,lz]of[[-1,-1],[2,-1],[-1,2],[2,2]]){
+        place(bwx+lx,bgy+1,bwz+lz,4);place(bwx+lx,bgy+2,bwz+lz,4);place(bwx+lx,bgy+3,bwz+lz,4);
+      }
+      place(bwx,bgy+3,bwz-1,4);place(bwx+1,bgy+3,bwz-1,4);
+      place(bwx,bgy+3,bwz+2,4);place(bwx+1,bgy+3,bwz+2,4);
+    } else if(b.type==='vhouseSmall'){
+      buildHouse(bwx-2,bwz-2,5,5,5,df);
+      path(bwx,bwz,vwx,vwz);
+      // No villager in small house - only blacksmith gets one
+    } else if(b.type==='vhouseLarge'){
+      buildHouse(bwx-3,bwz-3,7,7,5,df);
+      path(bwx,bwz,vwx,vwz);
+      // No villager in large house either
+    } else if(b.type==='vblacksmith'){
+      // Stone walls, iron block "anvil", crafting area
+      buildHouse(bwx-3,bwz-3,7,6,5,df);
+      // Override walls with stone (cobble)
+      const bsgy=surfH(bwx,bwz);
+      for(let dy=0;dy<5;dy++)for(let dx=0;dx<7;dx++)for(let dz=0;dz<6;dz++){
+        const isWall=dx===0||dx===6||dz===0||dz===5;
+        if(isWall&&data[ci(bwx-3+dx-cx*CS,bsgy+dy,bwz-3+dz-cz*CS)]===7)
+          place(bwx-3+dx,bsgy+dy,bwz-3+dz,8);
+      }
+      place(bwx,bsgy+1,bwz,18); // iron block anvil
+      path(bwx,bwz,vwx,vwz);
+      // Villager spawning handled in genVillages with dedup
+    }
+  }
+}
+
+function genVillages(data,cx,cz){
+  const vcx0=Math.floor(cx/VC),vcz0=Math.floor(cz/VC);
+  for(let vdx=-1;vdx<=1;vdx++)for(let vdz=-1;vdz<=1;vdz++){
+    const vcx=vcx0+vdx,vcz=vcz0+vdz;
+    const v=getVillageForCell(vcx,vcz);
+    if(!v)continue;
+    const vChunkX=Math.floor(v.wx/CS),vChunkZ=Math.floor(v.wz/CS);
+    if(Math.abs(cx-vChunkX)>4||Math.abs(cz-vChunkZ)>4)continue;
+    placeVillage(data,cx,cz,v.wx,v.wz,v.vseed);
+    // Queue villagers exactly once per village using a dedup key
+    if(cx===vChunkX&&cz===vChunkZ){
+      const vkey=`${v.wx},${v.wz}`;
+      if(!spawnedVillageKeys.has(vkey)){
+        spawnedVillageKeys.add(vkey);
+        const layout=getVillageLayout(v.wx,v.wz,v.vseed);
+        let blacksmithFound=false;
+        for(const b of layout){
+          if(b.type==='vblacksmith'&&!blacksmithFound){
+            blacksmithFound=true;
+            pendingVillagers.push({wx:v.wx+b.dx,wy:v.gndY+1,wz:v.wz+b.dz+2,prof:'blacksmith'});
+          } else if(b.type!=='vwell'){
+            const pkey=PROF_KEYS[Math.floor(hash(v.wx*b.dx*3.1+v.wz*b.dz*7.9+41)*PROF_KEYS.length)];
+            pendingVillagers.push({wx:v.wx+b.dx,wy:v.gndY+1,wz:v.wz+b.dz,prof:pkey});
+          }
+        }
+      }
+    }
   }
 }
 
@@ -460,65 +2040,536 @@ function genStructures(data,cx,cz){
   }
 }
 
-function genChunk(cx,cz){
+
+// ═══════ NETHER GENERATION ═══════
+// Nether: bedrock floor(0-3), lava sea(4-16), cave space(17-48), ceiling(49-63)
+// Uses variable 2D floor/ceiling heights + 3D interior rocky masses — authentic MC nether feel
+
+const NETHER_LAVA = 16;  // lava sea fills y <= this
+
+// Variable floor height: 14–26 based on large-scale noise
+function netherFloorH(wx,wz){
+  const a=fbm(wx*0.04+1000,wz*0.04+1000,4);
+  const b=fbm(wx*0.015+2000,wz*0.015+2000,3);
+  // Ridged noise for jagged peaks and deep chasms
+  const ridge=Math.abs(a-0.5)*2.0;
+  return Math.floor(14 + (ridge*0.6 + b*0.4)*14); // 14–28
+}
+
+// Variable ceiling height: 44–56
+function netherCeilH(wx,wz){
+  const a=fbm(wx*0.035+3000,wz*0.035+3000,4);
+  const b=fbm(wx*0.018+4000,wz*0.018+4000,3);
+  const ridge=Math.abs(a-0.5)*2.0;
+  return Math.floor(44 + (ridge*0.5 + (1-b)*0.5)*12); // 44–56
+}
+
+// Is a given interior point solid (rocky mass/pillar)?
+// Returns true for solid netherrack, false for air/lava
+function netherInteriorSolid(wx,wy,wz,floorH,ceilH){
+  // Large-scale connectivity noise — low values guarantee open tunnels
+  // This creates big connected cave "highways" through the nether
+  const corridorN = fbm(wx*0.012+700, wz*0.012+700, 2);
+  if(corridorN < 0.38) return false; // open corridor, always traversable
+
+  // 3D noise for rocky masses and pillars
+  const n1=n3d(wx*0.055+100,wy*0.075,wz*0.055);
+  const n2=n3d(wx*0.11+500,wy*0.14+300,wz*0.11+200);
+  const rocky=n1*0.65+n2*0.35;
+
+  // Softer threshold near surfaces (still thick walls), more open in middle
+  const distF=wy-floorH, distC=ceilH-wy;
+  const margin=Math.min(distF,distC);
+  const thresh=margin<3 ? 0.78-margin*0.08 : 0.56; // more open than before
+  return rocky>thresh;
+}
+
+// Biome: 0=nether wastes, 1=soul sand valley, 2=crimson forest
+function getNetherBiome(wx,wz){
+  const t=fbm(wx*0.006+1000,wz*0.006+1000,3);
+  const h=fbm(wx*0.007+5000,wz*0.007+5000,3);
+  if(t<0.30)return 1;  // soul sand valley
+  if(h>0.64)return 2;  // crimson forest
+  return 0;             // nether wastes
+}
+
+// Fortress placement helper
+function netherFortressAt(wx,wz){
+  const FW=128,fx=Math.floor(wx/FW),fz=Math.floor(wz/FW);
+  if(hash(fx*31.7+fz*57.3+9999)<0.45)return null;
+  const ox=Math.floor(fx*FW+hash(fx*17.3+fz*11.1)*80+20);
+  const oz=Math.floor(fz*FW+hash(fx*13.7+fz*29.9)*80+20);
+  return{ox,oz};
+}
+
+function placeNetherFortress(data,cx,cz,fox,foz,floorY){
+  const NB=27;
+  const place=(wx,wy,wz,t)=>{
+    const lx=wx-cx*CS,lz=wz-cz*CS;
+    if(lx<0||lx>=CS||lz<0||lz>=CS||wy<1||wy>=WH)return;
+    data[ci(lx,wy,lz)]=t;
+  };
+  const clear=(wx,wy,wz)=>place(wx,wy,wz,0);
+  const fy=floorY+1;
+  // Main bridge X
+  for(let dx=-20;dx<=20;dx++){
+    for(let dz=-2;dz<=2;dz++){place(fox+dx,fy,foz+dz,NB);place(fox+dx,fy+5,foz+dz,NB);}
+    for(let dy=1;dy<=4;dy++){place(fox+dx,fy+dy,foz-2,NB);place(fox+dx,fy+dy,foz+2,NB);}
+    if(Math.abs(dx)%5===0)for(let dy2=0;dy2<8;dy2++)place(fox+dx,fy-dy2,foz,NB);
+    if(Math.abs(dx)%2===0){place(fox+dx,fy+6,foz-2,NB);place(fox+dx,fy+6,foz+2,NB);}
+  }
+  for(let dx=-19;dx<=19;dx++)for(let dy=1;dy<=4;dy++)for(let dz=-1;dz<=1;dz++)clear(fox+dx,fy+dy,foz+dz);
+  // Cross bridge Z
+  for(let dz=-15;dz<=15;dz++){
+    for(let dx=-2;dx<=2;dx++){place(fox+dx,fy,foz+dz,NB);place(fox+dx,fy+5,foz+dz,NB);}
+    for(let dy=1;dy<=4;dy++){place(fox-2,fy+dy,foz+dz,NB);place(fox+2,fy+dy,foz+dz,NB);}
+    if(Math.abs(dz)%5===0)for(let dy2=0;dy2<8;dy2++)place(fox,fy-dy2,foz+dz,NB);
+    if(Math.abs(dz)%2===0){place(fox-2,fy+6,foz+dz,NB);place(fox+2,fy+6,foz+dz,NB);}
+  }
+  for(let dz=-14;dz<=14;dz++)for(let dy=1;dy<=4;dy++)for(let dx=-1;dx<=1;dx++)clear(fox+dx,fy+dy,foz+dz);
+  // Central tower
+  for(let dy=0;dy<=14;dy++)for(let dx=-3;dx<=3;dx++)for(let dz=-3;dz<=3;dz++){
+    const wall=dx===-3||dx===3||dz===-3||dz===3;
+    if(wall)place(fox+dx,fy+dy,foz+dz,NB);
+    else if(dy===0||dy===14)place(fox+dx,fy+dy,foz+dz,NB);
+    else clear(fox+dx,fy+dy,foz+dz);
+  }
+  for(let dx=-3;dx<=3;dx+=2)for(let dz=-3;dz<=3;dz+=2)place(fox+dx,fy+15,foz+dz,NB);
+  // Side room with loot
+  const rx=fox+18,rz=foz;
+  for(let dy=0;dy<=7;dy++)for(let dx=0;dx<=8;dx++)for(let dz=-4;dz<=4;dz++){
+    const wall=dx===0||dx===8||dz===-4||dz===4;
+    if(wall||dy===0||dy===7)place(rx+dx,fy+dy,rz+dz,NB);else clear(rx+dx,fy+dy,rz+dz);
+  }
+  clear(rx,fy+1,rz);clear(rx,fy+2,rz);
+  place(rx+4,fy+6,rz,26);place(rx+4,fy+6,rz-3,26);place(rx+4,fy+6,rz+3,26);
+  place(rx+2,fy+1,rz-2,20);
+  const fck=`${rx+2},${fy+1},${rz-2}`;
+  if(!chestData.has(fck))chestData.set(fck,LOOT.fortress());
+}
+
+function genNetherVolcano(data,cx,cz){
+  const VSCALE=200;
+  const vfx=Math.floor(cx*CS/VSCALE),vfz=Math.floor(cz*CS/VSCALE);
+  if(hash(vfx*47.3+vfz*83.7+1234)<=0.55)return;
+  const volcX=Math.floor(vfx*VSCALE+hash(vfx*31+vfz*53)*140+30);
+  const volcZ=Math.floor(vfz*VSCALE+hash(vfx*61+vfz*29+5)*140+30);
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    const ddx=wx-volcX,ddz=wz-volcZ;
+    const dist=Math.sqrt(ddx*ddx+ddz*ddz);
+    if(dist>24)continue;
+    const coneH=Math.floor(Math.max(0,(24-dist)*1.1));
+    const base=NETHER_LAVA+1,peak=base+coneH;
+    for(let y=base;y<=peak&&y<WH-2;y++)data[ci(lx,y,lz)]=22;
+    if(dist<5&&coneH>3)data[ci(lx,peak,lz)]=33;
+    else if(dist>=5&&dist<9)data[ci(lx,peak,lz)]=28;
+  }
+}
+
+function genNetherRuins(data,cx,cz){
+  const RSCALE=96;
+  const rcxMin=Math.floor((cx*CS-20)/RSCALE),rcxMax=Math.floor((cx*CS+CS+20)/RSCALE);
+  const rczMin=Math.floor((cz*CS-20)/RSCALE),rczMax=Math.floor((cz*CS+CS+20)/RSCALE);
+  for(let rrx2=rcxMin;rrx2<=rcxMax;rrx2++)for(let rrz2=rczMin;rrz2<=rczMax;rrz2++){
+    if(hash(rrx2*53.1+rrz2*79.3+777)<0.6)continue;
+    const rrx=Math.floor(rrx2*RSCALE+hash(rrx2*23+rrz2*41)*60+18);
+    const rrz=Math.floor(rrz2*RSCALE+hash(rrx2*37+rrz2*19+3)*60+18);
+    const floorH=netherFloorH(rrx,rrz)+1;
+    const NB=27;
+    const rplace=(rwx,rwy,rwz,t)=>{
+      const rlx=rwx-cx*CS,rlz=rwz-cz*CS;
+      if(rlx<0||rlx>=CS||rlz<0||rlz>=CS||rwy<1||rwy>=WH)return;
+      data[ci(rlx,rwy,rlz)]=t;
+    };
+    for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){
+      const wall=dx===-2||dx===2||dz===-2||dz===2;if(!wall)continue;
+      const wallH=1+Math.floor(hash(rrx+dx*7+rrz+dz*11)*4);
+      for(let dy=0;dy<wallH;dy++)
+        if(hash(rrx+dx*13+rrz+dz*17+dy*31)>0.35)rplace(rrx+dx,floorH+dy,rrz+dz,NB);
+    }
+    for(let dx=-1;dx<=1;dx++)for(let dz=-1;dz<=1;dz++) rplace(rrx+dx,floorH,rrz+dz,NB);
+    if(hash(rrx*7+rrz*13)<0.4){
+      const rck=`${rrx},${floorH},${rrz}`;
+      rplace(rrx,floorH+1,rrz,20);
+      if(!chestData.has(rck))chestData.set(rck,LOOT.fortress());
+    }
+  }
+}
+
+function genNetherChunk(cx,cz){
   const data=new Uint8Array(CS*WH*CS);
 
-  // ── Terrain pass ──
+  // ── Pass 1: Base terrain ──
   for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
-    const wx=cx*CS+lx,wz=cz*CS+lz,h=surfH(wx,wz);
-    for(let y=0;y<WH;y++){
-      let t=0;
-      if(y===0)t=15; // Bedrock
-      else if(y<=h){
-        if(y===h)t=h<=SEA+1?6:1;
-        else if(y>h-4)t=2;
-        else{
-          const o=hash(wx*13+y*7+wz*31);
-          if(o<.014)t=14;           // Coal Ore   (common, all depths)
-          else if(o<.024&&y<28)t=16; // Iron Ore   (below y=28)
-          else if(o<.030&&y<16)t=13; // Gold Ore   (below y=16)
-          else if(o<.034&&y<10)t=17; // Diamond Ore (below y=10)
-          else t=3;
-        }
-      } else if(y<=SEA)t=11;
-      data[ci(lx,y,lz)]=t;
-    }
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    const nb=getNetherBiome(wx,wz);
+    const floorH=netherFloorH(wx,wz);
+    const ceilH=netherCeilH(wx,wz);
 
-    // Trees
-    if(h>SEA+1){
-      for(let tx=wx-2;tx<=wx+2;tx++)for(let tz=wz-2;tz<=wz+2;tz++){
-        if(hash(tx*94.7+tz*57.3)>=.038)continue;
-        const th2=surfH(tx,tz);if(th2<=SEA+1)continue;
-        const trH=4+Math.floor(hash(tx+tz*100)*3);const top=th2+trH,dx=wx-tx,dz=wz-tz;
-        if(dx===0&&dz===0){for(let i=1;i<=trH&&th2+i<WH;i++)if(!data[ci(lx,th2+i,lz)])data[ci(lx,th2+i,lz)]=4;}
-        for(let ly=-1;ly<=2;ly++){const ly2=top+ly;if(ly2<0||ly2>=WH)continue;if(Math.abs(dx)+Math.abs(dz)+Math.abs(ly)<=3){const cur=data[ci(lx,ly2,lz)];if(!cur||cur===11)data[ci(lx,ly2,lz)]=5;}}
+    for(let y=0;y<WH;y++){
+      // Bedrock rows
+      if(y===0||(y===1&&hash(wx*7+wz*13)<0.5)){data[ci(lx,y,lz)]=15;continue;}
+      if(y>=WH-4){data[ci(lx,y,lz)]=15;continue;}  // solid 4-row bedrock roof
+
+      if(y<=floorH){
+        // Solid floor — quartz ore veins in wastes
+        const isQ=nb===0&&hash(wx*13+y*7+wz*31+500)<0.022;
+        data[ci(lx,y,lz)]=isQ?31:22;
+      } else if(y>=ceilH){
+        // Solid ceiling
+        data[ci(lx,y,lz)]=22;
+      } else {
+        // Interior: 3D rocky masses or air/lava
+        if(netherInteriorSolid(wx,y,wz,floorH,ceilH)){
+          const isQ=nb===0&&hash(wx*17+y*11+wz*23+600)<0.018;
+          data[ci(lx,y,lz)]=isQ?31:22;
+        } else {
+          data[ci(lx,y,lz)]=y<=NETHER_LAVA?33:0;
+        }
       }
     }
   }
 
-  // ── Cave pass (3D noise carving) ──
+  // ── Pass 2: Biome surface blocks ──
   for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
     const wx=cx*CS+lx,wz=cz*CS+lz;
-    const sh=surfH(wx,wz);
-    for(let y=2;y<sh-3;y++){
-      if(data[ci(lx,y,lz)]===15)continue; // preserve bedrock
-      // Use product of two offset noise fields for swiss-cheese caves
-      const n1=n3d(wx*.055,y*.09+1000,wz*.055);
-      const n2=n3d(wx*.045+500,y*.07,wz*.045+500);
-      const threshold=y<8?0.74:0.70; // slightly bigger caves deep down
-      if(n1*n2>threshold*threshold*0.45)data[ci(lx,y,lz)]=0;
+    const nb=getNetherBiome(wx,wz);
+    if(nb===0){
+      // Nether wastes: magma/soul sand patches on floor surface
+      for(let y=2;y<WH-1;y++){
+        if(data[ci(lx,y,lz)]!==22)continue;
+        const above=data[ci(lx,y+1,lz)];
+        if(above!==0&&above!==11)continue;
+        const ss=n3d(wx*0.08+200,0,wz*0.08+200);
+        const mg=n3d(wx*0.12+800,0,wz*0.12+800);
+        if(ss>0.63)data[ci(lx,y,lz)]=25;
+        else if(mg>0.68)data[ci(lx,y,lz)]=28;
+      }
+    } else if(nb===1){
+      // Soul sand valley: replace floor netherrack with soul sand (2 layers deep)
+      for(let y=2;y<WH-1;y++){
+        if(data[ci(lx,y,lz)]!==22&&data[ci(lx,y,lz)]!==31)continue;
+        const above=data[ci(lx,y+1,lz)];
+        if(above!==0&&above!==11)continue;
+        data[ci(lx,y,lz)]=25;
+        if(y>=2&&data[ci(lx,y-1,lz)]===22)data[ci(lx,y-1,lz)]=25;
+      }
+    }
+    // Crimson forest: floor stays netherrack
+  }
+
+  // ── Pass 3: Glowstone clusters from ceiling ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    const nb=getNetherBiome(wx,wz);
+    const thresh=nb===0?0.44:0.56;
+    if(n3d(wx*0.14+700,0,wz*0.14+700)<thresh)continue;
+    // Find first ceiling face (solid block with air directly below)
+    for(let y=WH-3;y>NETHER_LAVA+4;y--){
+      const t=data[ci(lx,y,lz)];
+      if((t===22||t===31)&&data[ci(lx,y-1,lz)]===0){
+        const drop=Math.floor(n3d(wx,y*0.3,wz)*7)+1;
+        for(let dy=0;dy<=drop;dy++){
+          for(let sx=-1;sx<=1;sx++)for(let sz=-1;sz<=1;sz++){
+            if(dy>0&&(Math.abs(sx)+Math.abs(sz)>1||(hash(wx+sx*3+dy*7+wz+sz*5)>0.4)))continue;
+            const gy=y-dy,gx=lx+sx,gz=lz+sz;
+            if(gy>=2&&gx>=0&&gx<CS&&gz>=0&&gz<CS&&data[ci(gx,gy,gz)]===0)
+              data[ci(gx,gy,gz)]=26;
+          }
+        }
+        break;
+      }
     }
   }
 
-  // ── Structure pass ──
-  genStructures(data,cx,cz);
+  // ── Pass 4: Basalt columns (soul sand valley) ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    if(getNetherBiome(wx,wz)!==1)continue;
+    if(n3d(wx*0.18+400,0,wz*0.18+400)<0.68)continue;
+    const floorH=netherFloorH(wx,wz);
+    const ceilH=netherCeilH(wx,wz);
+    const colH=6+Math.floor(n3d(wx*0.3,0,wz*0.3)*14);
+    for(let dy=0;dy<=colH&&floorH+dy<ceilH;dy++)data[ci(lx,floorH+dy,lz)]=29;
+  }
+
+  // ── Pass 5: Soul fire pillars (soul sand valley) ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    if(getNetherBiome(wx,wz)!==1)continue;
+    if(hash(wx*73.1+wz*41.9)>0.04)continue;
+    const floorH=netherFloorH(wx,wz);
+    const pilH=2+Math.floor(hash(wx*19+wz*37)*4);
+    for(let dy=1;dy<=pilH;dy++)data[ci(lx,floorH+dy,lz)]=25;
+    if(floorH+pilH+1<WH-2)data[ci(lx,floorH+pilH+1,lz)]=26;
+  }
+
+  // ── Pass 6: Crimson forest mushrooms ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    if(getNetherBiome(wx,wz)!==2)continue;
+    if(hash(wx*41.3+wz*67.7)>0.07)continue;
+    const floorH=netherFloorH(wx,wz);
+    const stemH=7+Math.floor(hash(wx*23+wz*47)*9);
+    for(let dy=1;dy<=stemH&&floorH+dy<WH-4;dy++)
+      if(!data[ci(lx,floorH+dy,lz)])data[ci(lx,floorH+dy,lz)]=30;
+    const capY=floorH+stemH+1;
+    for(let sx=-2;sx<=2;sx++)for(let sz=-2;sz<=2;sz++){
+      const gx=lx+sx,gz=lz+sz;
+      if(gx<0||gx>=CS||gz<0||gz>=CS)continue;
+      const d2=Math.abs(sx)+Math.abs(sz);
+      if(d2<=3&&capY<WH-2&&!data[ci(gx,capY,gz)])data[ci(gx,capY,gz)]=32;
+      if(d2<=2&&capY+1<WH-2&&!data[ci(gx,capY+1,gz)])data[ci(gx,capY+1,gz)]=32;
+    }
+  }
+
+  // ── Pass 7: Netherrack spires (nether wastes) ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    if(getNetherBiome(wx,wz)!==0)continue;
+    if(n3d(wx*0.09+300,0,wz*0.09+300)<0.76)continue;
+    const floorH=netherFloorH(wx,wz);
+    const ceilH=netherCeilH(wx,wz);
+    const spH=4+Math.floor(n3d(wx*0.22+100,0,wz*0.22+100)*(ceilH-floorH-5)*0.6);
+    for(let dy=1;dy<=spH&&!data[ci(lx,floorH+dy,lz)];dy++)
+      data[ci(lx,floorH+dy,lz)]=22;
+  }
+
+  // ── Pass 8: Lava geysers (nether wastes) ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    if(getNetherBiome(wx,wz)!==0)continue;
+    if(hash(wx*61.3+wz*97.7)>0.022)continue;
+    const floorH=netherFloorH(wx,wz);
+    const ceilH=netherCeilH(wx,wz);
+    const gH=8+Math.floor(hash(wx*43+wz*79)*(ceilH-floorH-10));
+    for(let dy=1;dy<=gH&&floorH+dy<ceilH;dy++)data[ci(lx,floorH+dy,lz)]=33;
+    data[ci(lx,floorH,lz)]=28;
+  }
+
+  // ── Pass 9: Lava falls from ceiling ──
+  for(let lx=0;lx<CS;lx++)for(let lz=0;lz<CS;lz++){
+    const wx=cx*CS+lx,wz=cz*CS+lz;
+    if(hash(wx*53.3+wz*89.7)>0.014)continue;
+    const ceilH=netherCeilH(wx,wz);
+    const floorH=netherFloorH(wx,wz);
+    const fallLen=3+Math.floor(hash(wx*37+wz*61)*9);
+    for(let dy=0;dy<fallLen;dy++){
+      const fy=ceilH-1-dy;
+      if(fy>floorH+2&&data[ci(lx,fy,lz)]===0)data[ci(lx,fy,lz)]=33;
+    }
+  }
+
+  // ── Volcano, Ruins, Fortress ──
+  genNetherVolcano(data,cx,cz);
+  genNetherRuins(data,cx,cz);
+
+  const FW=128;
+  const fcxMin=Math.floor((cx*CS-64)/FW),fcxMax=Math.floor((cx*CS+CS+64)/FW);
+  const fczMin=Math.floor((cz*CS-64)/FW),fczMax=Math.floor((cz*CS+CS+64)/FW);
+  for(let fx=fcxMin;fx<=fcxMax;fx++)for(let fz=fczMin;fz<=fczMax;fz++){
+    if(hash(fx*31.7+fz*57.3+9999)<0.45)continue;
+    const fox=Math.floor(fx*FW+hash(fx*17.3+fz*11.1)*80+20);
+    const foz=Math.floor(fz*FW+hash(fx*13.7+fz*29.9)*80+20);
+    if(fox<cx*CS-32||fox>cx*CS+CS+32)continue;
+    if(foz<cz*CS-32||foz>cz*CS+CS+32)continue;
+    const fortFloor=Math.max(NETHER_LAVA+2,Math.min(28,netherFloorH(fox,foz)+2));
+    placeNetherFortress(data,cx,cz,fox,foz,fortFloor);
+  }
 
   chunks.set(ck(cx,cz),data);
   return data;
 }
 
+// ═══════ PORTAL SYSTEM ═══════
+function tryLightPortal(px,py,pz){
+  // Strategy: find any obsidian within range, then check if it's part of a valid frame
+  const plx=Math.floor(player.pos.x),ply=Math.floor(player.pos.y),plz=Math.floor(player.pos.z);
+  let tried=0,found=0;
+  // Scan around BOTH the clicked position AND the player position
+  const sx=Math.min(px,plx)-6, ex=Math.max(px,plx)+6;
+  const sy=Math.min(py,ply)-6, ey=Math.max(py,ply)+6;
+  const sz=Math.min(pz,plz)-6, ez=Math.max(pz,plz)+6;
+  for(let ox=sx;ox<=ex;ox++)for(let oy=sy;oy<=ey;oy++)for(let oz=sz;oz<=ez;oz++){
+    tried++;
+    if(checkAndFillPortal(ox,oy,oz,'x')){found++;return true;}
+    if(checkAndFillPortal(ox,oy,oz,'z')){found++;return true;}
+  }
+  console.log('[Portal] scanned',tried,'positions, found',found,'near',px,py,pz);
+  return false;
+}
+
+// Check for a valid portal frame with bottom-left corner at (ox,oy,oz), axis = 'x' or 'z'
+// axis='x': frame spans X and Y (constant Z=oz)
+// axis='z': frame spans Z and Y (constant X=ox)
+function checkAndFillPortal(ox,oy,oz,axis){
+  // Try widths 4-8 and heights 5-8
+  for(let W=4;W<=8;W++)for(let H=5;H<=8;H++){
+    let valid=true,failReason='';
+    for(let dw=0;dw<W&&valid;dw++)for(let dh=0;dh<H&&valid;dh++){
+      const wx=axis==='x'?ox+dw:ox;
+      const wz=axis==='z'?oz+dw:oz;
+      const wy=oy+dh;
+      const border=dw===0||dw===W-1||dh===0||dh===H-1;
+      const t=getB(wx,wy,wz);
+      if(border){if(t!==23){valid=false;failReason='border@'+dw+','+dh+'='+t;}}
+      else{if(t!==0&&t!==24){valid=false;failReason='interior@'+dw+','+dh+'='+t;}}
+    }
+    if(valid){
+      console.log('[Portal] FOUND! W='+W+' H='+H+' at ('+ox+','+oy+','+oz+') axis='+axis);
+      // Fill interior with portal blocks
+      for(let dw=1;dw<W-1;dw++)for(let dh=1;dh<H-1;dh++){
+        const wx=axis==='x'?ox+dw:ox;
+        const wz=axis==='z'?oz+dw:oz;
+        setB(wx,oy+dh,wz,24);
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+// Teleport between dimensions
+function teleportDimension(){
+  const fromNether=dimension==='nether';
+  const tx=fromNether?Math.floor(player.pos.x*8):Math.floor(player.pos.x/8);
+  const tz=fromNether?Math.floor(player.pos.z*8):Math.floor(player.pos.z/8);
+
+  // Hide all current meshes
+  for(const m of chunkMeshes.values())scene.remove(m);
+  // Flush gen queue
+  genQ.length=0;genQSet.clear();dirtyQ.clear();
+
+  dimension=fromNether?'overworld':'nether';
+  chunks=dimension==='nether'?netherChunks:overChunks;
+  chunkMeshes=dimension==='nether'?netherMeshes:overMeshes;
+
+  // Restore existing meshes for this dimension
+  for(const m of chunkMeshes.values())scene.add(m);
+
+  // Place player at destination ground level
+  // Generate a few chunks around destination immediately
+  for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){
+    const ccx=Math.floor(tx/CS)+dx,ccz=Math.floor(tz/CS)+dz;
+    const key=ck(ccx,ccz);
+    if(!chunks.has(key)){
+      if(dimension==='nether')genNetherChunk(ccx,ccz);
+      else genChunk(ccx,ccz);
+      dirtyQ.add(key);
+    }
+  }
+  // Build immediate meshes
+  for(const key of dirtyQ){const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);}
+  dirtyQ.clear();
+
+  // Find ground at destination — search upward from above lava level to avoid roof spawn
+  let landY=NETHER_LAVA+3+EYE;
+  if(dimension==='nether'){
+    // In nether: search from lava level up for first open 2-block gap
+    for(let y=NETHER_LAVA+2;y<WH-8;y++){
+      const t1=getB(tx,y,tz), t2=getB(tx,y+1,tz);
+      const b=getB(tx,y-1,tz);
+      if(isSolid(b)&&!isSolid(t1)&&!isSolid(t2)&&t1!==33&&t2!==33){landY=y+EYE;break;}
+    }
+  } else {
+    for(let y=WH-1;y>=1;y--){if(isSolid(getB(tx,y,tz))){landY=y+1+EYE;break;}}
+  }
+  player.pos.set(tx+.5,landY,tz+.5);
+  player.vel.set(0,0,0);
+
+  // Ensure portal exists at destination
+  if(!fromNether){
+    // In nether: place a portal frame+fill if none nearby
+    ensureNetherPortal(tx,tz);
+  } else {
+    // Returning to overworld: ensure overworld portal exists
+    ensureOverworldPortal(tx,tz);
+  }
+
+  setDimensionEnv();
+  scheduleChunks(player.pos.x,player.pos.z);
+  portalTimer=0;
+}
+
+function ensureNetherPortal(wx,wz){
+  // Search wider area for existing portal
+  let found=false;
+  for(let dx=-5;dx<=5&&!found;dx++) for(let dz=-5;dz<=5&&!found;dz++)
+    for(let y=NETHER_LAVA+2;y<WH-8&&!found;y++) if(getB(wx+dx,y,wz+dz)===24) found=true;
+  if(found) return;
+  // Find a solid floor with 5 clear blocks above, above lava level
+  let groundY=NETHER_LAVA+3;
+  for(let y=NETHER_LAVA+2;y<WH-10;y++){
+    const floor=getB(wx,y-1,wz);
+    if(!isSolid(floor)) continue;
+    // Need 5 clear blocks above
+    let clear=true;
+    for(let dy=0;dy<5;dy++) if(isSolid(getB(wx,y+dy,wz))&&getB(wx,y+dy,wz)!==22){clear=false;break;}
+    // Don't spawn in lava
+    if(getB(wx,y,wz)===33||getB(wx,y+1,wz)===33) continue;
+    if(clear){groundY=y;break;}
+  }
+  buildPortalStructure(wx,groundY,wz);
+}
+function ensureOverworldPortal(wx,wz){
+  let found=false;
+  for(let dx=-3;dx<=3&&!found;dx++)for(let dz=-3;dz<=3&&!found;dz++){
+    for(let y=5;y<WH-8&&!found;y++)if(getB(wx+dx,y,wz+dz)===24)found=true;
+  }
+  if(!found){
+    let groundY=SEA+2;
+    for(let y=WH-1;y>=1;y--)if(isSolid(getB(wx,y,wz))){groundY=y+1;break;}
+    buildPortalStructure(wx,groundY,wz);
+  }
+}
+function buildPortalStructure(wx,groundY,wz){
+  // Clear 5 wide × 6 tall space for the portal and room to stand
+  for(let dy=0;dy<6;dy++) for(let dx=-1;dx<5;dx++){
+    const b=getB(wx+dx,groundY+dy,wz);
+    if(b!==0&&!isSolid(b)) continue; // don't clear solid structure blocks above
+    if(dy>0) setB(wx+dx,groundY+dy,wz,0);
+  }
+  // Solid netherrack platform under portal so it doesn't hang in air
+  for(let dx=-1;dx<5;dx++) setB(wx+dx,groundY-1,wz,22);
+  // Obsidian frame: 4 wide × 5 tall along X axis
+  for(let dy=0;dy<5;dy++) for(let dx=0;dx<4;dx++){
+    const isBorder=dx===0||dx===3||dy===0||dy===4;
+    setB(wx+dx,groundY+dy,wz,isBorder?23:24);
+  }
+}
+
+const NETHER_SKY=new THREE.Color(0x1a0500);
+const NETHER_FOG=new THREE.Color(0x330800);
+function setDimensionEnv(){
+  if(dimension==='nether'){
+    scene.fog.density=.04;
+    scene.fog.color.copy(NETHER_FOG);
+    scene.background=NETHER_SKY;
+    renderer.setClearColor(NETHER_SKY);
+    // Warm ambient — like being lit by distant lava
+    ambL.color.set(0xff6633);ambL.intensity=.55;
+    sunL.intensity=0;moonL.intensity=0;
+    // Lava glow lights active
+    lavaGlowL.intensity=2.2;
+    lavaGlowL2.intensity=1.4;
+    cloudGrp.visible=false;
+    document.getElementById('badge').textContent=(gameMode==='creative'?'CREATIVE ':'SURVIVAL ')+' | THE NETHER';
+    document.getElementById('badge').style.color='#ff8855';
+  } else {
+    ambL.color.set(0xffffff);
+    scene.fog.density=.018;
+    cloudGrp.visible=true;
+    moonL.intensity=.08;
+    lavaGlowL.intensity=0;
+    lavaGlowL2.intensity=0;
+    document.getElementById('badge').textContent=gameMode==='creative'?('CREATIVE '+(player.fly?'[FLY]':'')):'SURVIVAL';
+    document.getElementById('badge').style.color='#fff';
+  }
+}
+
 // ═══════ PER-CHUNK MESHES ═══════
-const chunkMeshes=new Map(),dirtyQ=new Set(),genQ=[],genQSet=new Set();
+const dirtyQ=new Set(),genQ=[],genQSet=new Set();
 const FACES=[
   {dir:[0,1,0], verts:[[0,1,0],[0,1,1],[1,1,1],[1,1,0]],uv:b=>b.top,sh:1.0},
   {dir:[0,-1,0],verts:[[0,0,0],[1,0,0],[1,0,1],[0,0,1]],uv:b=>b.bot||b.side,sh:.5},
@@ -537,9 +2588,11 @@ function buildChunkMesh(cx,cz){
   for(let lx=0;lx<CS;lx++)for(let y=0;y<WH;y++)for(let lz=0;lz<CS;lz++){
     const t=data[ci(lx,y,lz)];if(!t||!BLK[t])continue;
     const bd=BLK[t],wx=cx*CS+lx,wz=cz*CS+lz;
+    // Don't render open doors
+    if(bd.door&&doorOpen.has(`${wx},${y},${wz}`))continue;
     for(const{dir,verts,uv,sh}of FACES){
       const nb=getB(wx+dir[0],y+dir[1],wz+dir[2]);
-      if(isOpaque(nb))continue;if(bd.liq&&isLiquid(nb))continue;
+      if(isOpaque(nb,wx+dir[0],y+dir[1],wz+dir[2]))continue;if(bd.liq&&isLiquid(nb))continue;
       const tl=uv(bd),u0=tl[0]/AC,u1=(tl[0]+1)/AC,s=bd.liq?sh*.78:sh;
       for(let i=0;i<4;i++){const[vx,vy,vz]=verts[i];pos.push(wx+vx,y+vy,wz+vz);nrm.push(dir[0],dir[1],dir[2]);const[u,v]=faceUV(vx,vy,vz,dir,u0,u1);uvs.push(u,v);col.push(s,s,s);}
       ids.push(vi,vi+1,vi+2,vi,vi+2,vi+3);vi+=4;
@@ -561,10 +2614,7 @@ function scheduleChunks(px,pz){
   toAdd.sort((a,b)=>a.dist-b.dist);genQ.push(...toAdd);
 }
 const SPAWN_WX=8,SPAWN_WZ=8;
-for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++)genChunk(Math.floor(SPAWN_WX/CS)+dx,Math.floor(SPAWN_WZ/CS)+dz);
-for(const[key]of chunks){const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);}
-scheduleChunks(SPAWN_WX,SPAWN_WZ);
-let spawnY=EYE+2;for(let y=WH-1;y>=0;y--){if(isSolid(getB(SPAWN_WX,y,SPAWN_WZ))){spawnY=y+1+EYE;break;}}
+// World not generated at startup — wait for player to select/create one
 const hlBox=new THREE.Mesh(new THREE.BoxGeometry(1.005,1.005,1.005),new THREE.MeshBasicMaterial({color:0,wireframe:true,transparent:true,opacity:.35}));hlBox.visible=false;scene.add(hlBox);
 let lastCX=Math.floor(SPAWN_WX/CS),lastCZ=Math.floor(SPAWN_WZ/CS);
 
@@ -584,6 +2634,29 @@ const RECIPES=[
   {p:[7,7,50],w:1,h:3,out:{type:68,n:1}},
   {p:[51,51,50],w:1,h:3,out:{type:69,n:1}},
   {p:[51,51,51, 51,51,51, 51,51,51],w:3,h:3,out:{type:18,n:1}},
+  // Door: 2x3 planks → 2 doors
+  {p:[7,7, 7,7, 7,7],w:2,h:3,out:{type:21,n:2}},
+  // Flint & Steel: iron ingot + flint
+  {p:[51,0, 0,55],w:2,h:2,out:{type:54,n:1}},
+  // Diamond tools
+  {p:[53,53,53, 0,50,0, 0,50,0],w:3,h:3,out:{type:70,n:1}}, // Diamond Pickaxe
+  {p:[53,53,50],w:1,h:3,out:{type:71,n:1}},                  // Diamond Sword
+  // Iron Armor
+  {p:[51,0,51, 51,51,51, 0,0,0],w:3,h:2,out:{type:90,n:1}}, // Iron Helmet
+  {p:[51,0,51, 51,51,51, 51,51,51],w:3,h:3,out:{type:91,n:1}}, // Iron Chestplate
+  {p:[51,51,51, 51,0,51, 51,0,51],w:3,h:3,out:{type:92,n:1}}, // Iron Leggings
+  {p:[51,0,51, 51,0,51],w:3,h:2,out:{type:93,n:1}},            // Iron Boots
+  // Diamond Armor
+  {p:[53,0,53, 53,53,53, 0,0,0],w:3,h:2,out:{type:94,n:1}},
+  {p:[53,0,53, 53,53,53, 53,53,53],w:3,h:3,out:{type:95,n:1}},
+  {p:[53,53,53, 53,0,53, 53,0,53],w:3,h:3,out:{type:96,n:1}},
+  {p:[53,0,53, 53,0,53],w:3,h:2,out:{type:97,n:1}},
+  // Torch: coal on stick
+  {p:[52,50],w:1,h:2,out:{type:38,n:4}},
+  // Furnace: 8 cobblestone ring
+  {p:[8,8,8, 8,0,8, 8,8,8],w:3,h:3,out:{type:39,n:1}},
+  // Cobbled Deepslate: deepslate in 2x2 -> 4 cobbled
+  {sh:1,need:[[34,4]],out:{type:40,n:4}},
 ];
 const CW=3;
 const csl=Array(CW*CW).fill(null);
@@ -611,8 +2684,118 @@ function take(id){if(INV[sel]?.type===id){INV[sel].count--;if(!INV[sel].count)IN
 function pickup(id){if(id===null)return;give(id,1);rfH();if(invOpen)rfI();}
 function curItem(){return INV[sel]||null;}
 function curB(){const s=INV[sel];return(s&&BLK[s.type])?s.type:null;}
-give(1,32);give(2,20);give(3,20);give(7,20);give(4,16);give(8,20);give(6,16);give(9,10);give(12,8);
-if(gameMode==='creative'){give(13,16);give(14,16);give(15,4);give(16,16);give(17,8);}
+// (starter items given in startNewWorld)
+
+// ═══════ FURNACE SYSTEM ═══════
+const SMELT_RECIPES={
+  6:{out:9},8:{out:3},
+  80:{out:83},81:{out:84},82:{out:85},
+  14:{out:51},16:{out:51},13:{out:85}, // ores (coal ore->iron ingot etc won't make sense but adding for smelting progression)
+};
+const FUEL_VALUES={52:80,7:15,4:15,50:5};
+const furnaceData=new Map();
+let furnaceOpen=false,openFurnaceKey=null;
+
+function furnaceSmeltTime(){return 10;} // seconds
+
+function tickFurnace(dt){
+  for(const[key,f] of furnaceData){
+    if(!f.ingr)continue;
+    const rec=SMELT_RECIPES[f.ingr.type];if(!rec)continue;
+    if(f.fuelLeft<=0){
+      if(!f.fuel)continue;
+      const fv=FUEL_VALUES[f.fuel.type];if(!fv)continue;
+      f.fuel.count--;if(!f.fuel.count)f.fuel=null;
+      f.fuelLeft=fv;
+    }
+    f.fuelLeft=Math.max(0,f.fuelLeft-dt);
+    f.smeltT+=dt;
+    if(f.smeltT>=furnaceSmeltTime()){
+      f.smeltT=0;
+      const add={type:rec.out,count:1};
+      if(!f.out)f.out=add;
+      else if(f.out.type===rec.out&&f.out.count<64)f.out.count++;
+      else{f.smeltT=furnaceSmeltTime()-0.1;continue;}
+      f.ingr.count--;if(!f.ingr.count)f.ingr=null;
+    }
+    if(furnaceOpen&&openFurnaceKey===key)rfFurnace();
+  }
+}
+
+function getFurnace(key){if(!furnaceData.has(key))furnaceData.set(key,{ingr:null,fuel:null,out:null,fuelLeft:0,smeltT:0});return furnaceData.get(key);}
+
+function rfFurnace(){
+  if(!furnaceOpen||!openFurnaceKey)return;
+  const f=getFurnace(openFurnaceKey);
+  const renderSlot=(el,item)=>{
+    const cv=el.querySelector('canvas'),ct=el.querySelector('.ct');
+    if(item&&BLK[item.type]||item&&NONBLK[item.type]){
+      cv.getContext('2d').clearRect(0,0,16,16);
+      cv.getContext('2d').drawImage(getItemIcon(item.type),0,0,16,16);
+      ct.textContent=item.count>1?item.count:'';
+    } else {
+      cv.getContext('2d').clearRect(0,0,16,16);ct.textContent='';
+    }
+  };
+  renderSlot(document.getElementById('furnIngr'),f.ingr);
+  renderSlot(document.getElementById('furnFuel'),f.fuel);
+  renderSlot(document.getElementById('furnOut'),f.out);
+  // Progress bars
+  const tot=furnaceSmeltTime();
+  document.getElementById('furnProgBar').style.width=(f.ingr&&SMELT_RECIPES[f.ingr.type]&&f.fuelLeft>0?Math.min(100,f.smeltT/tot*100):0)+'%';
+  document.getElementById('furnFuelBarInner').style.width=(f.fuelLeft>0?Math.min(100,f.fuelLeft)+'%':'0%');
+  // Inventory rows
+  const bagEl=document.getElementById('furnInvBag'),hotEl=document.getElementById('furnInvHot');
+  bagEl.innerHTML='';hotEl.innerHTML='';
+  const mkFurnInvSlot=(i,el)=>{
+    const d=document.createElement('div');d.className='isl';
+    const cv=document.createElement('canvas');cv.width=16;cv.height=16;
+    const ct=document.createElement('span');ct.className='ct';
+    d.appendChild(cv);d.appendChild(ct);
+    const upd=()=>{const s=INV[i];if(s&&(BLK[s.type]||NONBLK[s.type])){cv.getContext('2d').clearRect(0,0,16,16);cv.getContext('2d').drawImage(getItemIcon(s.type),0,0,16,16);ct.textContent=s.count>1?s.count:'';}else{cv.getContext('2d').clearRect(0,0,16,16);ct.textContent='';}};
+    upd();
+    d.addEventListener('click',()=>{
+      if(!dragItem){if(INV[i]){dragItem={...INV[i]};INV[i]=null;}}
+      else{const slot=INV[i];if(!slot){INV[i]={...dragItem};dragItem=null;}else if(slot.type===dragItem.type&&slot.count<itemMaxStack(slot.type)){const add=Math.min(dragItem.count,itemMaxStack(slot.type)-slot.count);slot.count+=add;dragItem.count-=add;if(!dragItem.count)dragItem=null;}else{const tmp={...slot};INV[i]={...dragItem};dragItem=tmp;}}
+      rfFurnace();rfH();
+    });
+    el.appendChild(d);
+  };
+  for(let i=9;i<36;i++)mkFurnInvSlot(i,bagEl);
+  for(let i=0;i<9;i++)mkFurnInvSlot(i,hotEl);
+}
+
+function mkFurnSlot(id){
+  const f=getFurnace(openFurnaceKey);
+  const el=document.getElementById(id);
+  const isOut=id==='furnOut';
+  el.style.cursor='pointer';
+  el.addEventListener('click',()=>{
+    if(!openFurnaceKey)return;
+    const f2=getFurnace(openFurnaceKey);
+    const key=id==='furnIngr'?'ingr':id==='furnFuel'?'fuel':'out';
+    if(isOut){
+      if(f2.out){if(!dragItem){dragItem={...f2.out};f2.out=null;}else if(dragItem.type===f2.out.type&&dragItem.count<itemMaxStack(dragItem.type)){const add=Math.min(f2.out.count,itemMaxStack(dragItem.type)-dragItem.count);dragItem.count+=add;f2.out.count-=add;if(!f2.out.count)f2.out=null;}rfFurnace();rfH();}
+      return;
+    }
+    const cur=f2[key];
+    if(!dragItem){if(cur){dragItem={...cur};f2[key]=null;}}
+    else{if(!cur){f2[key]={...dragItem};dragItem=null;}else if(cur.type===dragItem.type&&cur.count<64){const add=Math.min(dragItem.count,64-cur.count);cur.count+=add;dragItem.count-=add;if(!dragItem.count)dragItem=null;}else{const tmp={...cur};f2[key]={...dragItem};dragItem=tmp;}}
+    rfFurnace();rfH();
+  });
+}
+
+function openFurnace(wx,wy,wz){
+  openFurnaceKey=`${wx},${wy},${wz}`;furnaceOpen=true;
+  document.getElementById('furnaceUI').style.display='flex';
+  mkFurnSlot('furnIngr');mkFurnSlot('furnFuel');mkFurnSlot('furnOut');
+  rfFurnace();if(locked)document.exitPointerLock();
+}
+function closeFurnace(){
+  furnaceOpen=false;openFurnaceKey=null;
+  document.getElementById('furnaceUI').style.display='none';
+  tryLock();
+}
 
 let invOpen=false,dragItem=null,sel=0;
 const bEl=document.getElementById('ibag'),hEl=document.getElementById('ihot'),cgEl=document.getElementById('icg'),coutEl=document.getElementById('cout');
@@ -675,8 +2858,104 @@ function rfI(){
   else{cv.getContext('2d').clearRect(0,0,16,16);ct.textContent='';}
   rfDg();
 }
-function openInv(){invOpen=true;document.getElementById('inv').classList.add('open');rfI();}
-function closeInv(){invOpen=false;hideTip();document.getElementById('inv').classList.remove('open');rfI();}
+function openInv(){invOpen=true;document.getElementById('inv').classList.add('open');rfI();rfArmorSlots();}
+function closeInv(){invOpen=false;hideTip();document.getElementById('inv').classList.remove('open');rfI();rfArmorBar();}
+
+// ═══════ CREATIVE INVENTORY ═══════
+let creativeOpen=false,creativeTab='blocks';
+
+// All items grouped by tab
+const CREATIVE_TABS={
+  blocks: [...Object.keys(BLK).map(Number)],
+  tools:  [60,61,62,63,64,65,66,67,68,69,70,71],
+  armor:  [90,91,92,93,94,95,96,97],
+  materials:[50,51,52,53,54,55,56,57,58],
+  food:   [80,81,82],
+};
+CREATIVE_TABS.all=[
+  ...CREATIVE_TABS.blocks,
+  ...CREATIVE_TABS.tools,
+  ...CREATIVE_TABS.armor,
+  ...CREATIVE_TABS.materials,
+  ...CREATIVE_TABS.food,
+];
+
+function buildCreativeSlot(id,parent){
+  const el=document.createElement('div');
+  el.className='isl';
+  el.style.background='#555';el.style.borderColor='#777';el.style.cursor='pointer';
+  const cv=document.createElement('canvas');cv.width=16;cv.height=16;el.appendChild(cv);
+  cv.getContext('2d').drawImage(getItemIcon(id),0,0,16,16);
+  const lb=document.createElement('span');lb.style.cssText='position:absolute;bottom:1px;left:0;right:0;text-align:center;font-size:7px;color:#ddd;text-shadow:1px 1px 0 #000;pointer-events:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 2px';
+  lb.textContent=itemName(id);el.appendChild(lb);
+  el.addEventListener('mouseenter',e=>showTip(itemName(id),e));
+  el.addEventListener('mouseleave',hideTip);
+  el.addEventListener('mousedown',e=>{
+    e.preventDefault();hideTip();
+    const qty=e.button===2?1:itemMaxStack(id);
+    give(id,qty);rfH();rfCreativeHotbar();
+  });
+  el.addEventListener('contextmenu',e=>e.preventDefault());
+  parent.appendChild(el);
+}
+
+function rfCreativeGrid(){
+  const grid=document.getElementById('creativeGrid');grid.innerHTML='';
+  const search=document.getElementById('creativeSearch')?.value.toLowerCase()||'';
+  let ids=CREATIVE_TABS[creativeTab]||CREATIVE_TABS.all;
+  if(search)ids=CREATIVE_TABS.all.filter(id=>itemName(id).toLowerCase().includes(search));
+  ids.forEach(id=>buildCreativeSlot(id,grid));
+}
+
+function rfCreativeHotbar(){
+  const hb=document.getElementById('creativeHotbar');hb.innerHTML='';
+  for(let i=0;i<9;i++){
+    const el=document.createElement('div');el.className='isl';
+    el.style.cssText='background:#444;border-color:'+(i===sel?'#fff':'#777')+';cursor:pointer;width:44px;height:44px';
+    const cv=document.createElement('canvas');cv.width=16;cv.height=16;el.appendChild(cv);
+    const ct=document.createElement('span');ct.className='ct';el.appendChild(ct);
+    const s=INV[i];
+    if(s){cv.getContext('2d').drawImage(getItemIcon(s.type),0,0,16,16);ct.textContent=s.count>1?s.count:'';}
+    el.addEventListener('mouseenter',e=>{if(INV[i])showTip(itemName(INV[i].type),e);});
+    el.addEventListener('mouseleave',hideTip);
+    el.addEventListener('mousedown',e=>{
+      e.preventDefault();hideTip();
+      // Left click clears slot, right click also clears
+      INV[i]=null;rfH();rfCreativeHotbar();
+    });
+    el.addEventListener('contextmenu',e=>e.preventDefault());
+    hb.appendChild(el);
+  }
+}
+
+function openCreative(){
+  creativeOpen=true;
+  const el=document.getElementById('creativeInv');
+  el.style.display='flex';
+  rfCreativeGrid();rfCreativeHotbar();
+  if(locked)document.exitPointerLock();
+  // Tab buttons
+  el.querySelectorAll('.ctab').forEach(btn=>{
+    btn.onclick=()=>{
+      creativeTab=btn.dataset.tab;
+      el.querySelectorAll('.ctab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('creativeSearch').value='';
+      rfCreativeGrid();
+    };
+  });
+  // Search
+  document.getElementById('creativeSearch').oninput=rfCreativeGrid;
+  document.getElementById('creativeSearch').value='';
+}
+function closeCreative(){
+  creativeOpen=false;
+  document.getElementById('creativeInv').style.display='none';
+  hideTip();rfH();tryLock();
+}
+document.getElementById('creativeInv').addEventListener('mousedown',e=>{
+  if(e.target===document.getElementById('creativeInv'))closeCreative();
+});
 
 const hSlots=[];
 for(let i=0;i<9;i++){
@@ -698,7 +2977,21 @@ let hp=20,dead=false,hunger=20,hungerT=0;
 function rfHP(){const hb=document.getElementById('hbar');hb.innerHTML='';for(let i=0;i<10;i++){const h=document.createElement('div');h.className='heart';h.textContent=hp>=(i*2+2)?'❤️':hp===i*2+1?'🩷':'🖤';hb.appendChild(h);}}
 function rfHunger(){const fb=document.getElementById('fbar');fb.innerHTML='';for(let i=0;i<10;i++){const h=document.createElement('div');h.className='food';h.textContent=hunger>=(i*2+2)?'🍗':hunger===i*2+1?'🍖':'🦴';fb.appendChild(h);}}
 rfHP();rfHunger();
-function dmg(n){if(gameMode==='creative')return;hp=Math.max(0,hp-n);rfHP();if(!hp&&!dead)die();}
+function rfArmorBar(){
+  const ab=document.getElementById('abar');if(!ab)return;
+  const pts=Math.round(getArmorReduction()*25); // 0-20 visual
+  ab.innerHTML='';
+  if(pts===0){ab.style.display='none';return;}
+  ab.style.display='flex';ab.style.gap='2px';
+  for(let i=0;i<Math.min(10,Math.ceil(pts/2));i++){const h=document.createElement('div');h.className='heart';h.style.fontSize='13px';h.textContent='🛡️';ab.appendChild(h);}
+}
+function dmg(n){
+  if(gameMode==='creative')return;
+  const red=getArmorReduction();
+  hp=Math.max(0,hp-Math.ceil(n*(1-red)));
+  rfHP();if(!hp&&!dead)die();
+}
+rfArmorBar();
 function heal(n){if(hp<20){hp=Math.min(20,hp+n);rfHP();}}
 function eatFood(foodVal){hunger=Math.min(20,hunger+foodVal);rfHunger();}
 function tickHunger(dt,moving){
@@ -711,25 +3004,155 @@ function tickHunger(dt,moving){
 
 // ═══════ ANIMALS ═══════
 const MOB_DEFS={
-  sheep:{hp:10,col:0xf0f0f0,sx:.8,sy:.8,sz:.5,drop:82,dropN:2},
-  cow:  {hp:20,col:0x8B4513,sx:1,sy:.9,sz:.6,drop:80,dropN:3},
-  chicken:{hp:4,col:0xfffde7,sx:.4,sy:.5,sz:.35,drop:81,dropN:1},
+  sheep:  {hp:10,drop:82,dropN:2,
+           body:{w:0.9,h:0.65,d:0.65}, head:{w:0.5,h:0.5,d:0.5},
+           leg:{w:0.2,h:0.5,d:0.2}, totalH:1.3, speed:1.4,
+           bodyCol:0xe8e8e8, headCol:0xdcdcdc, legCol:0xe0c0a0, woolly:true},
+  cow:    {hp:20,drop:80,dropN:3,
+           body:{w:1.1,h:0.75,d:0.6}, head:{w:0.7,h:0.65,d:0.55},
+           leg:{w:0.22,h:0.6,d:0.22}, totalH:1.45, speed:1.2,
+           bodyCol:0x584134, headCol:0x584134, legCol:0x3a2820, woolly:false},
+  chicken:{hp:4,drop:81,dropN:1,
+           body:{w:0.45,h:0.45,d:0.45}, head:{w:0.3,h:0.3,d:0.3},
+           leg:{w:0.1,h:0.38,d:0.1}, totalH:0.9, speed:1.8,
+           bodyCol:0xf5f5f0, headCol:0xf5f5f0, legCol:0xe8a030, woolly:false},
 };
 const mobs=[];
+
+function makeMobMesh(def, type){
+  const root=new THREE.Group();
+  const mats=[];
+  const mkMat=(col)=>{const m=new THREE.MeshLambertMaterial({color:col});mats.push(m);return m;};
+
+  // Body
+  const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(def.body.w,def.body.h,def.body.d),mkMat(def.bodyCol));
+  const legH=def.leg.h;
+  const bodyY=legH+def.body.h/2; // body sits on top of legs
+  bodyMesh.position.y=bodyY;
+  root.add(bodyMesh);
+
+  // Head — at front of body, slightly raised
+  const headMesh=new THREE.Mesh(new THREE.BoxGeometry(def.head.w,def.head.h,def.head.d),mkMat(def.headCol));
+  const headZ=+(def.body.d/2+def.head.d/2*0.6);
+  headMesh.position.set(0, bodyY+def.body.h*0.1, headZ);
+  root.add(headMesh);
+
+  // Beak / nose accent
+  if(type==='chicken'){
+    const beakMesh=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.1,0.15),mkMat(0xe8a030));
+    beakMesh.position.set(0,-0.05,+def.head.d/2+0.07);
+    headMesh.add(beakMesh);
+    // Comb on top
+    const combMesh=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.15,0.08),mkMat(0xdd3333));
+    combMesh.position.set(0,def.head.h/2+0.06,0);
+    headMesh.add(combMesh);
+  }
+  if(type==='cow'){
+    // Snout protrusion
+    const snoutMesh=new THREE.Mesh(new THREE.BoxGeometry(0.42,0.3,0.2),mkMat(0xc89070));
+    snoutMesh.position.set(0,-0.1,+def.head.d/2+0.09);
+    headMesh.add(snoutMesh);
+    // Horns
+    const hornGeo=new THREE.BoxGeometry(0.08,0.2,0.08);
+    const hornMat=mkMat(0xe8d8b0);
+    const lhorn=new THREE.Mesh(hornGeo,hornMat);lhorn.position.set(-def.head.w/2+0.04,def.head.h/2+0.08,0);
+    headMesh.add(lhorn);
+    const rhorn=new THREE.Mesh(hornGeo,hornMat);rhorn.position.set(def.head.w/2-0.04,def.head.h/2+0.08,0);
+    headMesh.add(rhorn);
+  }
+  if(type==='sheep'){
+    // Wool tuft on forehead
+    const tuftMesh=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.25,0.15),mkMat(0xe8e8e8));
+    tuftMesh.position.set(0,def.head.h/2+0.05,0);
+    headMesh.add(tuftMesh);
+  }
+
+  // Eyes — small dark squares on face
+  const eyeGeo=new THREE.BoxGeometry(0.08,0.08,0.02);
+  const eyeMat=new THREE.MeshBasicMaterial({color:0x111111});
+  const leye=new THREE.Mesh(eyeGeo,eyeMat);
+  leye.position.set(-def.head.w*0.25, def.head.h*0.1,+def.head.d/2+0.01);
+  headMesh.add(leye);
+  const reye=new THREE.Mesh(eyeGeo,eyeMat);
+  reye.position.set(def.head.w*0.25, def.head.h*0.1,+def.head.d/2+0.01);
+  headMesh.add(reye);
+
+  // Four legs (pivot at top of leg so they swing naturally)
+  const legPositions=[
+    [-def.body.w/2+def.leg.w*0.6,  def.body.d/2-def.leg.d*0.6],  // FL
+    [ def.body.w/2-def.leg.w*0.6,  def.body.d/2-def.leg.d*0.6],  // FR
+    [-def.body.w/2+def.leg.w*0.6, -def.body.d/2+def.leg.d*0.6],  // BL
+    [ def.body.w/2-def.leg.w*0.6, -def.body.d/2+def.leg.d*0.6],  // BR
+  ];
+  const legs=[];
+  for(const[lx,lz] of legPositions){
+    const legPivot=new THREE.Group();
+    legPivot.position.set(lx, bodyY-def.body.h/2, lz);
+    const legMesh=new THREE.Mesh(new THREE.BoxGeometry(def.leg.w,def.leg.h,def.leg.d),mkMat(def.legCol));
+    legMesh.position.y=-def.leg.h/2; // hang below pivot
+    legPivot.add(legMesh);
+    root.add(legPivot);
+    legs.push(legPivot);
+  }
+
+  // Chicken wings (flat on sides)
+  if(type==='chicken'){
+    const wingGeo=new THREE.BoxGeometry(0.08,0.35,0.35);
+    const lw=new THREE.Mesh(wingGeo,mkMat(0xd8d8d4));lw.position.set(-def.body.w/2-0.04,bodyY,0);root.add(lw);
+    const rw=new THREE.Mesh(wingGeo,mkMat(0xd8d8d4));rw.position.set(def.body.w/2+0.04,bodyY,0);root.add(rw);
+  }
+
+  // Woolly sheep: add fluffy layer over body
+  if(def.woolly){
+    const woolMesh=new THREE.Mesh(
+      new THREE.BoxGeometry(def.body.w+0.12,def.body.h+0.1,def.body.d+0.12),
+      mkMat(0xf2f2f2));
+    woolMesh.position.copy(bodyMesh.position);
+    woolMesh.position.y+=0.04;
+    root.add(woolMesh);
+  }
+
+  return {root, mats, legs, headMesh};
+}
+
 function spawnMob(wx,wz,type){
   let wy=SEA+2;for(let y=WH-1;y>=0;y--)if(isSolid(getB(Math.floor(wx),y,Math.floor(wz)))){wy=y+1;break;}
   const def=MOB_DEFS[type];
-  const geo=new THREE.BoxGeometry(def.sx,def.sy,def.sz);
-  const mat=new THREE.MeshLambertMaterial({color:def.col});
-  const mesh=new THREE.Mesh(geo,mat);
-  const eyeGeo=new THREE.BoxGeometry(.08,.08,.01),eyeMat=new THREE.MeshBasicMaterial({color:0});
-  const el=new THREE.Mesh(eyeGeo,eyeMat);el.position.set(-def.sx*.2,def.sy*.25,-def.sz*.51);mesh.add(el);
-  const er=new THREE.Mesh(eyeGeo,eyeMat);er.position.set(def.sx*.2,def.sy*.25,-def.sz*.51);mesh.add(er);
-  mesh.position.set(wx,wy+def.sy/2,wz);scene.add(mesh);
-  const mob={mesh,type,hp:def.hp,maxHp:def.hp,pos:new THREE.Vector3(wx,wy+def.sy*.5,wz),vel:new THREE.Vector3(),wt:2+Math.random()*3,wd:Math.random()*Math.PI*2,def,hitCd:0};
+  const {root,mats,legs,headMesh}=makeMobMesh(def,type);
+  root.position.set(wx+0.5, wy, wz+0.5);
+  scene.add(root);
+  const mob={mesh:root,mats,legs,headMesh,type,hp:def.hp,maxHp:def.hp,
+    pos:new THREE.Vector3(wx+0.5,wy,wz+0.5),vel:new THREE.Vector3(),
+    wt:2+Math.random()*3,wd:Math.random()*Math.PI*2,
+    def,hitCd:0,legPhase:Math.random()*Math.PI*2,moving:false};
   mobs.push(mob);return mob;
 }
-for(let i=0;i<8;i++){const t=['sheep','cow','chicken'][i%3];spawnMob(SPAWN_WX+(Math.random()-.5)*40,SPAWN_WZ+(Math.random()-.5)*40,t);}
+
+function spawnVillager(wx,wy,wz,profession){
+  const bodyGeo=new THREE.BoxGeometry(.55,.6,.3);
+  const legGeo=new THREE.BoxGeometry(.25,.5,.25);
+  const headGeo=new THREE.BoxGeometry(.5,.5,.5);
+  const nosGeo=new THREE.BoxGeometry(.1,.12,.12);
+  const cols={farmer:0x7ba23f,miner:0x666688,blacksmith:0x554433,librarian:0xaa8866,shepherd:0xd4a020};
+  const bodyCol=cols[profession]||0x886644;
+  const bodyMat=new THREE.MeshLambertMaterial({color:bodyCol});
+  const skinMat=new THREE.MeshLambertMaterial({color:0xd4a87a});
+  const darkMat=new THREE.MeshLambertMaterial({color:0x333322});
+  const root=new THREE.Group();
+  const body=new THREE.Mesh(bodyGeo,bodyMat);body.position.y=.55;root.add(body);
+  const head=new THREE.Mesh(headGeo,skinMat);head.position.y=1.1;root.add(head);
+  const nos=new THREE.Mesh(nosGeo,new THREE.MeshLambertMaterial({color:0xc49060}));nos.position.set(0,.05,-.27);head.add(nos);
+  const lleg=new THREE.Mesh(legGeo,darkMat);lleg.position.set(-.15,.25,0);root.add(lleg);
+  const rleg=new THREE.Mesh(legGeo,darkMat);rleg.position.set(.15,.25,0);root.add(rleg);
+  root.position.set(wx,wy,wz);
+  scene.add(root);
+  const trades=VILLAGER_TRADES[profession]||VILLAGER_TRADES.farmer;
+  const v={mesh:root,lleg,rleg,profession,trades,
+    pos:new THREE.Vector3(wx,wy,wz),homePos:new THREE.Vector3(wx,wy,wz),
+    wt:3+Math.random()*3,wd:Math.random()*Math.PI*2,legPhase:0};
+  villagers.push(v);return v;
+}
+// (animals spawned in startNewWorld)
 
 function updateMobs(dt){
   for(let i=mobs.length-1;i>=0;i--){
@@ -737,14 +3160,48 @@ function updateMobs(dt){
     m.hitCd=Math.max(0,m.hitCd-dt);
     m.wt-=dt;
     if(m.wt<0){m.wt=2+Math.random()*4;m.wd=Math.random()*Math.PI*2;}
-    const spd=m.def.sx*.8;
-    const vx=Math.cos(m.wd)*spd,vz=Math.sin(m.wd)*spd;
-    m.pos.x+=vx*dt;m.pos.z+=vz*dt;
-    if(!isSolid(getB(Math.floor(m.pos.x),Math.floor(m.pos.y-m.def.sy*.5-.1),Math.floor(m.pos.z)))){m.pos.y-=5*dt;}
-    let gy=SEA+1;for(let y=WH-1;y>=0;y--)if(isSolid(getB(Math.floor(m.pos.x),y,Math.floor(m.pos.z)))){gy=y+1+m.def.sy*.5;break;}
-    if(m.pos.y<gy)m.pos.y=gy;
-    m.mesh.position.copy(m.pos);
-    m.mesh.rotation.y=m.wd+Math.PI*.5;
+    const spd=m.def.speed;
+    const nx=m.pos.x+Math.cos(m.wd)*spd*dt;
+    const nz=m.pos.z+Math.sin(m.wd)*spd*dt;
+    const bx=Math.floor(nx),bz=Math.floor(nz),by=Math.floor(m.pos.y);
+    m.moving=false;
+    if(!isSolid(getB(bx,by,bz))&&!isSolid(getB(bx,by+1,bz))){
+      m.pos.x=nx;m.pos.z=nz;m.moving=true;
+    } else {
+      m.wd=Math.random()*Math.PI*2;
+    }
+    // Gravity
+    m.vy=(m.vy||0)-18*dt;
+    const ny=m.pos.y+m.vy*dt;
+    const footY=Math.floor(ny-0.05);
+    if(isSolid(getB(Math.floor(m.pos.x),footY,Math.floor(m.pos.z)))){
+      m.pos.y=footY+1; m.vy=0;
+    } else {
+      m.pos.y=Math.max(0,ny);
+    }
+    m.vy=Math.max(m.vy,-30);
+
+    // Animate legs — swing front/back pairs in opposite phase
+    if(m.moving) m.legPhase+=dt*spd*4;
+    const swing=Math.sin(m.legPhase)*0.45;
+    if(m.legs&&m.legs.length===4){
+      m.legs[0].rotation.x= swing;  // FL
+      m.legs[1].rotation.x=-swing;  // FR
+      m.legs[2].rotation.x=-swing;  // BL
+      m.legs[3].rotation.x= swing;  // BR
+    } else if(m.legs&&m.legs.length===2){
+      m.legs[0].rotation.x= swing;
+      m.legs[1].rotation.x=-swing;
+    }
+
+    // Head bobs slightly while moving
+    if(m.headMesh&&m.moving){
+      m.headMesh.rotation.x=Math.sin(m.legPhase*2)*0.05;
+    }
+
+    // Position and orient the root group
+    m.mesh.position.set(m.pos.x, m.pos.y, m.pos.z);
+    m.mesh.rotation.y=Math.atan2(Math.cos(m.wd),Math.sin(m.wd));
   }
 }
 function attackMob(mob){
@@ -752,41 +3209,188 @@ function attackMob(mob){
   mob.hitCd=.5;
   const dmgAmt=getToolDamage(INV[sel]?.type);
   mob.hp-=dmgAmt;
-  mob.mesh.material.color.setHex(0xff4444);
-  setTimeout(()=>mob.mesh.material.color.setHex(MOB_DEFS[mob.type].col),150);
+  // Flash all parts red
+  for(const mat of mob.mats) mat.color.setHex(0xff5555);
+  setTimeout(()=>{
+    const def=MOB_DEFS[mob.type];
+    const origCols=[def.bodyCol,def.headCol,def.legCol,def.legCol,def.legCol,def.legCol];
+    mob.mats.forEach((mat,i)=>mat.color.setHex(origCols[i]??def.bodyCol));
+  },150);
   if(mob.hp<=0){
-    scene.remove(mob.mesh);mob.mesh.geometry.dispose();
-    const n=mob.def.dropN+Math.floor(Math.random()*2);give(mob.def.drop,n);rfH();
-    mobs.splice(mobs.indexOf(mob),1);
+    scene.remove(mob.mesh);
+    const n=mob.def.dropN+Math.floor(Math.random()*2);if(mob.def.drop)give(mob.def.drop,n);rfH();
+    const arr=hostiles.includes(mob)?hostiles:mobs;
+    arr.splice(arr.indexOf(mob),1);
   }
 }
 function raycastMob(){
   const o=camera.position.clone(),d=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion).normalize();
-  for(const m of mobs){
-    const dx=m.pos.x-o.x,dy=m.pos.y-o.y,dz=m.pos.z-o.z,dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
+  for(const m of [...mobs,...hostiles]){
+    const dx=m.pos.x-o.x,dy=(m.pos.y+m.def.totalH/2)-o.y,dz=m.pos.z-o.z;
+    const dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
     if(dist>6)continue;
     const dot=(dx*d.x+dy*d.y+dz*d.z)/dist;
-    if(dot>.93)return m;
+    if(dot>.92)return m;
   }
   return null;
 }
 
+function updateVillagers(dt){
+  for(const v of villagers){
+    v.wt-=dt;
+    if(v.wt<0){
+      v.wt=3+Math.random()*4;
+      // Wander near home
+      const angle=Math.random()*Math.PI*2;
+      const dist=2+Math.random()*4;
+      v.wd=angle;
+      const tx=v.homePos.x+Math.cos(angle)*dist;
+      const tz=v.homePos.z+Math.sin(angle)*dist;
+      const dx=tx-v.pos.x,dz=tz-v.pos.z;
+      const len=Math.sqrt(dx*dx+dz*dz);
+      if(len>0.5){v.pos.x+=dx/len*1.2*Math.min(1,v.wt*.3);v.pos.z+=dz/len*1.2*Math.min(1,v.wt*.3);}
+    }
+    // Gravity
+    v.vy=(v.vy||0)-18*dt;
+    const ny=v.pos.y+v.vy*dt;
+    const footY=Math.floor(ny-0.05);
+    if(isSolid(getB(Math.floor(v.pos.x),footY,Math.floor(v.pos.z)))){
+      v.pos.y=footY+1;
+      v.vy=0;
+    } else {
+      v.pos.y=Math.max(ny,0);
+    }
+    v.vy=Math.max(v.vy,-30);
+    v.mesh.position.set(v.pos.x,v.pos.y,v.pos.z);
+    // Face toward player if close
+    const pdx=player.pos.x-v.pos.x,pdz=player.pos.z-v.pos.z;
+    const pdist=Math.sqrt(pdx*pdx+pdz*pdz);
+    if(pdist<6)v.mesh.rotation.y=Math.atan2(pdx,pdz);
+    else v.mesh.rotation.y=v.wd;
+    // Leg walk animation
+    v.legPhase=(v.legPhase||0)+dt*3;
+    v.lleg.rotation.x=Math.sin(v.legPhase)*0.4;
+    v.rleg.rotation.x=-Math.sin(v.legPhase)*0.4;
+  }
+}
+
+function raycastVillager(){
+  const o=camera.position.clone(),d=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion).normalize();
+  for(const v of villagers){
+    const dx=v.pos.x-o.x,dy=v.pos.y+0.5-o.y,dz=v.pos.z-o.z,dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
+    if(dist>4)continue;
+    const dot=(dx*d.x+dy*d.y+dz*d.z)/dist;
+    if(dot>.92)return v;
+  }
+  return null;
+}
+
+function countItem(id){let n=0;for(let i=0;i<SLOTS;i++)if(INV[i]?.type===id)n+=INV[i].count;return n;}
+function removeItems(id,n){for(let i=0;i<SLOTS&&n>0;i++){if(INV[i]?.type===id){const take2=Math.min(INV[i].count,n);INV[i].count-=take2;n-=take2;if(!INV[i].count)INV[i]=null;}}}
+
+function openTrade(v){
+  tradeOpen=true;tradeVillager=v;
+  document.getElementById('tradeUI').style.display='flex';
+  document.getElementById('tradeTitle').textContent=
+    v.profession.charAt(0).toUpperCase()+v.profession.slice(1)+' Villager';
+  rfTradeUI();
+  if(locked)document.exitPointerLock();
+}
+function closeTrade(){
+  tradeOpen=false;tradeVillager=null;
+  document.getElementById('tradeUI').style.display='none';
+  rfH();tryLock();
+}
+document.getElementById('tradeUI').addEventListener('mousedown',e=>{
+  if(e.target===document.getElementById('tradeUI'))closeTrade();
+});
+document.getElementById('tradeClose').onclick=closeTrade;
+
+function rfTradeUI(){
+  if(!tradeVillager)return;
+  const list=document.getElementById('tradeList');list.innerHTML='';
+  tradeVillager.trades.forEach((trade,i)=>{
+    const canAfford=countItem(trade.cost.id)>=trade.cost.n;
+    const row=document.createElement('div');
+    row.style.cssText=`display:flex;align-items:center;gap:8px;padding:5px 8px;background:${canAfford?'#d4edc4':'#e0c4c4'};border:2px solid ${canAfford?'#5a9e3a':'#9e3a3a'};cursor:${canAfford?'pointer':'not-allowed'}`;
+    // Cost
+    const costDiv=document.createElement('div');costDiv.style.cssText='display:flex;align-items:center;gap:3px;min-width:70px';
+    const costCv=document.createElement('canvas');costCv.width=16;costCv.height=16;
+    costCv.getContext('2d').drawImage(getItemIcon(trade.cost.id),0,0,16,16);
+    costDiv.appendChild(costCv);
+    const costLbl=document.createElement('span');costLbl.style.cssText='font-size:9px;color:#333';
+    costLbl.textContent=`${trade.cost.n}x ${itemName(trade.cost.id)}`;
+    costDiv.appendChild(costLbl);
+    row.appendChild(costDiv);
+    // Arrow
+    const arr=document.createElement('span');arr.textContent='→';arr.style.cssText='font-size:12px;color:#555;flex:0 0 auto';row.appendChild(arr);
+    // Reward
+    const rewDiv=document.createElement('div');rewDiv.style.cssText='display:flex;align-items:center;gap:3px;min-width:90px';
+    const rewCv=document.createElement('canvas');rewCv.width=16;rewCv.height=16;
+    rewCv.getContext('2d').drawImage(getItemIcon(trade.reward.id),0,0,16,16);
+    rewDiv.appendChild(rewCv);
+    const rewLbl=document.createElement('span');rewLbl.style.cssText='font-size:9px;color:#333';
+    rewLbl.textContent=`${trade.reward.n}x ${itemName(trade.reward.id)}`;
+    rewDiv.appendChild(rewLbl);
+    row.appendChild(rewDiv);
+    // Have indicator
+    const have=document.createElement('span');have.style.cssText='font-size:8px;color:#555;margin-left:auto';
+    have.textContent=`(have ${countItem(trade.cost.id)})`;
+    row.appendChild(have);
+
+    if(canAfford){
+      row.addEventListener('click',()=>{
+        if(countItem(trade.cost.id)>=trade.cost.n){
+          removeItems(trade.cost.id,trade.cost.n);
+          give(trade.reward.id,trade.reward.n);
+          rfH();rfTradeUI();rfTradeInv();
+        }
+      });
+    }
+    row.addEventListener('mouseenter',e=>{showTip(canAfford?'Click to trade':'Need more '+itemName(trade.cost.id),e);});
+    row.addEventListener('mouseleave',hideTip);
+    list.appendChild(row);
+  });
+  rfTradeInv();
+}
+
+function rfTradeInv(){
+  const mkSlot=(getS,par)=>{
+    const el=document.createElement('div');el.className='isl';el.style.cssText='width:40px;height:40px;position:relative';
+    const cv=document.createElement('canvas');cv.width=16;cv.height=16;el.appendChild(cv);
+    const ct=document.createElement('span');ct.className='ct';el.appendChild(ct);
+    const s=getS();
+    if(s){cv.getContext('2d').drawImage(getItemIcon(s.type),0,0,16,16);ct.textContent=s.count>1?s.count:'';}
+    el.addEventListener('mouseenter',e=>{if(getS())showTip(itemName(getS().type),e);});
+    el.addEventListener('mouseleave',hideTip);
+    par.appendChild(el);
+  };
+  const bag=document.getElementById('tradeInvBag');bag.innerHTML='';
+  const hot=document.getElementById('tradeInvHot');hot.innerHTML='';
+  for(let i=9;i<36;i++)mkSlot(()=>INV[i],bag);
+  for(let i=0;i<9;i++)mkSlot(()=>INV[i],hot);
+}
+
 // ═══════ PLAYER ═══════
-const player={pos:new THREE.Vector3(SPAWN_WX+.5,spawnY,SPAWN_WZ+.5),vel:new THREE.Vector3(),yaw:Math.PI,pitch:0,onGround:false,inWater:false,fly:false};
+const player={pos:new THREE.Vector3(SPAWN_WX+.5,EYE+2,SPAWN_WZ+.5),vel:new THREE.Vector3(),yaw:Math.PI,pitch:0,onGround:false,inWater:false,fly:false};
 let fallFrom=null;
 function pAABB(p){return{x0:p.x-PW,x1:p.x+PW,y0:p.y-EYE,y1:p.y+PCAP,z0:p.z-PW,z1:p.z+PW};}
-function solidAt(p){const b=pAABB(p);for(let x=Math.floor(b.x0);x<=Math.floor(b.x1);x++)for(let y=Math.floor(b.y0);y<=Math.floor(b.y1);y++)for(let z=Math.floor(b.z0);z<=Math.floor(b.z1);z++)if(isSolid(getB(x,y,z)))return true;return false;}
-function waterAt(p){const b=pAABB(p);for(let x=Math.floor(b.x0+.01);x<=Math.floor(b.x1-.01);x++)for(let y=Math.floor(b.y0+.5);y<=Math.floor(p.y);y++)for(let z=Math.floor(b.z0+.01);z<=Math.floor(b.z1-.01);z++)if(isLiquid(getB(x,y,z)))return true;return false;}
+function solidAt(p){const b=pAABB(p);for(let x=Math.floor(b.x0);x<=Math.floor(b.x1);x++)for(let y=Math.floor(b.y0);y<=Math.floor(b.y1);y++)for(let z=Math.floor(b.z0);z<=Math.floor(b.z1);z++)if(isSolidAt(x,y,z))return true;return false;}
+function waterAt(p){const b=pAABB(p);for(let x=Math.floor(b.x0+.01);x<=Math.floor(b.x1-.01);x++)for(let y=Math.floor(b.y0+.5);y<=Math.floor(p.y);y++)for(let z=Math.floor(b.z0+.01);z<=Math.floor(b.z1-.01);z++){const t=getB(x,y,z);if(isLiquid(t)){if(t===33)dmg(0.5);return true;}}return false;}
 function onGnd(p){return solidAt({x:p.x,y:p.y-.05,z:p.z})&&!solidAt(p);}
 const keys={};
 function updatePlayer(dt){
-  if(invOpen||dead||!focused)return;
+  if(invOpen||chestOpen||creativeOpen||tradeOpen||dead||!focused)return;
   const inW=waterAt(player.pos);player.inWater=inW;
   const sy=Math.sin(player.yaw),cy=Math.cos(player.yaw);
   const mv=new THREE.Vector3();
-  const sprint=(keys['ControlLeft']||keys['ControlRight'])&&!inW;
-  const sp=inW?SW:sprint?SP:WK;
   const moving=keys['KeyW']||keys['KeyS']||keys['KeyA']||keys['KeyD'];
+  // Stop sprinting if not moving forward, in water, or too hungry
+  if(!keys['KeyW']||inW||hunger<6)sprintActive=false;
+  const sp=inW?SW:sprintActive?SP:WK;
+  // FOV: 75 normal, 85 sprinting
+  const targetFOV=sprintActive&&!inW?83:75;
+  if(Math.abs(camera.fov-targetFOV)>0.5){camera.fov+=(targetFOV-camera.fov)*Math.min(1,dt*8);camera.updateProjectionMatrix();}
   if(keys['KeyW'])mv.add(new THREE.Vector3(-sy,0,-cy));if(keys['KeyS'])mv.add(new THREE.Vector3(sy,0,cy));
   if(keys['KeyA'])mv.add(new THREE.Vector3(-cy,0,sy));if(keys['KeyD'])mv.add(new THREE.Vector3(cy,0,-sy));
   const ml=mv.length();if(ml>0)mv.multiplyScalar(sp/ml);
@@ -795,13 +3399,13 @@ function updatePlayer(dt){
   else if(inW){player.vel.y+=G*.12*dt;if(keys['Space'])player.vel.y=3;else if(keys['ShiftLeft']||keys['ShiftRight'])player.vel.y=-2;}
   else{player.vel.y=Math.max(player.vel.y+G*dt,-40);if(keys['Space']&&player.onGround){player.vel.y=JV;player.onGround=false;fallFrom=null;}}
   const p=player.pos.clone();
-  const nx={x:p.x+player.vel.x*dt,y:p.y,z:p.z};if(!solidAt(nx))p.x=nx.x;else player.vel.x=0;
+  const nx={x:p.x+player.vel.x*dt,y:p.y,z:p.z};if(!solidAt(nx)){p.x=nx.x;}else{player.vel.x=0;sprintActive=false;}
   const ny2=p.y+player.vel.y*dt,py={x:p.x,y:ny2,z:p.z};
   if(!solidAt(py)){p.y=ny2;if(!player.fly&&!inW&&player.vel.y<0&&fallFrom===null)fallFrom=p.y;}
   else{if(player.vel.y<0){if(fallFrom!==null&&!player.fly&&!inW){const d=fallFrom-p.y;if(d>3.5)dmg(Math.floor((d-3.5)*2));}fallFrom=null;player.onGround=true;}player.vel.y=0;}
-  const nz={x:p.x,y:p.y,z:p.z+player.vel.z*dt};if(!solidAt(nz))p.z=nz.z;else player.vel.z=0;
+  const nz={x:p.x,y:p.y,z:p.z+player.vel.z*dt};if(!solidAt(nz)){p.z=nz.z;}else{player.vel.z=0;sprintActive=false;}
   if(!player.fly&&!inW){player.onGround=onGnd(p);if(!player.onGround&&player.vel.y===0&&fallFrom===null)fallFrom=p.y;}
-  if(p.y<-25){respawn();return;}
+  if(p.y<-2){respawn();return;}
   player.pos.copy(p);
   camera.position.copy(player.pos);
   const qY=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),player.yaw);
@@ -841,45 +3445,109 @@ function tickBrk(dt,hit){
   brk.e+=dt;const p=Math.min(1,brk.e/brk.tot);setBB(p);
   if(p>=1){
     const drop=hasProper||gameMode==='creative'?getBlockDrop(bid):null;
-    setB(brk.bx,brk.by,brk.bz,0);pickup(drop);brk=null;setBB(0);
+    // If it's a chest, drop its contents too
+    if(bid===20){
+      const key=chestK(brk.bx,brk.by,brk.bz);
+      const inv=chestData.get(key);
+      if(inv)inv.forEach(s=>{if(s)give(s.type,s.count);});
+      chestData.delete(key);
+    }
+    if(bid===39){
+      // Drop furnace contents
+      const fk=`${brk.bx},${brk.by},${brk.bz}`;
+      const fd=furnaceData.get(fk);
+      if(fd){if(fd.ingr)give(fd.ingr.type,fd.ingr.count);if(fd.fuel)give(fd.fuel.type,fd.fuel.count);if(fd.out)give(fd.out.type,fd.out.count);furnaceData.delete(fk);}
+    }
+    setB(brk.bx,brk.by,brk.bz,0);
+    // Check block above for falling
+    checkFallAbove(brk.bx,brk.by-1,brk.bz);
+    pickup(drop);brk=null;setBB(0);
   }
 }
 function setBB(p){document.getElementById('bb').style.display=p>0?'block':'none';document.getElementById('bf').style.width=(p*100)+'%';}
 
 // ═══════ INPUT + POINTER LOCK ═══════
 let focused=false,paused=true,locked=false,lastPX=null,lastPY=null;
+// Sprint: double-tap W within 300ms
+let sprintActive=false,lastWTap=0,sprintFOV=false;
 function tryLock(){if(document.pointerLockElement===canvas)return;try{const r=canvas.requestPointerLock({unadjustedMovement:true});if(r&&r.catch)r.catch(()=>{try{canvas.requestPointerLock();}catch(e){}});}catch(ex){try{canvas.requestPointerLock();}catch(e){}}}
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;if(locked){lastPX=null;lastPY=null;}});
 document.addEventListener('keydown',e=>{
   keys[e.code]=true;
-  if(e.code==='Escape'){if(invOpen){closeInv();return;}focused=false;paused=true;if(locked)document.exitPointerLock();showOv();return;}
-  if(e.code==='KeyE'&&(focused||invOpen)){if(invOpen)closeInv();else openInv();return;}
-  if(e.code==='KeyF'&&focused){player.fly=!player.fly;player.vel.y=0;document.getElementById('badge').textContent=(gameMode==='creative'?'CREATIVE ':'SURVIVAL ')+(player.fly?'[FLY]':'');}
+  if(e.code==='Escape'){if(furnaceOpen){closeFurnace();return;}if(chestOpen){closeChest();return;}if(creativeOpen){closeCreative();return;}if(tradeOpen){closeTrade();return;}if(invOpen){closeInv();return;}if(pauseEl.style.display==='flex'){hidePause();focused=true;paused=false;tryLock();return;}focused=false;paused=true;showPause();return;}
+  if(e.code==='KeyE'&&(focused||invOpen||creativeOpen||tradeOpen||furnaceOpen)){if(furnaceOpen){closeFurnace();return;}
+    if(tradeOpen){closeTrade();return;}
+    if(gameMode==='creative'){if(creativeOpen)closeCreative();else openCreative();}
+    else{if(invOpen)closeInv();else openInv();}
+    return;
+  }
+  // Fly only in creative mode
+  if(e.code==='KeyF'&&focused&&gameMode==='creative'){player.fly=!player.fly;player.vel.y=0;document.getElementById('badge').textContent='CREATIVE '+(player.fly?'[FLY]':'');}
   if(e.code==='KeyG'&&focused)advT();
   if(e.code.startsWith('Digit')&&!invOpen){const n=+e.code.replace('Digit','')-1;if(n>=0&&n<=8){sel=n;rfH();}}
+  // Double-tap W = sprint
+  if(e.code==='KeyW'&&focused&&!invOpen&&!chestOpen){
+    const now=performance.now();
+    if(now-lastWTap<300&&gameMode==='survival')sprintActive=true;
+    lastWTap=now;
+  }
 });
 document.addEventListener('keyup',e=>{keys[e.code]=false;});
 document.addEventListener('pointermove',e=>{
-  if(!focused||invOpen)return;
+  if(!focused||invOpen||chestOpen||creativeOpen||tradeOpen||furnaceOpen)return;
   let dx,dy;
   if(locked){dx=e.movementX;dy=e.movementY;}
   else{if(lastPX===null){lastPX=e.clientX;lastPY=e.clientY;return;}dx=e.clientX-lastPX;dy=e.clientY-lastPY;lastPX=e.clientX;lastPY=e.clientY;}
   player.yaw-=dx*.0022;player.pitch=Math.max(-PI2+.01,Math.min(PI2-.01,player.pitch-dy*.0022));
 });
 function handleMouseDown(e){
-  if(invOpen||dead)return;
-  if(!focused){focused=true;paused=false;hideOv();}
+  if(invOpen||chestOpen||creativeOpen||tradeOpen||furnaceOpen||dead)return;
+  if(!focused){focused=true;paused=false;hidePause();hideHome();}
   if(e.button===0)brkBtn=true;
   if(e.button===2){
     e.preventDefault();
+    // Check for villager first
+    const vill=raycastVillager();
+    if(vill){openTrade(vill);return;}
     const s=INV[sel];if(s&&NONBLK[s.type]?.food){eatFood(NONBLK[s.type].food);s.count--;if(!s.count)INV[sel]=null;rfH();return;}
+    // Light portal with flint & steel — scan around player, works even clicking air
+    if(NONBLK[INV[sel]?.type]?.flintSteel){
+      const hit0=raycast();
+      const px=hit0?hit0.bx:Math.floor(player.pos.x);
+      const py=hit0?hit0.by:Math.floor(player.pos.y);
+      const pz=hit0?hit0.bz:Math.floor(player.pos.z);
+      if(tryLightPortal(px,py,pz))return;
+    }
+    // Place fluid from bucket
+    if(NONBLK[INV[sel]?.type]?.bucket!==undefined){
+      const hit0=raycast();if(!hit0)return;
+      const ftype=NONBLK[INV[sel].type].bucket;
+      const px2=hit0.bx+hit0.nx,py2=hit0.by+hit0.ny,pz2=hit0.bz+hit0.nz;
+      placeFluidBlock(px2,py2,pz2,ftype);
+      // Consume bucket (replace with empty bucket item or just remove for now)
+      INV[sel].count--;if(!INV[sel].count)INV[sel]=null;rfH();
+      return;
+    }
     const hit=raycast();if(!hit)return;
+    // Open furnace on right-click
+    if(hit.t===39){openFurnace(hit.bx,hit.by,hit.bz);return;}
+    // Open chest on right-click
+    if(hit.t===20){openChest(hit.bx,hit.by,hit.bz);return;}
+    // Toggle door on right-click
+    if(hit.t===21){
+      const dk=`${hit.bx},${hit.by},${hit.bz}`;
+      if(doorOpen.has(dk))doorOpen.delete(dk);else doorOpen.add(dk);
+      markDirty(hit.bx,hit.bz);
+      return;
+    }
     const id=curB();if(!id)return;
     const px2=hit.bx+hit.nx,py2=hit.by+hit.ny,pz2=hit.bz+hit.nz;
     const bb=pAABB(player.pos);
     if(px2+1>bb.x0&&px2<bb.x1&&py2+1>bb.y0&&py2<bb.y1&&pz2+1>bb.z0&&pz2<bb.z1)return;
     if(getB(px2,py2,pz2))return;if(!take(id))return;
     setB(px2,py2,pz2,id);
+    // Check if block placed under a falling block triggers it
+    if(getB(px2,py2+1,pz2) && BLK[getB(px2,py2+1,pz2)]?.falls) startFall(px2,py2+1,pz2);
   }
   if(!locked){try{canvas.setPointerCapture(e.pointerId);}catch(ex){}}
   tryLock();
@@ -895,6 +3563,156 @@ document.addEventListener('mouseup',e=>{if(locked&&e.target===canvas)handleMouse
 document.addEventListener('wheel',e=>{if(invOpen)return;sel=((sel+(e.deltaY>0?1:-1))+9)%9;rfH();},{passive:true});
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 
+
+// ═══════ HOSTILE MOBS ═══════
+const HOSTILE_DEFS={
+  zombie:{hp:20,drop:80,dropN:0,speed:1.6,totalH:1.4,aggroRange:16,damage:2,attackRange:1.5,attackCd:1.0,
+    body:{w:0.6,h:0.65,d:0.3},head:{w:0.5,h:0.5,d:0.5},leg:{w:0.22,h:0.55,d:0.22},
+    bodyCol:0x4a8a4a,headCol:0x5a9e5a,legCol:0x1a3a8a,woolly:false},
+  skeleton:{hp:20,drop:86,dropN:2,speed:1.4,totalH:1.4,aggroRange:16,damage:1,attackRange:14,attackCd:2.0,ranged:true,
+    body:{w:0.5,h:0.6,d:0.25},head:{w:0.5,h:0.5,d:0.5},leg:{w:0.18,h:0.55,d:0.18},
+    bodyCol:0xcccccc,headCol:0xe8e8e8,legCol:0xbbbbbb,woolly:false},
+  creeper:{hp:20,drop:87,dropN:1,speed:1.8,totalH:1.45,aggroRange:14,damage:0,attackRange:3,attackCd:999,explodes:true,
+    body:{w:0.55,h:0.7,d:0.55},head:{w:0.55,h:0.55,d:0.55},leg:{w:0.22,h:0.4,d:0.22},
+    bodyCol:0x3a8c2a,headCol:0x3a8c2a,legCol:0x2a6a1a,woolly:false},
+};
+const hostiles=[];
+let hostileSpawnT=0;
+
+function spawnHostile(wx,wz,type){
+  const def=HOSTILE_DEFS[type];if(!def)return;
+  // Find ground
+  let wy=SEA+2;
+  for(let y=WH-1;y>=0;y--)if(isSolid(getB(Math.floor(wx),y,Math.floor(wz)))){wy=y+1;break;}
+  // Don't spawn in lava or water
+  if(isLiquid(getB(Math.floor(wx),wy,Math.floor(wz))))return;
+  const {root,mats,legs,headMesh}=makeMobMesh(def,type);
+  // Creeper face: add dark eye patches and jagged mouth
+  if(type==='creeper'){
+    const eyeMat=new THREE.MeshBasicMaterial({color:0x111111});
+    const el=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.12,0.02),eyeMat);
+    el.position.set(-0.12,0.1,def.head.d/2+0.01);headMesh.add(el);
+    const er=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.12,0.02),eyeMat);
+    er.position.set(0.12,0.1,def.head.d/2+0.01);headMesh.add(er);
+    const mouth=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.18,0.02),eyeMat);
+    mouth.position.set(0,-0.12,def.head.d/2+0.01);headMesh.add(mouth);
+  }
+  if(type==='skeleton'){
+    // Make skeleton look gaunt: no body fill
+    for(const mat of mats)mat.transparent=true,mat.opacity=0.85;
+  }
+  root.position.set(wx+0.5,wy,wz+0.5);
+  scene.add(root);
+  const h={mesh:root,mats,legs,headMesh,type,hp:def.hp,maxHp:def.hp,
+    pos:new THREE.Vector3(wx+0.5,wy,wz+0.5),
+    wt:0,wd:0,def,hitCd:0,legPhase:Math.random()*Math.PI*2,
+    vy:0,fuseT:0,attackCd:0,shootCd:0,burnT:0};
+  hostiles.push(h);return h;
+}
+
+function explodeAt(wx,wy,wz){
+  const R=3;
+  for(let dx=-R;dx<=R;dx++)for(let dy=-R;dy<=R;dy++)for(let dz=-R;dz<=R;dz++){
+    if(dx*dx+dy*dy+dz*dz>R*R+1)continue;
+    const t=getB(wx+dx,wy+dy,wz+dz);
+    if(t&&t!==15)setB(wx+dx,wy+dy,wz+dz,0);
+  }
+  markDirty(wx,wz);
+  const dist=player.pos.distanceTo(new THREE.Vector3(wx+0.5,wy+0.5,wz+0.5));
+  if(dist<R+2)dmg(Math.ceil((R+2-dist)*2));
+}
+
+function updateHostiles(dt){
+  for(let i=hostiles.length-1;i>=0;i--){
+    const m=hostiles[i];
+    m.hitCd=Math.max(0,m.hitCd-dt);
+    m.attackCd=Math.max(0,m.attackCd-dt);
+    m.shootCd=Math.max(0,m.shootCd-dt);
+
+    // AI: chase player if in range
+    const dx=player.pos.x-m.pos.x,dz=player.pos.z-m.pos.z;
+    const hdist=Math.sqrt(dx*dx+dz*dz);
+    const inRange=hdist<m.def.aggroRange;
+
+    if(inRange){
+      m.wd=Math.atan2(dz,dx);
+      const spd=m.def.speed;
+      const nx=m.pos.x+Math.cos(m.wd)*spd*dt;
+      const nz=m.pos.z+Math.sin(m.wd)*spd*dt;
+      const bx=Math.floor(nx),bz=Math.floor(nz),by=Math.floor(m.pos.y);
+      if(!isSolid(getB(bx,by,bz))&&!isSolid(getB(bx,by+1,bz))){
+        m.pos.x=nx;m.pos.z=nz;
+      } else {
+        // Try to jump over 1-block obstacles
+        if(isSolid(getB(bx,by,bz))&&!isSolid(getB(bx,by+1,bz))&&m.vy===0)m.vy=8;
+      }
+
+      // Melee attack
+      if(!m.def.ranged&&hdist<m.def.attackRange&&m.attackCd<=0){
+        m.attackCd=m.def.attackCd;
+        dmg(m.def.damage);
+      }
+
+      // Skeleton ranged attack
+      if(m.def.ranged&&hdist<m.def.attackRange&&m.shootCd<=0){
+        m.shootCd=m.def.attackCd;
+        // Line of sight check (simplified)
+        let blocked=false;
+        const steps=Math.ceil(hdist);
+        for(let s=1;s<steps;s++){
+          const lx=Math.floor(m.pos.x+dx/steps*s),ly=Math.floor(m.pos.y+1),lz=Math.floor(m.pos.z+dz/steps*s);
+          if(isSolid(getB(lx,ly,lz))){blocked=true;break;}
+        }
+        if(!blocked)dmg(m.def.damage);
+      }
+
+      // Creeper fuse
+      if(m.def.explodes){
+        if(hdist<m.def.attackRange){
+          m.fuseT+=dt;
+          // Flash white while fusing
+          const flash=Math.floor(m.fuseT*8)%2===0;
+          for(const mat of m.mats)mat.color.setHex(flash?0xffffff:m.def.bodyCol);
+          if(m.fuseT>=1.5){
+            // BOOM
+            explodeAt(Math.floor(m.pos.x),Math.floor(m.pos.y),Math.floor(m.pos.z));
+            const n=m.def.dropN;if(n>0)give(m.def.drop,n);
+            scene.remove(m.mesh);hostiles.splice(i,1);continue;
+          }
+        } else {
+          m.fuseT=Math.max(0,m.fuseT-dt*2);
+          for(const mat of m.mats)mat.color.setHex(m.def.bodyCol);
+        }
+      }
+    } else {
+      // Wander
+      m.wt-=dt;
+      if(m.wt<0){m.wt=2+Math.random()*3;m.wd=Math.random()*Math.PI*2;}
+      const nx2=m.pos.x+Math.cos(m.wd)*m.def.speed*0.4*dt;
+      const nz2=m.pos.z+Math.sin(m.wd)*m.def.speed*0.4*dt;
+      const bx2=Math.floor(nx2),bz2=Math.floor(nz2),by2=Math.floor(m.pos.y);
+      if(!isSolid(getB(bx2,by2,bz2))&&!isSolid(getB(bx2,by2+1,bz2))){m.pos.x=nx2;m.pos.z=nz2;}
+      else m.wd=Math.random()*Math.PI*2;
+    }
+
+    // Gravity
+    m.vy=(m.vy||0)-18*dt;
+    const ny=m.pos.y+m.vy*dt;
+    const footY=Math.floor(ny-0.05);
+    if(isSolid(getB(Math.floor(m.pos.x),footY,Math.floor(m.pos.z)))){m.pos.y=footY+1;m.vy=0;}
+    else m.pos.y=Math.max(0,ny);
+    m.vy=Math.max(m.vy,-30);
+
+    // Leg animation
+    if(inRange)m.legPhase+=dt*m.def.speed*4;
+    const sw=Math.sin(m.legPhase)*0.45;
+    if(m.legs&&m.legs.length>=4){m.legs[0].rotation.x=sw;m.legs[1].rotation.x=-sw;m.legs[2].rotation.x=-sw;m.legs[3].rotation.x=sw;}
+
+    m.mesh.position.set(m.pos.x,m.pos.y,m.pos.z);
+    m.mesh.rotation.y=Math.atan2(Math.cos(m.wd),Math.sin(m.wd));
+  }
+}
+
 // ═══════ DAY/NIGHT ═══════
 let dayT=.3;const TSPD=[4e-4,2e-3,0];let tI=0;
 function advT(){tI=(tI+1)%TSPD.length;}
@@ -907,20 +3725,310 @@ function updateDN(dt){
   renderer.setClearColor(sky);scene.background=sky;scene.fog.color.copy(sky);ambL.intensity=Math.max(.04,ai);sunL.intensity=Math.max(0,si);sunL.color.set(t>.35&&t<.65?0xfff5d0:0xff8844);
 }
 
-// ═══════ OVERLAY ═══════
-function showOv(){document.getElementById('ov').style.display='flex';hlBox.visible=false;}
-function hideOv(){document.getElementById('ov').style.display='none';}
-document.getElementById('btnSurv').onclick=()=>{gameMode='survival';document.getElementById('btnSurv').classList.add('active');document.getElementById('btnCrea').classList.remove('active');player.fly=false;document.getElementById('badge').textContent='SURVIVAL';rfHunger();};
-document.getElementById('btnCrea').onclick=()=>{gameMode='creative';document.getElementById('btnCrea').classList.add('active');document.getElementById('btnSurv').classList.remove('active');player.fly=true;document.getElementById('badge').textContent='CREATIVE [FLY]';rfHunger();};
-document.getElementById('pBtn').onclick=()=>{focused=true;paused=false;hideOv();lastPX=null;lastPY=null;tryLock();};
+// ═══════ SAVE / LOAD SYSTEM ═══════
+const SAVE_PREFIX='mc3d_world_';
+const SAVE_INDEX='mc3d_index';
+
+function listWorlds(){
+  try{const idx=JSON.parse(localStorage.getItem(SAVE_INDEX)||'[]');return idx;}catch{return[];}
+}
+function saveIndex(idx){localStorage.setItem(SAVE_INDEX,JSON.stringify(idx));}
+
+function serializeWorld(){
+  // Serialize only modified chunks (all overworld + nether chunks)
+  const over={},nether={};
+  for(const[k,v] of overChunks)over[k]=Array.from(v);
+  for(const[k,v] of netherChunks)nether[k]=Array.from(v);
+  // Chest contents
+  const chests={};for(const[k,v] of chestData)chests[k]=v;
+  // Furnace contents
+  const furnaces={};for(const[k,v] of furnaceData)furnaces[k]=v;
+  return{
+    over,nether,chests,furnaces,
+    player:{x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw,pitch:player.pitch},
+    inv:JSON.parse(JSON.stringify(INV)),
+    armorSlots:JSON.parse(JSON.stringify(armorSlots)),
+    hp,hunger,gameMode,dimension,dayT,
+    ts:Date.now()
+  };
+}
+
+function deserializeWorld(data){
+  // Clear existing world
+  overChunks.clear();netherChunks.clear();
+  for(const m of overMeshes.values())scene.remove(m);overMeshes.clear();
+  for(const m of netherMeshes.values())scene.remove(m);netherMeshes.clear();
+  genQ.length=0;genQSet.clear();dirtyQ.clear();
+  fluidSrc.clear();fluidDirty.clear();
+  chestData.clear();furnaceData.clear();
+  // Clear mobs/hostiles
+  for(const m of mobs){scene.remove(m.mesh);}mobs.length=0;
+  for(const h of hostiles){scene.remove(h.mesh);}hostiles.length=0;
+
+  // Restore chunks
+  for(const[k,arr] of Object.entries(data.over))overChunks.set(k,new Uint8Array(arr));
+  for(const[k,arr] of Object.entries(data.nether))netherChunks.set(k,new Uint8Array(arr));
+  // Restore chests + furnaces
+  for(const[k,v] of Object.entries(data.chests||{}))chestData.set(k,v);
+  for(const[k,v] of Object.entries(data.furnaces||{}))furnaceData.set(k,v);
+  // Restore game state
+  for(let i=0;i<INV.length;i++)INV[i]=data.inv[i]||null;
+  for(const s of ['head','chest','legs','feet'])armorSlots[s]=data.armorSlots?.[s]||null;
+  hp=data.hp??20;hunger=data.hunger??20;
+  gameMode=data.gameMode||'survival';
+  dimension=data.dimension||'overworld';
+  chunks=dimension==='nether'?netherChunks:overChunks;
+  chunkMeshes=dimension==='nether'?netherMeshes:overMeshes;
+  dayT=data.dayT??0.3;
+  player.pos.set(data.player.x,data.player.y,data.player.z);
+  player.yaw=data.player.yaw??Math.PI;
+  player.pitch=data.player.pitch??0;
+  player.vel.set(0,0,0);player.onGround=false;
+  rfHP();rfHunger();rfArmorBar();rfH();
+  setDimensionEnv();
+  // Rebuild all chunk meshes
+  for(const m of chunkMeshes.values())scene.add(m);
+  for(const[key] of chunks){const[a,b]=key.split(',').map(Number);dirtyQ.add(key);}
+  scheduleChunks(player.pos.x,player.pos.z);
+}
+
+function saveWorld(slotId,name){
+  const data=serializeWorld();
+  try{
+    localStorage.setItem(SAVE_PREFIX+slotId,JSON.stringify(data));
+    let idx=listWorlds();
+    const existing=idx.find(w=>w.id===slotId);
+    if(existing){existing.name=name;existing.ts=data.ts;existing.mode=data.gameMode;}
+    else idx.push({id:slotId,name,ts:data.ts,mode:data.gameMode});
+    saveIndex(idx);
+    return true;
+  }catch(e){
+    // localStorage quota exceeded — try stripping nether if not visited
+    try{
+      data.nether={};
+      localStorage.setItem(SAVE_PREFIX+slotId,JSON.stringify(data));
+      console.warn('Save: nether stripped due to storage quota');
+      return true;
+    }catch(e2){alert('Save failed: not enough browser storage.');return false;}
+  }
+}
+
+function loadWorld(slotId){
+  try{
+    const raw=localStorage.getItem(SAVE_PREFIX+slotId);
+    if(!raw)return false;
+    const data=JSON.parse(raw);
+    deserializeWorld(data);
+    return true;
+  }catch(e){console.error('Load failed',e);return false;}
+}
+
+function deleteWorld(slotId){
+  localStorage.removeItem(SAVE_PREFIX+slotId);
+  let idx=listWorlds();idx=idx.filter(w=>w.id!==slotId);saveIndex(idx);
+}
+
+// ═══════ HOME SCREEN ═══════
+let selectedWorldId=null, selectedWorldName='My World';
+const homeEl=document.getElementById('home');
+const pauseEl=document.getElementById('pause');
+const loadingEl=document.getElementById('loading');
+
+function showHome(){
+  homeEl.style.display='flex';
+  pauseEl.style.display='none';
+  hlBox.visible=false;
+  renderWorldList();
+}
+function hideHome(){homeEl.style.display='none';}
+function showPause(){
+  pauseEl.style.display='flex';
+  if(locked)document.exitPointerLock();
+}
+function hidePause(){pauseEl.style.display='none';}
+
+function showLoading(msg){
+  loadingEl.style.display='flex';
+  document.getElementById('loadMsg').textContent=msg||'Generating terrain...';
+  document.getElementById('loadBarFill').style.width='0%';
+}
+function hideLoading(){loadingEl.style.display='none';}
+function loadProgress(pct,msg){
+  document.getElementById('loadBarFill').style.width=pct+'%';
+  if(msg)document.getElementById('loadMsg').textContent=msg;
+}
+
+function renderWorldList(){
+  const worlds=listWorlds();
+  const listEl=document.getElementById('wList');
+  listEl.innerHTML='';
+  if(worlds.length===0){
+    listEl.innerHTML='<div style="color:#555;font-size:10px;padding:8px 0">No saved worlds yet. Create one above!</div>';
+    document.getElementById('wPlayBtn').disabled=true;
+    selectedWorldId=null;
+    return;
+  }
+  worlds.sort((a,b)=>b.ts-a.ts);
+  worlds.forEach(w=>{
+    const d=document.createElement('div');
+    d.className='wslot'+(w.id===selectedWorldId?' sel':'');
+    const ago=timeAgo(w.ts);
+    d.innerHTML=`<div class="wico">&#127758;</div><div class="wmeta"><div class="wname">${esc(w.name)}</div><div class="winfo">${esc(w.mode||'survival').toUpperCase()} &nbsp;·&nbsp; ${ago}</div></div><button class="wdel" data-id="${esc(w.id)}">✕</button>`;
+    d.addEventListener('click',e=>{
+      if(e.target.classList.contains('wdel'))return;
+      selectedWorldId=w.id;selectedWorldName=w.name;
+      document.querySelectorAll('.wslot').forEach(s=>s.classList.remove('sel'));
+      d.classList.add('sel');
+      document.getElementById('wPlayBtn').disabled=false;
+    });
+    d.querySelector('.wdel').addEventListener('click',e=>{
+      e.stopPropagation();
+      if(confirm(`Delete "${w.name}"? This cannot be undone.`)){
+        deleteWorld(w.id);
+        if(selectedWorldId===w.id){selectedWorldId=null;document.getElementById('wPlayBtn').disabled=true;}
+        renderWorldList();
+      }
+    });
+    listEl.appendChild(d);
+  });
+  document.getElementById('wPlayBtn').disabled=!selectedWorldId;
+}
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function timeAgo(ts){
+  const d=Math.floor((Date.now()-ts)/1000);
+  if(d<60)return 'just now';
+  if(d<3600)return Math.floor(d/60)+'m ago';
+  if(d<86400)return Math.floor(d/3600)+'h ago';
+  return Math.floor(d/86400)+'d ago';
+}
+
+// Mode buttons (home screen)
+let newWorldMode='survival';
+document.getElementById('btnSurv').onclick=()=>{
+  newWorldMode='survival';
+  document.getElementById('btnSurv').classList.add('active');
+  document.getElementById('btnCrea').classList.remove('active');
+};
+document.getElementById('btnCrea').onclick=()=>{
+  newWorldMode='creative';
+  document.getElementById('btnCrea').classList.add('active');
+  document.getElementById('btnSurv').classList.remove('active');
+};
+
+function startNewWorld(name, mode){
+  showLoading('Generating terrain...');
+  selectedWorldName=name;
+  // Generate a unique slot id
+  selectedWorldId='w_'+Date.now();
+  gameMode=mode;
+  setTimeout(()=>{
+    // Reset world state
+    overChunks.clear();netherChunks.clear();
+    for(const m of overMeshes.values())scene.remove(m);overMeshes.clear();
+    for(const m of netherMeshes.values())scene.remove(m);netherMeshes.clear();
+    genQ.length=0;genQSet.clear();dirtyQ.clear();
+    fluidSrc.clear();fluidDirty.clear();
+    chestData.clear();furnaceData.clear();
+    for(const m of mobs){scene.remove(m.mesh);}mobs.length=0;
+    for(const h of hostiles){scene.remove(h.mesh);}hostiles.length=0;
+    dimension='overworld';chunks=overChunks;chunkMeshes=overMeshes;
+    hp=20;hunger=20;fallFrom=null;dead=false;dayT=0.3;
+    for(let i=0;i<INV.length;i++)INV[i]=null;
+    for(const s of ['head','chest','legs','feet'])armorSlots[s]=null;
+    loadProgress(20,'Building chunks...');
+    // Generate spawn chunks
+    for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){
+      genChunk(Math.floor(SPAWN_WX/CS)+dx,Math.floor(SPAWN_WZ/CS)+dz);
+    }
+    loadProgress(60,'Building meshes...');
+    for(const[key] of chunks){const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);}
+    loadProgress(80,'Placing player...');
+    let sy=EYE+2;for(let y=WH-1;y>=0;y--){if(isSolid(getB(SPAWN_WX,y,SPAWN_WZ))){sy=y+1+EYE;break;}}
+    player.pos.set(SPAWN_WX+.5,sy,SPAWN_WZ+.5);
+    player.vel.set(0,0,0);player.yaw=Math.PI;player.pitch=0;player.onGround=false;player.fly=mode==='creative';
+    // Give starter items
+    give(1,32);give(2,20);give(3,20);give(7,20);give(4,16);give(8,20);give(6,16);give(9,10);give(12,8);give(38,8);
+    if(mode==='creative'){give(13,16);give(14,16);give(15,4);give(16,16);give(17,8);give(23,16);give(54,1);}
+    // Spawn animals near origin
+    // (animals spawned in startNewWorld)
+    rfHP();rfHunger();rfArmorBar();rfH();scheduleChunks(SPAWN_WX,SPAWN_WZ);
+    setDimensionEnv();
+    loadProgress(100,'Done!');
+    // Auto-save new world immediately
+    saveWorld(selectedWorldId, selectedWorldName);
+    setTimeout(()=>{
+      hideLoading();hideHome();
+      focused=true;paused=false;lastPX=null;lastPY=null;tryLock();
+      updateBadge();
+    },200);
+  },50);
+}
+
+function playSelectedWorld(){
+  if(!selectedWorldId)return;
+  showLoading('Loading world...');
+  setTimeout(()=>{
+    loadProgress(30,'Reading data...');
+    const ok=loadWorld(selectedWorldId);
+    if(!ok){hideLoading();alert('Failed to load world.');return;}
+    loadProgress(80,'Building meshes...');
+    for(const[key] of chunks){const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);}
+    for(const m of chunkMeshes.values())scene.add(m);
+    loadProgress(100,'Done!');
+    setTimeout(()=>{
+      hideLoading();hideHome();
+      focused=true;paused=false;lastPX=null;lastPY=null;tryLock();
+      updateBadge();
+    },200);
+  },50);
+}
+
+document.getElementById('wNewBtn').onclick=()=>{
+  const name=(document.getElementById('wNameIn').value||'My World').trim().slice(0,24);
+  startNewWorld(name,newWorldMode);
+};
+document.getElementById('wPlayBtn').onclick=playSelectedWorld;
+
+// Double-click world slot to play immediately
+document.getElementById('wList').addEventListener('dblclick',e=>{
+  const slot=e.target.closest('.wslot');
+  if(slot&&selectedWorldId)playSelectedWorld();
+});
+
+// Pause buttons
+document.getElementById('pauseResume').onclick=()=>{
+  hidePause();focused=true;paused=false;lastPX=null;lastPY=null;tryLock();
+};
+document.getElementById('pauseSave').onclick=()=>{
+  if(selectedWorldId){
+    saveWorld(selectedWorldId,selectedWorldName);
+    document.getElementById('pauseSave').textContent='✓ Saved!';
+    setTimeout(()=>document.getElementById('pauseSave').textContent='💾 Save World',1200);
+  }
+};
+document.getElementById('pauseQuit').onclick=()=>{
+  if(selectedWorldId)saveWorld(selectedWorldId,selectedWorldName);
+  hidePause();dead=false;focused=false;paused=true;hp=20;hunger=20;
+  document.getElementById('death').style.display='none';
+  showHome();
+};
+
+function updateBadge(){
+  const nb=document.getElementById('badge');
+  nb.textContent=(gameMode==='creative'?'CREATIVE':'SURVIVAL')+(player.fly?' [FLY]':'')+(dimension==='nether'?' | THE NETHER':'');
+}
+
 function die(){dead=true;focused=false;if(locked)document.exitPointerLock();document.getElementById('death').style.display='flex';}
 function respawn(){
-  dead=false;hp=20;hunger=20;fallFrom=null;rfHP();rfHunger();
-  let ry=spawnY;for(let y=WH-1;y>=0;y--)if(isSolid(getB(SPAWN_WX,y,SPAWN_WZ))){ry=y+1+EYE;break;}
+  dead=false;hp=20;hunger=20;fallFrom=null;rfHP();rfHunger();rfArmorBar();
+  let ry=EYE+2;for(let y=WH-1;y>=0;y--)if(isSolid(getB(SPAWN_WX,y,SPAWN_WZ))){ry=y+1+EYE;break;}
   player.pos.set(SPAWN_WX+.5,ry,SPAWN_WZ+.5);player.vel.set(0,0,0);player.onGround=false;
-  document.getElementById('death').style.display='none';focused=true;paused=false;hideOv();lastPX=null;lastPY=null;tryLock();
+  document.getElementById('death').style.display='none';focused=true;paused=false;hidePause();lastPX=null;lastPY=null;tryLock();
 }
 document.getElementById('rBtn').onclick=respawn;
+// Auto-save periodically
+let autoSaveT=0;
 
 // ═══════ DEBUG ═══════
 const dbgEl=document.getElementById('dbg'),cmpEl=document.getElementById('cmp');
@@ -930,29 +4038,96 @@ function updateDBG(){
   fc++;const now=performance.now();if(now-lastT>700){fps=Math.round(fc*1e3/(now-lastT));fc=0;lastT=now;}
   const p=player.pos,blk=INV[sel]?itemName(INV[sel].type):'empty';
   const pcx=Math.floor(p.x/CS),pcz=Math.floor(p.z/CS);
-  dbgEl.innerHTML=`FPS: ${fps}<br>XYZ: ${p.x.toFixed(1)} / ${p.y.toFixed(1)} / ${p.z.toFixed(1)}<br>Chunk: ${pcx},${pcz}<br>Hold: ${blk}<br>${gameMode.toUpperCase()}${player.fly?' [FLY]':''} ${locked?'🔒':''}<br>Time: ${(dayT*24).toFixed(1)}h`;
+  dbgEl.innerHTML=`FPS: ${fps}<br>XYZ: ${p.x.toFixed(1)} / ${p.y.toFixed(1)} / ${p.z.toFixed(1)}<br>Chunk: ${pcx},${pcz}<br>Hold: ${blk}<br>${gameMode.toUpperCase()}${player.fly?' [FLY]':''}${sprintActive?' [SPRINT]':''} ${locked?'🔒':''}<br>Time: ${(dayT*24).toFixed(1)}h ${dayT<0.25||dayT>0.75?'🌙 NIGHT':'☀️'}<br>Hostiles: ${hostiles.length} | Mobs: ${mobs.length}<br>Armor: ${Math.round(getArmorReduction()*100)}%`;
   cmpEl.textContent=DIRS[Math.round(((player.yaw/Math.PI+1)%2)*4)%8];
 }
 
 // ═══════ RESIZE + LOOP ═══════
 function resize(){renderer.setSize(window.innerWidth,window.innerHeight);camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();}
 window.addEventListener('resize',resize);resize();
+// Show home screen on first load
+showHome();
+
 let last=performance.now();
 function loop(){
   requestAnimationFrame(loop);
   const now=performance.now(),dt=Math.min((now-last)/1e3,.05);last=now;
   if(!paused&&!dead){
-    updatePlayer(dt);updateDN(dt);updateMobs(dt);
+    updatePlayer(dt);if(dimension==='overworld')updateDN(dt);updateMobs(dt);updateVillagers(dt);updateHostiles(dt);
+    tickFluids(dt);updateFallingBlocks(dt);tickFurnace(dt);
+
+    // ── Hostile mob spawning at night ──
+    if(dimension==='overworld'&&gameMode==='survival'){
+      hostileSpawnT+=dt;
+      const isNight=dayT<0.25||dayT>0.75;
+      if(hostileSpawnT>4){
+        hostileSpawnT=0;
+        if(isNight&&hostiles.length<10){
+          const ang=Math.random()*Math.PI*2,dist=12+Math.random()*10;
+          const sx=player.pos.x+Math.cos(ang)*dist,sz=player.pos.z+Math.sin(ang)*dist;
+          const types=['zombie','zombie','skeleton','creeper'];
+          spawnHostile(sx,sz,types[Math.floor(Math.random()*types.length)]);
+        }
+        // Burn hostiles in sunlight during day
+        if(!isNight&&dayT>0.3&&dayT<0.7){
+          for(let hi=hostiles.length-1;hi>=0;hi--){
+            const h=hostiles[hi];
+            const hx=Math.floor(h.pos.x),hy=Math.ceil(h.pos.y+h.def.totalH),hz=Math.floor(h.pos.z);
+            let exposed=true;
+            for(let ly=hy;ly<WH;ly++)if(isSolid(getB(hx,ly,hz))){exposed=false;break;}
+            if(exposed){
+              h.hp-=2;
+              for(const mat of h.mats)mat.color.setHex(0xff6600);
+              setTimeout(()=>{if(hostiles.includes(h))for(const mat of h.mats)mat.color.setHex(h.def.bodyCol);},200);
+              if(h.hp<=0){scene.remove(h.mesh);hostiles.splice(hi,1);}
+            }
+          }
+        }
+      }
+    }
+    // Update nether lava glow lights
+    if(dimension==='nether'){
+      const pulse=Math.sin(performance.now()*.001)*0.3+1.0;
+      const pulse2=Math.sin(performance.now()*.0017+1.2)*0.25+1.0;
+      lavaGlowL.intensity=2.2*pulse;
+      lavaGlowL2.intensity=1.4*pulse2;
+      // Main glow follows player, secondary offset below for lava reflection
+      lavaGlowL.position.set(player.pos.x,player.pos.y+2,player.pos.z);
+      lavaGlowL2.position.set(player.pos.x+3,player.pos.y-3,player.pos.z+3);
+    }
+    // Spawn any pending villagers (queued during chunk gen)
+    for(let i=pendingVillagers.length-1;i>=0;i--){
+      const pv=pendingVillagers[i];
+      let gy=pv.wy;
+      for(let y=WH-1;y>=0;y--){if(isSolid(getB(Math.floor(pv.wx),y,Math.floor(pv.wz)))){gy=y+1;break;}}
+      spawnVillager(pv.wx+.5,gy,pv.wz+.5,pv.prof);
+      pendingVillagers.splice(i,1);
+    }
     cloudGrp.children.forEach(c=>{c.position.x+=c.userData.v*dt;if(c.position.x>player.pos.x+200)c.position.x=player.pos.x-200;});
     const pcx=Math.floor(player.pos.x/CS),pcz=Math.floor(player.pos.z/CS);
     if(pcx!==lastCX||pcz!==lastCZ){lastCX=pcx;lastCZ=pcz;scheduleChunks(player.pos.x,player.pos.z);}
-    if(genQ.length>0){const{cx,cz,key}=genQ.shift();genQSet.delete(key);if(!chunks.has(key)){genChunk(cx,cz);dirtyQ.add(key);for(const[ndx,ndz]of[[1,0],[-1,0],[0,1],[0,-1]]){const nk=ck(cx+ndx,cz+ndz);if(chunks.has(nk))dirtyQ.add(nk);}}}
-    let built=0;for(const key of dirtyQ){if(built>=2)break;dirtyQ.delete(key);const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);built++;}
+    if(genQ.length>0){const{cx,cz,key}=genQ.shift();genQSet.delete(key);if(!chunks.has(key)){if(dimension==='nether')genNetherChunk(cx,cz);else genChunk(cx,cz);dirtyQ.add(key);for(const[ndx,ndz]of[[1,0],[-1,0],[0,1],[0,-1]]){const nk=ck(cx+ndx,cz+ndz);if(chunks.has(nk))dirtyQ.add(nk);}}}
+    // Build at most 1 mesh per frame to stay smooth
+    for(const key of dirtyQ){dirtyQ.delete(key);const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);break;}
     const hit=raycast();
     if(hit&&!invOpen){hlBox.position.set(hit.bx+.5,hit.by+.5,hit.bz+.5);hlBox.visible=true;}else hlBox.visible=false;
     tickBrk(dt,hit);
     healT+=dt;if(healT>5&&gameMode==='survival'&&hunger>15){healT=0;heal(1);}
-    scene.fog.density=player.inWater?.14:.018;if(player.inWater)scene.fog.color.set(0x1a3a88);
+    autoSaveT+=dt;if(autoSaveT>300&&selectedWorldId){autoSaveT=0;saveWorld(selectedWorldId,selectedWorldName);}
+    // Portal teleport: stand in portal block for 4 seconds
+    if(getB(Math.floor(player.pos.x),Math.floor(player.pos.y-.5),Math.floor(player.pos.z))===24||
+       getB(Math.floor(player.pos.x),Math.floor(player.pos.y+.5),Math.floor(player.pos.z))===24){
+      portalTimer+=dt;
+      document.getElementById('portalBar').style.display='block';
+      document.getElementById('portalBar').style.opacity=portalTimer/4;
+      if(portalTimer>4)teleportDimension();
+    } else {portalTimer=0;document.getElementById('portalBar').style.display='none';}
+    if(dimension==='nether'){
+      scene.fog.density=player.inWater?.22:.05;
+      if(player.inWater)scene.fog.color.set(0x8B1500); // dark red/orange lava fog
+    } else {
+      scene.fog.density=player.inWater?.14:.018;if(player.inWater)scene.fog.color.set(0x1a3a88);
+    }
   }
   updateDBG();renderer.render(scene,camera);
 }
