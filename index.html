@@ -1369,6 +1369,7 @@ scene.fog=new THREE.FogExp2(0x87ceeb,.018);
 const camera=new THREE.PerspectiveCamera(75,1,.05,200);
 scene.add(camera);
 const SKY_D=new THREE.Color(0x87ceeb),SKY_N=new THREE.Color(0x06091c),SKY_K=new THREE.Color(0xff6b35);
+scene.background=SKY_D;renderer.setClearColor(SKY_D);
 const ambL=new THREE.AmbientLight(0xffffff,.45);scene.add(ambL);
 const sunL=new THREE.DirectionalLight(0xfff5d0,1.1);sunL.castShadow=true;sunL.shadow.mapSize.set(1024,1024);
 Object.assign(sunL.shadow.camera,{left:-40,right:40,top:40,bottom:-40,near:1,far:100});scene.add(sunL);
@@ -4666,8 +4667,9 @@ let last=performance.now();
 function loop(){
   requestAnimationFrame(loop);
   const now=performance.now(),dt=Math.min((now-last)/1e3,.05);last=now;
+  if(dimension==='overworld'){updateDN(dt);updateWeather(dt);}
   if(!paused&&!dead){
-    updatePlayer(dt);if(dimension==='overworld'){updateDN(dt);updateWeather(dt);}updateMobs(dt);updateVillagers(dt);updateHostiles(dt);
+    updatePlayer(dt);updateMobs(dt);updateVillagers(dt);updateHostiles(dt);
     tickFluids(dt);updateFallingBlocks(dt);tickFurnace(dt);updateProjectiles(dt);updateParticles(dt);
     tickSteps(dt,!!(keys['KeyW']||keys['KeyS']||keys['KeyA']||keys['KeyD']),player.onGround);
     tickCaveAmbient(dt);
