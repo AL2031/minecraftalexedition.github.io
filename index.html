@@ -4618,6 +4618,24 @@ document.getElementById('btnCrea').onclick=()=>{
   document.getElementById('btnSurv').classList.remove('active');
 };
 
+
+// Find a safe Y to spawn at: feet clear of all solid blocks, not inside a tree/leaves
+function safeSpawnY(wx,wz){
+  // Scan downward from top, skip leaves/logs, find first solid ground
+  // then walk up until the 2 blocks above are both clear
+  for(let y=WH-2;y>=1;y--){
+    const b=getB(wx,y,wz);
+    const above1=getB(wx,y+1,wz);
+    const above2=getB(wx,y+2,wz);
+    // Must be solid ground (not leaves/logs/glass), with 2 clear blocks above
+    if(isSolid(b) && BLK[b] && !BLK[b].xray && !isLiquid(b)
+       && !isSolid(above1) && !isSolid(above2)){
+      // pos.y is eye height: feet = pos.y - EYE, so pos.y = y+1+EYE+0.05 (small epsilon above surface)
+      return y + 1 + EYE + 0.05;
+    }
+  }
+  return EYE + 72; // fallback
+}
 function startNewWorld(name, mode){
   showLoading('Generating terrain...');
   selectedWorldName=name;
@@ -4647,7 +4665,7 @@ function startNewWorld(name, mode){
     loadProgress(60,'Building meshes...');
     for(const[key] of chunks){const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);}
     loadProgress(80,'Placing player...');
-    let sy=EYE+2;for(let y=WH-1;y>=0;y--){if(isSolid(getB(SPAWN_WX,y,SPAWN_WZ))){sy=y+1+EYE;break;}}
+    const sy=safeSpawnY(SPAWN_WX,SPAWN_WZ);
     player.pos.set(SPAWN_WX+.5,sy,SPAWN_WZ+.5);
     player.vel.set(0,0,0);player.yaw=Math.PI;player.pitch=0;player.onGround=false;player.fly=mode==='creative';
     // Give starter items
@@ -4672,11 +4690,29 @@ function playSelectedWorld(){
   if(!selectedWorldId)return;
   showLoading('Loading world...');
   setTimeout(()=>{
-    loadProgress(30,'Reading data...');
+    loadProgress(20,'Reading data...');
     const ok=loadWorld(selectedWorldId);
     if(!ok){hideLoading();alert('Failed to load world — the save data may be corrupted.\n\nYou can delete it from the world list and start fresh.');return;}
-    loadProgress(80,'Building meshes...');
+    loadProgress(40,'Generating terrain...');
+    // Synchronously generate all missing chunks near the player before showing the game.
+    // With compressed saves only modified chunks are stored; the rest must be regenerated.
+    const pcx=Math.floor(player.pos.x/CS),pcz=Math.floor(player.pos.z/CS);
+    for(let dx=-RC;dx<=RC;dx++)for(let dz=-RC;dz<=RC;dz++){
+      const key=ck(pcx+dx,pcz+dz);
+      if(!chunks.has(key)){
+        if(dimension==='nether')genNetherChunk(pcx+dx,pcz+dz);
+        else genChunk(pcx+dx,pcz+dz);
+      }
+    }
+    loadProgress(75,'Building meshes...');
+    // Build meshes for all loaded/generated chunks
     for(const[key] of chunks){const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);}
+    loadProgress(95,'Placing player...');
+    // Snap camera to player position immediately so first frame isn't black
+    camera.position.copy(player.pos);
+    const qY=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),player.yaw);
+    const qP=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),player.pitch);
+    camera.quaternion.multiplyQuaternions(qY,qP);
     loadProgress(100,'Done!');
     setTimeout(()=>{
       hideLoading();hideHome();
@@ -4725,7 +4761,7 @@ function die(){dead=true;focused=false;if(locked)document.exitPointerLock();docu
 function respawn(){
   dead=false;hp=20;hunger=20;fallFrom=null;rfHP();rfHunger();rfArmorBar();
   if(bedSpawnPt){player.pos.set(bedSpawnPt.x,bedSpawnPt.y,bedSpawnPt.z);}
-  else{let ry=EYE+2;for(let y=WH-1;y>=0;y--)if(isSolid(getB(SPAWN_WX,y,SPAWN_WZ))){ry=y+1+EYE;break;}player.pos.set(SPAWN_WX+.5,ry,SPAWN_WZ+.5);}
+  else{player.pos.set(SPAWN_WX+.5,safeSpawnY(SPAWN_WX,SPAWN_WZ),SPAWN_WZ+.5);}
   player.vel.set(0,0,0);player.onGround=false;
   document.getElementById('death').style.display='none';focused=true;paused=false;hidePause();lastPX=null;lastPY=null;tryLock();
 }
