@@ -4357,8 +4357,9 @@ function serializeWorld(){
   const chests={};for(const[k,v] of chestData)chests[k]=v;
   // Furnace contents
   const furnaces={};for(const[k,v] of furnaceData)furnaces[k]=v;
+  const fluidSrcData={};for(const[k,v] of fluidSrc)fluidSrcData[k]=v;
   return{
-    over,nether,chests,furnaces,
+    over,nether,chests,furnaces,fluidSrcData,
     player:{x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw,pitch:player.pitch},xp,xpLevel,bedSpawnPt,weatherState,
     inv:JSON.parse(JSON.stringify(INV)),
     armorSlots:JSON.parse(JSON.stringify(armorSlots)),
@@ -4374,7 +4375,7 @@ function deserializeWorld(data){
   for(const m of netherMeshes.values())scene.remove(m);netherMeshes.clear();
   genQ.length=0;genQSet.clear();dirtyQ.clear();
   fluidSrc.clear();fluidDirty.clear();
-  chestData.clear();furnaceData.clear();
+  chestData.clear();furnaceData.clear();fluidSrc.clear();fluidDirty.clear();
   // Clear mobs/hostiles
   for(const m of mobs){scene.remove(m.mesh);}mobs.length=0;
   for(const h of hostiles){scene.remove(h.mesh);}hostiles.length=0;
@@ -4384,9 +4385,10 @@ function deserializeWorld(data){
   for(const[k,arr] of Object.entries(data.nether))netherChunks.set(k,new Uint8Array(arr));
   // Restore chests + furnaces
   for(const[k,v] of Object.entries(data.chests||{}))chestData.set(k,v);
+  for(const[k,v] of Object.entries(data.fluidSrcData||{}))fluidSrc.set(k,v);
   for(const[k,v] of Object.entries(data.furnaces||{}))furnaceData.set(k,v);
   // Restore game state
-  for(let i=0;i<INV.length;i++)INV[i]=data.inv[i]||null;
+  for(let i=0;i<SLOTS;i++)INV[i]=(data.inv&&i<data.inv.length)?data.inv[i]||null:null;
   for(const s of ['head','chest','legs','feet'])armorSlots[s]=data.armorSlots?.[s]||null;
   hp=data.hp??20;hunger=data.hunger??20;xp=data.xp??0;xpLevel=data.xpLevel??0;bedSpawnPt=data.bedSpawnPt||null;weatherState=data.weatherState||'clear';
   gameMode=data.gameMode||'survival';
@@ -4400,9 +4402,8 @@ function deserializeWorld(data){
   player.vel.set(0,0,0);player.onGround=false;
   rfHP();rfHunger();rfArmorBar();rfH();rfXP();
   setDimensionEnv();
-  // Rebuild all chunk meshes
-  for(const m of chunkMeshes.values())scene.add(m);
-  for(const[key] of chunks){const[a,b]=key.split(',').map(Number);dirtyQ.add(key);}
+  // Caller (playSelectedWorld) is responsible for building meshes.
+  // Just schedule nearby chunks so the loader knows what to generate if any are missing.
   scheduleChunks(player.pos.x,player.pos.z);
 }
 
@@ -4417,24 +4418,47 @@ function saveWorld(slotId,name){
     saveIndex(idx);
     return true;
   }catch(e){
-    // localStorage quota exceeded — try stripping nether if not visited
+    // localStorage quota exceeded — strip nether data and reset player to overworld
     try{
       data.nether={};
+      // If player was in nether, move them back to overworld to avoid void-fall on load
+      if(data.dimension==='nether'){
+        data.dimension='overworld';
+        data.player={x:SPAWN_WX+.5,y:70,z:SPAWN_WZ+.5,yaw:Math.PI,pitch:0};
+      }
       localStorage.setItem(SAVE_PREFIX+slotId,JSON.stringify(data));
+      // Always update index even in fallback path
+      let idx2=listWorlds();
+      const ex2=idx2.find(w=>w.id===slotId);
+      if(ex2){ex2.name=name;ex2.ts=data.ts;ex2.mode=data.gameMode;}
+      else idx2.push({id:slotId,name,ts:data.ts,mode:data.gameMode});
+      saveIndex(idx2);
       console.warn('Save: nether stripped due to storage quota');
       return true;
-    }catch(e2){alert('Save failed: not enough browser storage.');return false;}
+    }catch(e2){
+      // Even stripped save failed — don't corrupt existing save, just warn
+      console.error('Save failed even after stripping nether',e2);
+      showMsg('⚠ Save failed: storage full','#ff8844');
+      return false;
+    }
   }
 }
 
 function loadWorld(slotId){
   try{
     const raw=localStorage.getItem(SAVE_PREFIX+slotId);
-    if(!raw)return false;
-    const data=JSON.parse(raw);
+    if(!raw){console.error('No save data for slot',slotId);return false;}
+    let data;
+    try{data=JSON.parse(raw);}
+    catch(parseErr){console.error('Save data corrupted (JSON parse error)',parseErr);return false;}
+    if(!data||!data.over){console.error('Save data missing world chunks');return false;}
+    // Validate player position
+    if(!data.player||typeof data.player.x!=='number'||isNaN(data.player.x)){
+      data.player={x:SPAWN_WX+.5,y:70,z:SPAWN_WZ+.5,yaw:Math.PI,pitch:0};
+    }
     deserializeWorld(data);
     return true;
-  }catch(e){console.error('Load failed',e);return false;}
+  }catch(e){console.error('Load failed unexpectedly',e);return false;}
 }
 
 function deleteWorld(slotId){
@@ -4585,10 +4609,9 @@ function playSelectedWorld(){
   setTimeout(()=>{
     loadProgress(30,'Reading data...');
     const ok=loadWorld(selectedWorldId);
-    if(!ok){hideLoading();alert('Failed to load world.');return;}
+    if(!ok){hideLoading();alert('Failed to load world — the save data may be corrupted.\n\nYou can delete it from the world list and start fresh.');return;}
     loadProgress(80,'Building meshes...');
     for(const[key] of chunks){const[a,b]=key.split(',').map(Number);buildChunkMesh(a,b);}
-    for(const m of chunkMeshes.values())scene.add(m);
     loadProgress(100,'Done!');
     setTimeout(()=>{
       hideLoading();hideHome();
