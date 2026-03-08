@@ -1623,7 +1623,9 @@ function surfH(wx,wz){
   return getBiomeBlend(wx,wz).height;
 }
 
+let _suppressModTrack=false;
 function genChunk(cx,cz){
+  _suppressModTrack=true;
   const data=new Uint8Array(CS*WH*CS);
 
   // ── Terrain pass ──
@@ -1727,12 +1729,13 @@ function genChunk(cx,cz){
   // ── Village pass ──
   genVillages(data,cx,cz);
 
+  _suppressModTrack=false;
   chunks.set(ck(cx,cz),data);
   return data;
 }
 
 function getB(wx,wy,wz){if(wy<0||wy>=WH)return 0;const cx=Math.floor(wx/CS),cz=Math.floor(wz/CS);const ch=chunks.get(ck(cx,cz));return ch?ch[ci(wx-cx*CS,wy,wz-cz*CS)]:0;}
-function setB(wx,wy,wz,t){if(wy<0||wy>=WH)return;const cx=Math.floor(wx/CS),cz=Math.floor(wz/CS);let ch=chunks.get(ck(cx,cz));if(!ch){ch=dimension==='nether'?genNetherChunk(cx,cz):genChunk(cx,cz);}ch[ci(wx-cx*CS,wy,wz-cz*CS)]=t;markDirty(wx,wz);}
+function setB_core(wx,wy,wz,t){if(wy<0||wy>=WH)return;const cx=Math.floor(wx/CS),cz=Math.floor(wz/CS);let ch=chunks.get(ck(cx,cz));if(!ch){ch=dimension==='nether'?genNetherChunk(cx,cz):genChunk(cx,cz);}ch[ci(wx-cx*CS,wy,wz-cz*CS)]=t;markDirty(wx,wz);}
 
 
 // ═══════ FLUID SIMULATION ═══════
@@ -2446,6 +2449,7 @@ function genNetherRuins(data,cx,cz){
 }
 
 function genNetherChunk(cx,cz){
+  _suppressModTrack=true;
   const data=new Uint8Array(CS*WH*CS);
 
   // ── Pass 1: Base terrain ──
@@ -2626,6 +2630,7 @@ function genNetherChunk(cx,cz){
     placeNetherFortress(data,cx,cz,fox,foz,fortFloor);
   }
 
+  _suppressModTrack=false;
   chunks.set(ck(cx,cz),data);
   return data;
 }
@@ -4348,19 +4353,70 @@ function listWorlds(){
 }
 function saveIndex(idx){localStorage.setItem(SAVE_INDEX,JSON.stringify(idx));}
 
+
+// ═══════ CHUNK COMPRESSION (RLE) ═══════
+// Encode a Uint8Array as a flat array of [run, value, run, value, ...]
+// This shrinks a typical chunk from ~80KB JSON to ~2KB.
+function rleEncode(u8){
+  const out=[];let i=0,n=u8.length;
+  while(i<n){
+    const v=u8[i];let run=1;
+    while(i+run<n&&u8[i+run]===v&&run<255)run++;
+    out.push(run,v);i+=run;
+  }
+  return out;
+}
+function rleDecode(arr,len){
+  const out=new Uint8Array(len);let pos=0;
+  for(let i=0;i<arr.length;i+=2){
+    const run=arr[i],val=arr[i+1];
+    for(let j=0;j<run;j++)out[pos++]=val;
+  }
+  return out;
+}
+const CHUNK_LEN=CS*WH*CS; // 32768
+
+// ═══════ MODIFIED CHUNK TRACKING ═══════
+// Only chunks the player has actually changed get saved.
+// Unmodified chunks are regenerated from the noise seed on load.
+const modifiedChunks=new Set();
+const modifiedNetherChunks=new Set();
+function setB(wx,wy,wz,t){
+  setB_core(wx,wy,wz,t);
+  if(!_suppressModTrack){
+    const cx=Math.floor(wx/CS),cz=Math.floor(wz/CS);
+    if(dimension==='nether')modifiedNetherChunks.add(ck(cx,cz));
+    else modifiedChunks.add(ck(cx,cz));
+  }
+}
+
+
+
 function serializeWorld(){
-  // Serialize only modified chunks (all overworld + nether chunks)
+  // Only save chunks the player has modified; the rest regenerate from seed.
   const over={},nether={};
-  for(const[k,v] of overChunks)over[k]=Array.from(v);
-  for(const[k,v] of netherChunks)nether[k]=Array.from(v);
-  // Chest contents
+  for(const k of modifiedChunks){
+    const v=overChunks.get(k);if(v)over[k]=rleEncode(v);
+  }
+  for(const k of modifiedNetherChunks){
+    const v=netherChunks.get(k);if(v)nether[k]=rleEncode(v);
+  }
+  // Also save any chunk that contains a chest, furnace, or fluid source
+  // (in case the player never directly broke/placed but the chunk has state)
+  const extraKeys=new Set([...chestData.keys(),...furnaceData.keys(),...fluidSrc.keys()].map(k=>{
+    const[wx,,wz]=k.split(',').map(Number);return ck(Math.floor(wx/CS),Math.floor(wz/CS));
+  }));
+  for(const k of extraKeys){
+    if(!over[k]){const v=overChunks.get(k);if(v)over[k]=rleEncode(v);}
+  }
   const chests={};for(const[k,v] of chestData)chests[k]=v;
-  // Furnace contents
   const furnaces={};for(const[k,v] of furnaceData)furnaces[k]=v;
   const fluidSrcData={};for(const[k,v] of fluidSrc)fluidSrcData[k]=v;
   return{
+    v:2, // save format version
     over,nether,chests,furnaces,fluidSrcData,
-    player:{x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw,pitch:player.pitch},xp,xpLevel,bedSpawnPt,weatherState,
+    player:{x:player.pos.x,y:player.pos.y,z:player.pos.z,yaw:player.yaw,pitch:player.pitch},
+    xp,xpLevel,bedSpawnPt,weatherState,
     inv:JSON.parse(JSON.stringify(INV)),
     armorSlots:JSON.parse(JSON.stringify(armorSlots)),
     hp,hunger,gameMode,dimension,dayT,
@@ -4375,22 +4431,31 @@ function deserializeWorld(data){
   for(const m of netherMeshes.values())scene.remove(m);netherMeshes.clear();
   genQ.length=0;genQSet.clear();dirtyQ.clear();
   fluidSrc.clear();fluidDirty.clear();
-  chestData.clear();furnaceData.clear();fluidSrc.clear();fluidDirty.clear();
+  chestData.clear();furnaceData.clear();
+  modifiedChunks.clear();modifiedNetherChunks.clear();
   // Clear mobs/hostiles
   for(const m of mobs){scene.remove(m.mesh);}mobs.length=0;
   for(const h of hostiles){scene.remove(h.mesh);}hostiles.length=0;
 
-  // Restore chunks
-  for(const[k,arr] of Object.entries(data.over))overChunks.set(k,new Uint8Array(arr));
-  for(const[k,arr] of Object.entries(data.nether))netherChunks.set(k,new Uint8Array(arr));
-  // Restore chests + furnaces
+  // Restore modified chunks — decode RLE if v2 format, plain array if legacy
+  const isV2=(data.v===2);
+  for(const[k,arr] of Object.entries(data.over)){
+    overChunks.set(k, isV2?rleDecode(arr,CHUNK_LEN):new Uint8Array(arr));
+    modifiedChunks.add(k);
+  }
+  for(const[k,arr] of Object.entries(data.nether||{})){
+    netherChunks.set(k, isV2?rleDecode(arr,CHUNK_LEN):new Uint8Array(arr));
+    modifiedNetherChunks.add(k);
+  }
+  // Restore chests + furnaces + fluids
   for(const[k,v] of Object.entries(data.chests||{}))chestData.set(k,v);
   for(const[k,v] of Object.entries(data.fluidSrcData||{}))fluidSrc.set(k,v);
   for(const[k,v] of Object.entries(data.furnaces||{}))furnaceData.set(k,v);
   // Restore game state
   for(let i=0;i<SLOTS;i++)INV[i]=(data.inv&&i<data.inv.length)?data.inv[i]||null:null;
   for(const s of ['head','chest','legs','feet'])armorSlots[s]=data.armorSlots?.[s]||null;
-  hp=data.hp??20;hunger=data.hunger??20;xp=data.xp??0;xpLevel=data.xpLevel??0;bedSpawnPt=data.bedSpawnPt||null;weatherState=data.weatherState||'clear';
+  hp=data.hp??20;hunger=data.hunger??20;xp=data.xp??0;xpLevel=data.xpLevel??0;
+  bedSpawnPt=data.bedSpawnPt||null;weatherState=data.weatherState||'clear';
   gameMode=data.gameMode||'survival';
   dimension=data.dimension||'overworld';
   chunks=dimension==='nether'?netherChunks:overChunks;
@@ -4402,15 +4467,17 @@ function deserializeWorld(data){
   player.vel.set(0,0,0);player.onGround=false;
   rfHP();rfHunger();rfArmorBar();rfH();rfXP();
   setDimensionEnv();
-  // Caller (playSelectedWorld) is responsible for building meshes.
-  // Just schedule nearby chunks so the loader knows what to generate if any are missing.
+  // Unmodified chunks near player will be freshly generated when scheduleChunks runs
   scheduleChunks(player.pos.x,player.pos.z);
 }
 
 function saveWorld(slotId,name){
   const data=serializeWorld();
+  const json=JSON.stringify(data);
+  // Estimate size for debug
+  console.log(`Save size: ${(json.length/1024).toFixed(1)} KB (${Object.keys(data.over).length} over chunks, ${Object.keys(data.nether).length} nether chunks)`);
   try{
-    localStorage.setItem(SAVE_PREFIX+slotId,JSON.stringify(data));
+    localStorage.setItem(SAVE_PREFIX+slotId,json);
     let idx=listWorlds();
     const existing=idx.find(w=>w.id===slotId);
     if(existing){existing.name=name;existing.ts=data.ts;existing.mode=data.gameMode;}
@@ -4418,27 +4485,24 @@ function saveWorld(slotId,name){
     saveIndex(idx);
     return true;
   }catch(e){
-    // localStorage quota exceeded — strip nether data and reset player to overworld
+    // Quota hit despite compression — last resort: drop nether + reset player
     try{
       data.nether={};
-      // If player was in nether, move them back to overworld to avoid void-fall on load
       if(data.dimension==='nether'){
         data.dimension='overworld';
         data.player={x:SPAWN_WX+.5,y:70,z:SPAWN_WZ+.5,yaw:Math.PI,pitch:0};
       }
       localStorage.setItem(SAVE_PREFIX+slotId,JSON.stringify(data));
-      // Always update index even in fallback path
       let idx2=listWorlds();
       const ex2=idx2.find(w=>w.id===slotId);
       if(ex2){ex2.name=name;ex2.ts=data.ts;ex2.mode=data.gameMode;}
       else idx2.push({id:slotId,name,ts:data.ts,mode:data.gameMode});
       saveIndex(idx2);
-      console.warn('Save: nether stripped due to storage quota');
+      showMsg('⚠ Nether data dropped (storage full)','#ff8844');
       return true;
     }catch(e2){
-      // Even stripped save failed — don't corrupt existing save, just warn
-      console.error('Save failed even after stripping nether',e2);
-      showMsg('⚠ Save failed: storage full','#ff8844');
+      console.error('Save failed',e2);
+      showMsg('⚠ Save failed: clear browser storage','#ff4444');
       return false;
     }
   }
@@ -4571,6 +4635,7 @@ function startNewWorld(name, mode){
     for(const m of mobs){scene.remove(m.mesh);}mobs.length=0;
     for(const h of hostiles){scene.remove(h.mesh);}hostiles.length=0;
     dimension='overworld';chunks=overChunks;chunkMeshes=overMeshes;
+    modifiedChunks.clear();modifiedNetherChunks.clear();
     hp=20;hunger=20;fallFrom=null;dead=false;dayT=0.3;xp=0;xpLevel=0;bedSpawnPt=null;weatherState='clear';bowCharging=false;
     for(let i=0;i<INV.length;i++)INV[i]=null;
     for(const s of ['head','chest','legs','feet'])armorSlots[s]=null;
